@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-trae-theme="light" class=""><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Web → Java AI Agent 跳槽路线图</title>
+<style>
+:root {
+  --bg: #f7f8fb;
+  --bg2: #ffffff;
+  --ink: #1a2332;
+  --muted: #5d6b82;
+  --rule: #e4e9f2;
+  --accent: #2563eb;
+  --accent2: #7c3aed;
+  --warn: #d97706;
+  --ok: #059669;
+  --soft: #eef2ff;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "WenQuanYi Micro Hei", sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, .mono {
+  font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, "Source Code Pro", monospace;
+}
+
+/* Layout */
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 45%, #7c3aed 100%);
+  color: #fff;
+  padding: 64px 24px 56px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: ""; position: absolute; right: -80px; top: -80px;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
+}
+.hero-inner { max-width: 920px; margin: 0 auto; position: relative; z-index: 1; }
+.hero .eyebrow {
+  font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase;
+  opacity: 0.85; font-weight: 600; margin-bottom: 14px;
+}
+.hero h1 { font-size: 2.1rem; line-height: 1.3; margin: 0 0 14px; font-weight: 700; }
+.hero .lede { font-size: 1.08rem; opacity: 0.92; max-width: 640px; margin: 0 0 26px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28);
+  padding: 7px 14px; border-radius: 999px; font-size: 0.86rem; font-weight: 500;
+  backdrop-filter: blur(6px);
+}
+
+/* TOC */
+.toc {
+  background: var(--bg2); border: 1px solid var(--rule); border-radius: 12px;
+  padding: 18px 22px; margin: 28px 0; position: sticky; top: 12px; z-index: 10;
+  box-shadow: 0 2px 12px rgba(26,35,50,0.04);
+}
+.toc h4 { margin: 0 0 10px; font-size: 0.8rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.toc ol { margin: 0; padding-left: 18px; columns: 2; column-gap: 28px; }
+.toc li { margin-bottom: 4px; font-size: 0.9rem; }
+.toc a { color: var(--ink); text-decoration: none; }
+.toc a:hover { color: var(--accent); }
+
+/* Sections */
+section { padding: 14px 0 8px; }
+h2 {
+  font-size: 1.5rem; font-weight: 700; margin: 40px 0 18px;
+  padding-left: 14px; border-left: 4px solid var(--accent); line-height: 1.4;
+}
+h3 { font-size: 1.15rem; font-weight: 700; margin: 28px 0 12px; color: var(--ink); }
+h4 { font-size: 1rem; font-weight: 700; margin: 20px 0 8px; color: var(--accent2); }
+p { margin: 0 0 14px; }
+.lead { font-size: 1.05rem; color: var(--ink); }
+strong { font-weight: 700; }
+a { color: var(--accent); }
+
+/* Callout */
+.callout {
+  background: var(--bg2); border: 1px solid var(--rule); border-left: 4px solid var(--accent2);
+  border-radius: 8px; padding: 18px 22px; margin: 20px 0;
+}
+.callout.warn { border-left-color: var(--warn); background: #fff8f1; }
+.callout.ok { border-left-color: var(--ok); background: #f0fdf4; }
+.callout .label {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent2); margin-bottom: 6px; display: block;
+}
+.callout.warn .label { color: var(--warn); }
+.callout.ok .label { color: var(--ok); }
+.callout p:last-child { margin-bottom: 0; }
+
+/* Metric row */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 22px 0; }
+.metric {
+  background: var(--bg2); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 16px; text-align: center;
+}
+.metric .num { font-size: 1.7rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.metric .lbl { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; overflow-y: auto; max-height: 640px; margin: 18px 0; border: 1px solid var(--rule); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; min-width: 640px; }
+thead th {
+  background: var(--soft); color: var(--ink); font-weight: 700; text-align: left;
+  padding: 12px 14px; border-bottom: 2px solid var(--rule); position: sticky; top: 0;
+}
+tbody td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #f9fafe; }
+td .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.76rem; font-weight: 600; }
+.tag.hi { background: #fee2e2; color: #b91c1c; }
+.tag.mid { background: #fef3c7; color: #b45309; }
+.tag.lo { background: #dcfce7; color: #166534; }
+.tag.acc { background: var(--soft); color: var(--accent); }
+
+/* Phase cards */
+.phase {
+  background: var(--bg2); border: 1px solid var(--rule); border-radius: 12px;
+  padding: 24px 26px; margin: 18px 0; box-shadow: 0 2px 10px rgba(26,35,50,0.03);
+}
+.phase-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.phase-head .ph-badge {
+  background: var(--accent); color: #fff; font-size: 0.8rem; font-weight: 700;
+  padding: 4px 12px; border-radius: 999px; letter-spacing: 0.04em;
+}
+.phase-head h3 { margin: 0; font-size: 1.2rem; }
+.phase-head .ph-time { color: var(--muted); font-size: 0.88rem; }
+.phase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
+.phase-grid h4 { margin: 0 0 6px; }
+.phase-grid ul { margin: 0; padding-left: 18px; }
+.phase-grid li { margin-bottom: 5px; font-size: 0.92rem; }
+.verify {
+  margin-top: 14px; background: var(--soft); border-radius: 8px; padding: 12px 16px;
+  font-size: 0.9rem;
+}
+.verify b { color: var(--accent); }
+
+/* Project / interview cards */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+.card {
+  background: var(--bg2); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px;
+}
+.card h4 { margin: 0 0 8px; }
+.card .meta { font-size: 0.82rem; color: var(--muted); margin-bottom: 10px; }
+.card ul { margin: 0; padding-left: 18px; font-size: 0.9rem; }
+.card li { margin-bottom: 5px; }
+
+/* Mermaid */
+.diagram { margin: 22px 0; text-align: center; }
+.diagram figcaption { font-size: 0.86rem; color: var(--muted); margin-top: 8px; }
+
+/* Chart figure */
+.chart-figure { margin: 24px 0; }
+.chart-figure figcaption { font-size: 0.95rem; font-weight: 600; color: var(--ink); margin-bottom: 10px; text-align: center; }
+
+/* Citation */
+sup a { color: var(--accent); text-decoration: none; font-size: 0.72em; font-weight: 600; }
+sup a:hover { text-decoration: underline; }
+
+/* Sources */
+footer { background: var(--bg2); border-top: 1px solid var(--rule); margin-top: 50px; padding: 36px 24px 48px; }
+footer .sources { max-width: 920px; margin: 0 auto; }
+footer .sources h2 { border-left: none; padding-left: 0; font-size: 1.2rem; }
+footer .sources ol { padding-left: 1.2rem; font-size: 0.85rem; color: var(--muted); }
+footer .sources li { margin-bottom: 0.5rem; overflow-wrap: break-word; word-break: break-all; }
+footer .sources .src-title { color: var(--ink); word-break: normal; }
+footer .sources .src-url { display: block; margin-top: 0.15rem; font-size: 0.82rem; color: var(--accent); word-break: break-all; }
+
+/* Footer note */
+.foot-note { max-width: 920px; margin: 30px auto 0; font-size: 0.84rem; color: var(--muted); line-height: 1.7; }
+
+/* Responsive */
+@media (max-width: 720px) {
+  .hero h1 { font-size: 1.6rem; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .phase-grid, .card-grid { grid-template-columns: 1fr; }
+  .toc ol { columns: 1; }
+  .toc { position: static; }
+}
+</style>
+<script>document.documentElement.setAttribute('data-trae-theme', "light");window.__TRAE_DISABLE_LEGACY_ADD_TO_CHAT__=true;</script><style data-trae-edit-ui="true" id="trae-previewer-tools-styles">:root {
+  --trae-layer-browser-inspect-overlay: 90000;
+  --trae-layer-browser-inspect-highlight: 90010;
+  --trae-layer-browser-inspect-action: 90020;
+  --trae-layer-text-selection-action: 90030;
+  --trae-layer-edit-tooltip: 100095;
+}
+:root,
+[data-trae-theme='dark'] {
+  --trae-bg-base-default: #171717;
+  --trae-bg-menu: #222427;
+  --trae-bg-overlay-l1: rgba(255, 255, 255, 0.04);
+  --trae-bg-overlay-l2: rgba(255, 255, 255, 0.08);
+  --trae-bg-overlay-l3: rgba(255, 255, 255, 0.12);
+  --trae-bg-overlay-l4: rgba(255, 255, 255, 0.16);
+  --trae-bg-invert: #f5f9fe;
+  --trae-bg-invert-hover: #e8ecf0;
+  --trae-bg-invert-active: #dce0e4;
+  --trae-bg-invert-disabled: rgba(224, 226, 242, 0.12);
+  --trae-border-l1: #e0e2f217;
+  --trae-border-l2: rgba(255, 255, 255, 0.12);
+  --trae-border-l3: rgba(255, 255, 255, 0.08);
+  --trae-border-neutral-l3: rgba(229, 229, 229, 0.20);
+  --trae-border-brand: #6a6fff;
+  --trae-text-default: #f5f9fe;
+  --trae-text-default-hover: #f5f9fe;
+  --trae-text-default-active: #f5f9fe;
+  --trae-text-secondary: rgba(245, 249, 254, 0.5);
+  --trae-text-tertiary: rgba(245, 249, 254, 0.4);
+  --trae-text-disabled: #666b75;
+  --trae-text-onaccent: #222427;
+  --trae-icon-default: #f5f9fe;
+  --trae-icon-secondary: rgba(245, 249, 254, 0.5);
+  --trae-icon-brand: #6a6fff;
+  --trae-icon-onaccent: #222427;
+  --trae-status-success: #22c55e;
+  --trae-status-primary: #3b82f6;
+  --trae-status-primary-default: #387bff;
+  --trae-status-primary-surface-l1: rgba(53, 121, 255, 0.18);
+  --trae-status-success-default: #33c192;
+  --trae-status-success-surface-l1: rgba(0, 165, 110, 0.18);
+  --trae-status-error-default: #f65a5a;
+  --trae-status-error-surface-l1: rgba(246, 70, 70, 0.18);
+  --trae-annotation-marker-bg: #4b3fe3;
+  --trae-annotation-marker-text: #ffffff;
+  --trae-annotation-region-border: var(--trae-status-primary-default);
+  --trae-region-outside-mask-bg: rgba(0, 0, 0, 0.32);
+  --trae-annotation-rect-border: var(--trae-status-error-default);
+  --trae-annotation-arrow-anchor-bg: var(--trae-status-primary-default);
+  --trae-panel-shadow: 0px 6px 24px -1px rgba(0, 0, 0, 0.16);
+  --trae-floating-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.2);
+  --trae-shadow-elevation-50: 0 1px 2px -1px rgba(0, 0, 0, 0.45);
+  --trae-tab-active-shadow: 0px 1px 2px -1px rgba(0, 0, 0, 0.16);
+}
+
+[data-trae-theme='light'] {
+  --trae-bg-base-default: #fafafa;
+  --trae-bg-menu: #ffffff;
+  --trae-bg-overlay-l1: rgba(0, 0, 0, 0.04);
+  --trae-bg-overlay-l2: rgba(0, 0, 0, 0.06);
+  --trae-bg-overlay-l3: rgba(0, 0, 0, 0.08);
+  --trae-bg-overlay-l4: rgba(0, 0, 0, 0.12);
+  --trae-bg-invert: #1f2328;
+  --trae-bg-invert-hover: #32383f;
+  --trae-bg-invert-active: #444d56;
+  --trae-bg-invert-disabled: rgba(115, 115, 115, 0.20);
+  --trae-border-l1: rgba(0, 0, 0, 0.1);
+  --trae-border-l2: rgba(0, 0, 0, 0.12);
+  --trae-border-l3: rgba(0, 0, 0, 0.08);
+  --trae-border-neutral-l3: rgba(115, 115, 115, 0.36);
+  --trae-border-brand: #4b3fe3;
+  --trae-text-default: #1f2328;
+  --trae-text-default-hover: #111214;
+  --trae-text-default-active: #111214;
+  --trae-text-secondary: rgba(31, 35, 40, 0.5);
+  --trae-text-tertiary: rgba(31, 35, 40, 0.4);
+  --trae-text-disabled: #a1a1a1;
+  --trae-text-onaccent: #ffffff;
+  --trae-icon-default: #1f2328;
+  --trae-icon-secondary: rgba(31, 35, 40, 0.5);
+  --trae-icon-brand: #4b3fe3;
+  --trae-icon-onaccent: #ffffff;
+  --trae-status-success: #22c55e;
+  --trae-status-primary: #3b82f6;
+  --trae-status-primary-default: #2f74ff;
+  --trae-status-primary-surface-l1: rgba(47, 116, 255, 0.12);
+  --trae-status-success-default: #15a877;
+  --trae-status-success-surface-l1: rgba(64, 176, 139, 0.12);
+  --trae-status-error-default: #e8463a;
+  --trae-status-error-surface-l1: rgba(232, 70, 58, 0.12);
+  --trae-annotation-marker-bg: #4b3fe3;
+  --trae-annotation-marker-text: #ffffff;
+  --trae-annotation-region-border: var(--trae-status-primary-default);
+  --trae-region-outside-mask-bg: rgba(0, 0, 0, 0.18);
+  --trae-annotation-rect-border: var(--trae-status-error-default);
+  --trae-annotation-arrow-anchor-bg: var(--trae-status-primary-default);
+  --trae-panel-shadow: 0px 6px 24px -1px rgba(24, 24, 24, 0.06);
+  --trae-floating-shadow: 0px 2px 8px 0px rgba(24, 24, 24, 0.2);
+  --trae-shadow-elevation-50: 0 1px 2px -1px rgba(24, 24, 24, 0.08);
+  --trae-tab-active-shadow: 0px 1px 2px -1px rgba(24, 24, 24, 0.08);
+}
+
+@keyframes trae-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.trae-edit-mode-active body *:not([data-trae-edit-ui]):not([data-trae-edit-ui] *) {
+  transition: none !important;
+  animation-play-state: paused !important;
+}
+
+.trae-browser-inspect-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: var(--trae-layer-browser-inspect-overlay);
+  pointer-events: auto;
+  background: transparent;
+}
+
+.trae-browser-inspect-highlight-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--trae-layer-browser-inspect-highlight);
+  display: none;
+}
+
+.trae-browser-inspect-highlight-tag {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  height: 18px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  background-color: var(--trae-status-success-default);
+  color: var(--trae-text-onaccent);
+  font-size: 12px;
+  font-weight: 400;
+  display: none;
+  align-items: center;
+  z-index: var(--trae-layer-browser-inspect-action);
+}
+
+.trae-browser-inspect-highlight-box-show {
+  display: flex;
+}
+
+.trae-browser-inspect-highlight-tag.trae-browser-inspect-highlight-box-show {
+  display: none;
+}
+
+.trae-browser-inspect-select-button.trae-browser-inspect-highlight-box-show {
+  display: block !important;
+}
+
+.trae-browser-inspect-select-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  z-index: var(--trae-layer-browser-inspect-action);
+}
+
+.trae-browser-inspect-select-highlight-box {
+  background: transparent !important;
+}
+
+.trae-browser-inspect-select-highlight-box .trae-browser-inspect-highlight-tag {
+  background-color: var(--trae-status-success-default);
+}
+
+.trae-add-to-chat-card {
+  display: block;
+  overflow: hidden;
+  background: var(--trae-bg-menu);
+  border: 1px solid var(--trae-border-l1);
+  border-radius: 8px;
+  box-shadow: var(--trae-floating-shadow);
+  transition:
+    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trae-add-to-chat-content {
+  position: relative;
+  width: max-content;
+}
+
+.trae-fade-exit {
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+}
+
+.trae-fade-enter {
+  opacity: 1;
+  transition: opacity 0.2s ease-in;
+}
+
+.trae-buttons-view {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px;
+  background: transparent;
+}
+
+.trae-action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+.trae-action-button:hover {
+  background: var(--trae-bg-overlay-l2);
+}
+
+.trae-action-button:active {
+  background: var(--trae-bg-overlay-l3);
+}
+
+.trae-action-button:focus-visible {
+  outline: 2px solid var(--trae-status-primary);
+  outline-offset: 1px;
+}
+
+.trae-action-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--trae-icon-default);
+  flex-shrink: 0;
+}
+
+.trae-action-button-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--trae-text-default);
+  white-space: nowrap;
+}
+
+.trae-edit-toolbar-button-active {
+  background: var(--trae-status-primary-surface-l1) !important;
+  color: var(--trae-status-primary-default) !important;
+}
+
+.trae-edit-toolbar button[data-action='alignment-dropdown']:hover,
+.trae-edit-toolbar button[data-action='text-align-dropdown']:hover,
+.trae-edit-toolbar button[data-action='font-decrease']:hover,
+.trae-edit-toolbar button[data-action='font-increase']:hover,
+.trae-edit-toolbar button[data-action^='align-']:hover {
+  border-radius: 8px;
+  background: var(--bg-bg-overlay-l1, rgba(115, 115, 115, 0.08)) !important;
+}
+
+.trae-edit-toolbar button[data-action='alignment-dropdown']:active,
+.trae-edit-toolbar button[data-action='text-align-dropdown']:active,
+.trae-edit-toolbar button[data-action='font-decrease']:active,
+.trae-edit-toolbar button[data-action='font-increase']:active,
+.trae-edit-toolbar button[data-action^='align-']:active {
+  border-radius: 8px;
+  background: var(--bg-bg-overlay-l2, rgba(115, 115, 115, 0.12)) !important;
+}
+
+.trae-comment-input {
+  background: transparent;
+  color: var(--trae-text-default);
+  caret-color: var(--trae-text-default);
+}
+
+.trae-comment-input::placeholder {
+  color: var(--trae-text-tertiary);
+}
+
+.trae-edit-panel [data-trae-tooltip] {
+  position: relative;
+}
+
+.trae-edit-panel [data-trae-tooltip]::after {
+  content: attr(data-trae-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: var(--trae-layer-edit-tooltip);
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--bg-bg-invert, var(--trae-bg-invert));
+  color: var(--text-text-onaccent, var(--trae-text-onaccent));
+  box-shadow: var(--trae-floating-shadow);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.039px;
+  white-space: nowrap;
+  pointer-events: none;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateX(-50%);
+  visibility: hidden;
+}
+
+.trae-edit-panel [data-trae-tooltip]::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 5px);
+  z-index: var(--trae-layer-edit-tooltip);
+  width: 8px;
+  height: 4px;
+  background: var(--bg-bg-invert, var(--trae-bg-invert));
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.trae-edit-panel [data-trae-tooltip]:hover::after,
+.trae-edit-panel [data-trae-tooltip]:focus-visible::after,
+.trae-edit-panel [data-trae-tooltip]:hover::before,
+.trae-edit-panel [data-trae-tooltip]:focus-visible::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+.trae-comment-btn {
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.trae-comment-btn:disabled {
+  cursor: not-allowed;
+}
+
+.trae-comment-btn:focus-visible {
+  outline: 2px solid var(--trae-status-primary);
+  outline-offset: 1px;
+}
+
+.trae-comment-btn-primary {
+  background: var(--trae-bg-invert);
+  color: var(--trae-text-onaccent);
+}
+
+.trae-comment-btn-primary:hover:not(:disabled) {
+  background: var(--trae-bg-invert-hover);
+}
+
+.trae-comment-btn-primary:active:not(:disabled) {
+  background: var(--trae-bg-invert-active);
+}
+
+.trae-comment-btn-primary:disabled {
+  background: var(--trae-bg-invert-disabled);
+  color: var(--trae-text-disabled);
+}
+
+.trae-comment-btn-secondary {
+  background: var(--trae-bg-overlay-l2);
+  color: var(--trae-text-default);
+}
+
+.trae-comment-btn-secondary:hover:not(:disabled) {
+  background: var(--trae-bg-overlay-l3);
+}
+
+.trae-comment-btn-secondary:active:not(:disabled) {
+  background: var(--trae-bg-overlay-l4);
+}
+
+.trae-comment-btn-secondary:disabled {
+  background: var(--trae-bg-overlay-l2);
+  color: var(--trae-text-disabled);
+}
+
+.trae-comment-btn-text {
+  background: transparent;
+  color: var(--trae-text-default);
+}
+
+.trae-comment-btn-text:hover:not(:disabled) {
+  border-radius: 8px;
+  background: var(--bg-bg-overlay-l1, var(--trae-bg-overlay-l1));
+  color: var(--trae-text-default-hover);
+}
+
+.trae-comment-btn-text:active:not(:disabled) {
+  border-radius: 8px;
+  background: var(--trae-bg-overlay-l2);
+  color: var(--trae-text-default-active);
+}
+
+.trae-comment-btn-text:disabled {
+  background: transparent;
+  color: var(--trae-text-disabled);
+}
+
+.trae-marking-btn {
+  justify-content: center;
+}
+
+.trae-marking-btn:hover:not(:disabled) {
+  background: var(--trae-bg-overlay-l1) !important;
+}
+
+.trae-marking-btn:active:not(:disabled) {
+  background: var(--trae-bg-overlay-l2) !important;
+}
+
+.trae-marking-btn-active {
+  background: var(--trae-status-primary-surface-l1) !important;
+  color: var(--trae-status-primary-default) !important;
+}
+
+.trae-marking-btn:disabled {
+  color: var(--trae-text-disabled) !important;
+  cursor: not-allowed !important;
+}
+
+.trae-action-button-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--trae-icon-secondary);
+  flex-shrink: 0;
+}
+
+.trae-shortcut-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.trae-shortcut-key {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 12px;
+  color: var(--trae-icon-secondary);
+}
+
+.trae-add-to-chat-divider {
+  width: 2px;
+  height: 12px;
+  padding: 0 6px;
+  box-sizing: content-box;
+  background-clip: content-box;
+  background-color: var(--trae-border-l2);
+  flex-shrink: 0;
+}
+
+.trae-editor-view {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  padding: 8px;
+  background: transparent;
+}
+
+.trae-editor-text-container {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: var(--trae-bg-overlay-l1);
+  border: 1px solid var(--trae-border-l3);
+  border-radius: 4px;
+  gap: 8px;
+}
+
+.trae-editor-textarea {
+  flex: 1;
+  padding: 0 2px;
+  border: none;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--trae-text-default);
+  resize: none;
+  outline: none;
+  overflow-y: auto;
+  max-height: 140px;
+}
+
+.trae-editor-textarea::placeholder {
+  color: var(--trae-text-tertiary);
+}
+
+.trae-editor-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.2s ease-out,
+    opacity 0.2s ease-out,
+    margin-top 0.2s ease-out;
+}
+
+.trae-editor-action-bar-visible {
+  max-height: 32px;
+  opacity: 1;
+  margin-top: 8px;
+}
+
+.trae-editor-cancel-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 4px;
+  background: var(--trae-bg-overlay-l2);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.trae-editor-cancel-button:hover {
+  background: var(--trae-bg-overlay-l3);
+}
+
+.trae-editor-cancel-button:active {
+  background: var(--trae-bg-overlay-l3);
+}
+
+.trae-editor-cancel-button:focus-visible {
+  outline: 2px solid var(--trae-status-primary);
+  outline-offset: 1px;
+}
+
+.trae-editor-cancel-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--trae-text-default);
+  white-space: nowrap;
+  padding: 0 4px;
+}
+
+.trae-editor-submit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 8px;
+  background: var(--trae-bg-invert);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.trae-editor-submit-button:hover {
+  background: var(--trae-bg-invert-hover);
+}
+
+.trae-editor-submit-button:active {
+  background: var(--trae-bg-invert-active);
+}
+
+.trae-editor-submit-button:focus-visible {
+  outline: 2px solid var(--trae-status-primary);
+  outline-offset: 1px;
+}
+
+.trae-editor-submit-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  color: var(--trae-text-onaccent);
+  white-space: nowrap;
+  padding: 0 4px;
+}
+
+.trae-editor-submit-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  color: var(--trae-icon-onaccent);
+  flex-shrink: 0;
+}
+
+.trae-success-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 32px;
+  white-space: nowrap;
+}
+
+.trae-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--trae-status-success);
+  flex-shrink: 0;
+}
+
+.trae-success-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--trae-text-default);
+  user-select: none;
+}
+</style><style type="text/css">@font-face { font-family: TencentSans; src: url("chrome-extension://bcgpmkngbhpgdgbjgbaoddljkbabdkmm/static/fonts/TencentSans.woff2"); }</style></head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Career Transition Roadmap · 2026</div>
+    <h1>Java Web → Java AI Agent 智能体开发岗 跳槽路线图</h1>
+    <p class="lede">基于 15+ 真实招聘 JD、主流 Java AI 框架与开源项目、2025–2026 大厂面经三线调研，为"有 LangChain4j 基础 + Spring Boot 单体经验、无 Python、分布式生疏"的在职工程师定制的 3–6 个月可执行规划。</p>
+    <div class="chips">
+      <span class="chip">3–6 个月在职充电</span>
+      <span class="chip">2–4h / 天</span>
+      <span class="chip">保 AI 创业公司</span>
+      <span class="chip">冲互联网大厂</span>
+      <span class="chip">先入行再熟练</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h4>目录</h4>
+  <ol>
+    <li><a href="#summary">核心结论与战略总览</a></li>
+    <li><a href="#calibration">对你现有框架的校准（重点）</a></li>
+    <li><a href="#demand">岗位刚需能力地图</a></li>
+    <li><a href="#gap">能力差距分析</a></li>
+    <li><a href="#roadmap">五阶段路线图</a></li>
+    <li><a href="#projects">生产级项目实战清单</a></li>
+    <li><a href="#interview">面试"造飞机"体系</a></li>
+    <li><a href="#apply">投递策略与简历</a></li>
+    <li><a href="#resources">资源清单</a></li>
+  </ol>
+</nav>
+
+<!-- ============ 1. 核心结论 ============ -->
+<section id="summary">
+<h2>一、核心结论与战略总览</h2>
+
+<p class="lead">你选的方向和路径判断是对的：Java + LangChain4j 是 2026 年 AI Agent 工程岗的有效入场券，"先入行再熟练"的思路在元年也成立。但你的"面试造飞机进厂打螺丝"打法需要<strong>针对 AI 岗打折调整</strong>，且你的能力闭环里漏了两条关键线。</p>
+
+<div class="metrics">
+  <div class="metric"><div class="num">~60%</div><div class="lbl">当前岗位匹配度</div></div>
+  <div class="metric"><div class="num">6 项</div><div class="lbl">JD 六大刚需能力</div></div>
+  <div class="metric"><div class="num">2 个</div><div class="lbl">硬短板（Python / 分布式）</div></div>
+  <div class="metric"><div class="num">24 周</div><div class="lbl">完整路线周期</div></div>
+</div>
+
+<h3>六大刚需能力（几乎每条 JD 必现）</h3>
+<p>RAG 全链路、Function Calling / 工具调用、Prompt 工程、Agent 编排 / Workflow、向量数据库 + Embedding、Spring AI / LangChain4j——这六项在所调研的 15+ 个 JD 中高频出现，构成 Java 方向 AI Agent 岗的"基本盘"<sup><a href="#cite-1">[1]</a></sup><sup><a href="#cite-2">[2]</a></sup><sup><a href="#cite-3">[3]</a></sup>。其中 MCP 协议、A2A 协议、成本 / 可观测性工程化是当前的<strong>差异化窗口</strong>。</p>
+
+<div class="callout">
+  <span class="label">战略主线</span>
+  <p>以"Java + LangChain4j"为入场券 → 3 个月内补齐一个<strong>能讲清每个决策 why 的生产级 RAG 项目</strong> + Spring AI 双框架 → 第 4–5 个月补工程化（微服务 / 中间件 / 可观测）与 Agent 进阶 + 第二个项目 → 第 5–6 个月把面试原理深度练到<strong>超出项目一个数量级</strong>，边投边迭代。优先投 Java-only 或 Python 为加分项的岗位，避开暂要求 Java+Python 双能力的智谱核心岗。</p>
+</div>
+</section>
+
+<!-- ============ 2. 校准 ============ -->
+<section id="calibration">
+<h2>二、对你现有框架的校准（重点）</h2>
+<p>你的思路是"JD 提取刚需 → 学习能力 → 找生产级项目 → 找面试题 → 联动"，方向正确。以下是三个需要调整 / 补充的关键点，直接决定你能不能上岸。</p>
+
+<h3>校准 1：「面试造飞机进厂打螺丝」要打折——AI 岗不是 CRUD 岗</h3>
+<p>CRUD 岗能"进厂打螺丝"，是因为工作高度标准化、边界清晰，面试背熟八股进去就能干活。但 AI Agent 岗是 2026 年的新物种，<strong>面试官自己也在摸索，考察方式是追问你项目里每一个技术决策的 why</strong>——比如"你的混合检索 recall 提升了多少？rerank 带来多少延迟代价？为什么选 pgvector 不选 Milvus？"你无法在没真正做过 RAG 优化的情况下，fake 出一段带真实数字的深度对话<sup><a href="#cite-20">[20]</a></sup><sup><a href="#cite-21">[21]</a></sup>。</p>
+
+<div class="callout ok">
+  <span class="label">正确打法</span>
+  <p><strong>项目做到"每个技术决策能讲清 why"（真实可讲）+ 面试准备做到"原理深度超出项目一个数量级"（造飞机）。</strong>两个层次：项目层不造假但要可讲深；面试层在项目之上再叠原理、对比、系统设计。心态上把"进厂打螺丝"换成"先入行再熟练"——但 AI 岗的"打螺丝"含量低，入行后仍需持续高强度学习，别指望躺平。<strong>好消息是元年整体水位低</strong>，你做到"能讲清楚"就超过大多数还在背概念转简历的候选人<sup><a href="#cite-4">[4]</a></sup>。</p>
+</div>
+
+<h3>校准 2：你的能力闭环漏了两条关键线</h3>
+<h4>漏了"工程化深度"——这恰恰是你的差异化优势</h4>
+<p>你的 Java 背景在"高并发 / 可观测性 / 成本优化"上是天然优势，但你没把它纳入能力清单。调研中智谱把"降低大模型调用成本、降低响应延迟、保障高并发场景服务稳定性"<strong>直接写进岗位职责</strong><sup><a href="#cite-3">[3]</a></sup>；猎头岗要求"分布式开发、Redis、MQ、高并发高可用"<sup><a href="#cite-8">[8]</a></sup>。这是 Python 转 AI 的人普遍薄弱、而你能比他们更有底气的点。<strong>必须把工程化作为独立能力线，而不是 RAG 的附属品。</strong></p>
+
+<h4>漏了"差异化筹码"——大家都在学 RAG / Agent，你需要记忆点</h4>
+<p>当所有候选人简历上都写"熟悉 RAG、Function Calling"，面试官记不住你。你需要 1–2 个多数人还没掌握的加分项形成记忆点：<strong>MCP 协议</strong>（2026 已被写进大厂 JD，多数候选人尚未实操<sup><a href="#cite-2">[2]</a></sup><sup><a href="#cite-4">[4]</a></sup>）、<strong>RAG 效果评测体系</strong>（能拿出 Recall@K / nDCG 真实数字的人极少）、A2A 协议。这些是当前的差异化窗口，越早做越值钱。</p>
+
+<h3>校准 3：几个你可能低估的点</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>分布式不是加分项，是硬门槛</h4>
+    <div class="meta">百川、猎头岗、鑫锡均硬性要求</div>
+    <p style="font-size:0.9rem;margin:0">你"重新补充学习应该较快"的判断成立（有底子在），但<strong>必须排进时间线 Phase 2，不能拖到最后</strong>。SpringCloud + Redis + MQ 是工程化岗位的普遍门槛，缺它会被卡在初筛。</p>
+  </div>
+  <div class="card">
+    <h4>Python 要补，但不必精通</h4>
+    <div class="meta">智谱硬性 / 多数 Java 岗为加分项</div>
+    <p style="font-size:0.9rem;margin:0">补到"能读 Python、能写数据处理 / 模型调度脚本"即可，2–3 周够。这能直接把你可投岗位面从"Java-only"扩大到"Java 为主 + Python 加分"，多出一批机会<sup><a href="#cite-3">[3]</a></sup><sup><a href="#cite-9">[9]</a></sup>。</p>
+  </div>
+  <div class="card">
+    <h4>Spring AI 必须补，和 LangChain4j 是互补不是二选一</h4>
+    <div class="meta">JD 中两者并列出现</div>
+    <p style="font-size:0.9rem;margin:0">你已学 LangChain4j，但 Spring AI 的可观测性（Micrometer + Actuator 开箱即用）是企业级标配、面试高频考点<sup><a href="#cite-11">[11]</a></sup><sup><a href="#cite-14">[14]</a></sup>。两者定位不同：Spring AI 是企业集成基础设施层，LangChain4j 是灵活 LLM 工具箱，<strong>都要会、能讲选型</strong>。</p>
+  </div>
+  <div class="card">
+    <h4>demo ≠ 项目，差距在"工程环节"</h4>
+    <div class="meta">langchain4j-examples 远远不够</div>
+    <p style="font-size:0.9rem;margin:0">你已经意识到官方 demo 不够。生产级项目要在 RAG 链路之上叠五层：可靠性（重试 / 熔断）、可观测（指标 / 追踪）、安全合规（护栏 / 审计）、质量评测、成本规模化。这五层正是面试官追问的深水区<sup><a href="#cite-19">[19]</a></sup>。</p>
+  </div>
+</div>
+</section>
+
+<!-- ============ 3. 刚需能力地图 ============ -->
+<section id="demand">
+<h2>三、岗位刚需能力地图</h2>
+<p>下表基于 15+ 个 2025–2026 真实 JD 提取，按出现频率排序，并标注你当前现状与补齐优先级。验证等级：<code>[CONFIRMED]</code> 表示 ≥3 个独立来源交叉确认<sup><a href="#cite-1">[1]</a></sup><sup><a href="#cite-4">[4]</a></sup>。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>刚需能力</th><th>频率</th><th>验证</th><th>你当前现状</th><th>优先级</th></tr></thead>
+<tbody>
+<tr><td>RAG 全链路（解析→切分→检索→重排→生成）</td><td>极高</td><td><span class="tag acc">CONFIRMED</span></td><td>会用基础用法，缺全链路深度</td><td><span class="tag hi">P0</span></td></tr>
+<tr><td>Function Calling / 工具调用</td><td>极高</td><td><span class="tag acc">CONFIRMED</span></td><td>已掌握基本用法</td><td><span class="tag mid">P1</span></td></tr>
+<tr><td>Prompt 工程</td><td>极高</td><td><span class="tag acc">CONFIRMED</span></td><td>会基础，缺系统性</td><td><span class="tag mid">P1</span></td></tr>
+<tr><td>Agent 编排 / Workflow / 任务规划</td><td>极高</td><td><span class="tag acc">CONFIRMED</span></td><td>概念已学，缺实战</td><td><span class="tag hi">P0</span></td></tr>
+<tr><td>向量数据库 + Embedding</td><td>高</td><td><span class="tag acc">CONFIRMED</span></td><td>会用，缺选型深度</td><td><span class="tag mid">P1</span></td></tr>
+<tr><td>Spring AI / LangChain4j</td><td>高</td><td><span class="tag acc">CONFIRMED</span></td><td>LC4j ✓，Spring AI ✗</td><td><span class="tag hi">P0</span></td></tr>
+<tr><td>高并发 / 高可用 / 性能优化（工程化）</td><td>中高</td><td><span class="tag acc">CONFIRMED</span></td><td>Java 底子在，缺 LLM 场景实战</td><td><span class="tag hi">P0</span></td></tr>
+<tr><td>微服务（SpringBoot / SpringCloud）</td><td>高</td><td><span class="tag acc">CONFIRMED</span></td><td>单体 ✓，微服务 ✗</td><td><span class="tag hi">P0</span></td></tr>
+<tr><td>分布式中间件（Redis / MQ / Docker）</td><td>中</td><td><span class="tag acc">CONFIRMED</span></td><td>学过但生疏</td><td><span class="tag hi">P0</span></td></tr>
+<tr><td>Python 编程</td><td>中高</td><td><span class="tag acc">CONFIRMED</span></td><td>无基础</td><td><span class="tag mid">P1</span></td></tr>
+<tr><td>MCP 协议（差异化窗口）</td><td>中</td><td><span class="tag acc">MAJORITY</span></td><td>未接触</td><td><span class="tag lo">P2 加分</span></td></tr>
+<tr><td>多智能体 / Multi-Agent</td><td>中高</td><td><span class="tag acc">MAJORITY</span></td><td>概念已学</td><td><span class="tag mid">P1</span></td></tr>
+<tr><td>可观测性 / 成本优化 / 模型路由</td><td>中</td><td><span class="tag acc">MAJORITY</span></td><td>Java 经验可迁移</td><td><span class="tag lo">P2 加分</span></td></tr>
+<tr><td>模型私有化部署（Ollama / vLLM）</td><td>低中</td><td><span class="tag acc">SINGLE</span></td><td>未接触</td><td><span class="tag lo">P2 加分</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout warn">
+  <span class="label">大厂 vs 创业公司差异</span>
+  <p><strong>大厂</strong>（腾讯 / 美团 / 阿里）更看重平台化架构能力与 Multi-Agent 系统设计，存在纯 Java 路线（腾讯 AI 应用开发明确要 Java / Spring Boot）<sup><a href="#cite-4">[4]</a></sup><sup><a href="#cite-5">[5]</a></sup>；<strong>创业公司</strong>（智谱）更看重端到端交付与工程化闭环，<strong>明确把"降低成本 / 延迟 / 高并发稳定性"写进 JD</strong>，且智谱要求 Java + Python 双能力为"核心语言能力重点"<sup><a href="#cite-3">[3]</a></sup>。结论：你的 Java 工程化优势在创业公司更吃香，但 Python 是创业公司的硬门槛之一。</p>
+</div>
+</section>
+
+<!-- ============ 4. 差距分析 ============ -->
+<section id="gap">
+<h2>四、能力差距分析</h2>
+<p>下图直观呈现"岗位刚需要求"与"你当前水平"的差距。蓝色实线为 JD 要求高度，紫色虚线为你当前水平。差距最大的三块是 <strong>Python、分布式中间件、工程化（并发 / 可观测 / 成本）</strong>——前两个是硬门槛，第三个是你的差异化发力点。</p>
+
+<figure class="chart-figure">
+  <figcaption>能力差距雷达：岗位刚需要求 vs 你当前水平</figcaption>
+  <div id="chart-gap-radar" style="width:100%;min-height:460px" _echarts_instance_="ec_1785331217355"><div style="position: relative; overflow: hidden; width: 872px; height: 460px; cursor: default;"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" width="872" height="460" style="position: absolute; left: 0px; top: 0px; user-select: none;"><rect width="872" height="460" x="0" y="0" fill="none"></rect><g><path d="M436 238.28L415.8333 246.6333L407.48 266.8L415.8333 286.9667L436 295.32L456.1667 286.9667L464.52 266.8L456.1667 246.6333L436 238.28L436 266.8ZM436 181.24L375.4999 206.2999L350.44 266.8L375.4999 327.3001L436 352.36L496.5001 327.3001L521.56 266.8L496.5001 206.2999L436 181.24L436 209.76L476.3334 226.4666L493.04 266.8L476.3334 307.1334L436 323.84L395.6666 307.1334L378.96 266.8L395.6666 226.4666L436 209.76ZM436 124.2L335.1666 165.9666L293.4 266.8L335.1666 367.6334L436 409.4L536.8334 367.6334L578.6 266.8L536.8334 165.9666L436 124.2L436 152.72L516.6667 186.1333L550.08 266.8L516.6667 347.4667L436 380.88L355.3333 347.4667L321.92 266.8L355.3333 186.1333L436 152.72Z" fill="transparent"></path><path d="M436 209.76L395.6666 226.4666L378.96 266.8L395.6666 307.1334L436 323.84L476.3334 307.1334L493.04 266.8L476.3334 226.4666L436 209.76L436 238.28L456.1667 246.6333L464.52 266.8L456.1667 286.9667L436 295.32L415.8333 286.9667L407.48 266.8L415.8333 246.6333L436 238.28ZM436 152.72L355.3333 186.1333L321.92 266.8L355.3333 347.4667L436 380.88L516.6667 347.4667L550.08 266.8L516.6667 186.1333L436 152.72L436 181.24L496.5001 206.2999L521.56 266.8L496.5001 327.3001L436 352.36L375.4999 327.3001L350.44 266.8L375.4999 206.2999L436 181.24Z" fill="#ffffff"></path><path d="M436 266.8M436 238.28L415.8333 246.6333L407.48 266.8L415.8333 286.9667L436 295.32L456.1667 286.9667L464.52 266.8L456.1667 246.6333L436 238.28M436 209.76L395.6666 226.4666L378.96 266.8L395.6666 307.1334L436 323.84L476.3334 307.1334L493.04 266.8L476.3334 226.4666L436 209.76M436 181.24L375.4999 206.2999L350.44 266.8L375.4999 327.3001L436 352.36L496.5001 327.3001L521.56 266.8L496.5001 206.2999L436 181.24M436 152.72L355.3333 186.1333L321.92 266.8L355.3333 347.4667L436 380.88L516.6667 347.4667L550.08 266.8L516.6667 186.1333L436 152.72M436 124.2L335.1666 165.9666L293.4 266.8L335.1666 367.6334L436 409.4L536.8334 367.6334L578.6 266.8L536.8334 165.9666L436 124.2" fill="transparent" stroke="#e4e9f2"></path><path d="M436.5 266.8L436.5 124.2" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="middle" y="-6" transform="translate(436 109.2)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">RAG全链路</text><path d="M436 266.8L335.1666 165.9666" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="end" y="-6" transform="translate(324.56 155.36)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">Function</text><text dominant-baseline="central" text-anchor="end" y="6" transform="translate(324.56 155.36)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">Calling</text><path d="M436 267.5L293.4 267.5" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="end" transform="translate(278.4 266.8)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">Agent编排</text><path d="M436 266.8L335.1666 367.6334" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="end" transform="translate(324.56 378.24)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">向量数据库</text><path d="M436.5 266.8L436.5 409.4" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="middle" y="6" transform="translate(436 424.4)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">框架</text><text dominant-baseline="central" text-anchor="middle" xml:space="preserve" y="18" transform="translate(436 424.4)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">(Spring AI+LC4j)</text><path d="M436 266.8L536.8334 367.6334" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="start" y="-6" transform="translate(547.44 378.24)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">工程化</text><text dominant-baseline="central" text-anchor="start" y="6" transform="translate(547.44 378.24)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">(并发/可观测/成本)</text><path d="M436 267.5L578.6 267.5" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="start" transform="translate(593.6 266.8)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">分布式中间件</text><path d="M436 266.8L536.8334 165.9666" fill="transparent" stroke="#e4e9f2" stroke-linecap="round"></path><text dominant-baseline="central" text-anchor="start" transform="translate(547.44 155.36)" fill="#1a2332" style="font-size: 12px; font-family: &quot;Microsoft YaHei&quot;;">Python</text><path d="M436 138.46L345.2499 176.0499L307.66 266.8L355.3333 347.4667L436 380.88L516.6667 347.4667L535.82 266.8L496.5001 206.2999L436 138.46" fill="transparent" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"></path><path d="M436 138.46L345.2499 176.0499L307.66 266.8L355.3333 347.4667L436 380.88L516.6667 347.4667L535.82 266.8L496.5001 206.2999L436 138.46Z" fill="#2563eb22" fill-opacity="0.7"></path><path d="M436 195.5L375.4999 206.2999L378.96 266.8L375.4999 327.3001L436 352.36L476.3334 307.1334L478.78 266.8L446.0833 256.7167L436 195.5" fill="transparent" stroke="#7c3aed" stroke-width="2" stroke-dasharray="8,4" stroke-linejoin="round"></path><path d="M436 195.5L375.4999 206.2999L378.96 266.8L375.4999 327.3001L436 352.36L476.3334 307.1334L478.78 266.8L446.0833 256.7167L436 195.5Z" fill="#7c3aed22" fill-opacity="0.7"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,436,138.46)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,345.2499,176.0499)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,307.66,266.8)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,355.3333,347.4667)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,436,380.88)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,516.6667,347.4667)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,535.82,266.8)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,496.5001,206.2999)" fill="#2563eb"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,436,195.5)" fill="#7c3aed"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,375.4999,206.2999)" fill="#7c3aed"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,378.96,266.8)" fill="#7c3aed"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,375.4999,327.3001)" fill="#7c3aed"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,436,352.36)" fill="#7c3aed"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,476.3334,307.1334)" fill="#7c3aed"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,478.78,266.8)" fill="#7c3aed"></path><path d="M1 0A1 1 0 1 1 1 -0.0001" transform="matrix(4,0,0,4,446.0833,256.7167)" fill="#7c3aed"></path><path d="M-5 -5l223 0l0 24l-223 0Z" transform="translate(329.5 5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0"></path><path d="M3.5 0L21.5 0A3.5 3.5 0 0 1 25 3.5L25 10.5A3.5 3.5 0 0 1 21.5 14L3.5 14A3.5 3.5 0 0 1 0 10.5L0 3.5A3.5 3.5 0 0 1 3.5 0" transform="translate(329.5 5)" fill="#2563eb"></path><text dominant-baseline="central" text-anchor="start" x="30" y="7" transform="translate(329.5 5)" fill="#5d6b82" style="font-size: 13px; font-family: &quot;Microsoft YaHei&quot;;">岗位刚需要求</text><path d="M0 0l108 0l0 14l-108 0Z" transform="translate(329.5 5)" fill="transparent"></path><path d="M3.5 0L21.5 0A3.5 3.5 0 0 1 25 3.5L25 10.5A3.5 3.5 0 0 1 21.5 14L3.5 14A3.5 3.5 0 0 1 0 10.5L0 3.5A3.5 3.5 0 0 1 3.5 0" transform="translate(447.5 5)" fill="#7c3aed"></path><text dominant-baseline="central" text-anchor="start" x="30" y="7" transform="translate(447.5 5)" fill="#5d6b82" style="font-size: 13px; font-family: &quot;Microsoft YaHei&quot;;">你当前水平</text><path d="M0 0l95 0l0 14l-95 0Z" transform="translate(447.5 5)" fill="transparent"></path></g></svg><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: 0px auto auto 0px !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: 0px 0px auto auto !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: auto auto 0px 0px !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: auto 0px 0px auto !important;"></div></div></div>
+</figure>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>能力项</th><th>JD 要求</th><th>你的现状</th><th>差距 / 风险</th><th>补齐方式</th></tr></thead>
+<tbody>
+<tr><td>RAG 全链路</td><td>能设计完整链路 + 优化</td><td>会基础调用</td><td>缺切分 / 混合检索 / rerank / 评测</td><td>Phase 1 生产级项目</td></tr>
+<tr><td>Agent 编排</td><td>Multi-Agent / Workflow 设计</td><td>概念已学</td><td>缺实战 + 可靠性设计</td><td>Phase 2 智能客服项目</td></tr>
+<tr><td>Spring AI</td><td>与 LC4j 并列要求</td><td>未学</td><td>缺企业级框架 + 可观测性</td><td>Phase 0 补齐</td></tr>
+<tr><td>分布式中间件</td><td>Redis / MQ 硬性</td><td>学过生疏</td><td><strong>硬门槛，会卡初筛</strong></td><td>Phase 2 系统补</td></tr>
+<tr><td>工程化</td><td>高并发 / 成本 / 可观测</td><td>Java 经验在</td><td>缺 LLM 场景迁移</td><td>Phase 2 + 贯穿</td></tr>
+<tr><td>Python</td><td>智谱硬性 / 多数加分</td><td>无基础</td><td>限制可投岗位面</td><td>贯穿线 2–3 周</td></tr>
+<tr><td>面试原理深度</td><td>追问下钻 2–3 层</td><td>概念级</td><td>缺 Transformer / RAG / Agent 八股</td><td>Phase 3 冲刺</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ============ 5. 路线图 ============ -->
+<section id="roadmap">
+<h2>五、五阶段路线图</h2>
+<p>总周期约 24 周（6 个月），在职 2–4h / 天，可按实际进度压缩到 4 个月。每个阶段都有<strong>可量化的验收标准</strong>，达标再进下一阶段，杜绝完美主义但也不放水。</p>
+
+<figure class="diagram">
+<pre class="mermaid" data-processed="true"><svg id="mermaid-1785331217457" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 872 220" style="max-width: 872px;" role="graphics-document document" aria-roledescription="gantt"><style>#mermaid-1785331217457{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}#mermaid-1785331217457 .error-icon{fill:#552222;}#mermaid-1785331217457 .error-text{fill:#552222;stroke:#552222;}#mermaid-1785331217457 .edge-thickness-normal{stroke-width:1px;}#mermaid-1785331217457 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1785331217457 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1785331217457 .edge-thickness-invisible{stroke-width:0;fill:none;}#mermaid-1785331217457 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1785331217457 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1785331217457 .marker{fill:#666;stroke:#666;}#mermaid-1785331217457 .marker.cross{stroke:#666;}#mermaid-1785331217457 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-1785331217457 p{margin:0;}#mermaid-1785331217457 .mermaid-main-font{font-family:var(--mermaid-font-family, "trebuchet ms", verdana, arial, sans-serif);}#mermaid-1785331217457 .exclude-range{fill:#eeeeee;}#mermaid-1785331217457 .section{stroke:none;opacity:0.2;}#mermaid-1785331217457 .section0{fill:hsl(0, 0%, 73.9215686275%);}#mermaid-1785331217457 .section2{fill:hsl(0, 0%, 73.9215686275%);}#mermaid-1785331217457 .section1,#mermaid-1785331217457 .section3{fill:white;opacity:0.2;}#mermaid-1785331217457 .sectionTitle0{fill:#333;}#mermaid-1785331217457 .sectionTitle1{fill:#333;}#mermaid-1785331217457 .sectionTitle2{fill:#333;}#mermaid-1785331217457 .sectionTitle3{fill:#333;}#mermaid-1785331217457 .sectionTitle{text-anchor:start;font-family:var(--mermaid-font-family, "trebuchet ms", verdana, arial, sans-serif);}#mermaid-1785331217457 .grid .tick{stroke:hsl(0, 0%, 90%);opacity:0.8;shape-rendering:crispEdges;}#mermaid-1785331217457 .grid .tick text{font-family:"trebuchet ms",verdana,arial,sans-serif;fill:#000000;}#mermaid-1785331217457 .grid path{stroke-width:0;}#mermaid-1785331217457 .today{fill:none;stroke:#d42;stroke-width:2px;}#mermaid-1785331217457 .task{stroke-width:2;}#mermaid-1785331217457 .taskText{text-anchor:middle;font-family:var(--mermaid-font-family, "trebuchet ms", verdana, arial, sans-serif);}#mermaid-1785331217457 .taskTextOutsideRight{fill:#333;text-anchor:start;font-family:var(--mermaid-font-family, "trebuchet ms", verdana, arial, sans-serif);}#mermaid-1785331217457 .taskTextOutsideLeft{fill:#333;text-anchor:end;}#mermaid-1785331217457 .task.clickable{cursor:pointer;}#mermaid-1785331217457 .taskText.clickable{cursor:pointer;fill:#003163!important;font-weight:bold;}#mermaid-1785331217457 .taskTextOutsideLeft.clickable{cursor:pointer;fill:#003163!important;font-weight:bold;}#mermaid-1785331217457 .taskTextOutsideRight.clickable{cursor:pointer;fill:#003163!important;font-weight:bold;}#mermaid-1785331217457 .taskText0,#mermaid-1785331217457 .taskText1,#mermaid-1785331217457 .taskText2,#mermaid-1785331217457 .taskText3{fill:white;}#mermaid-1785331217457 .task0,#mermaid-1785331217457 .task1,#mermaid-1785331217457 .task2,#mermaid-1785331217457 .task3{fill:#707070;stroke:hsl(0, 0%, 33.9215686275%);}#mermaid-1785331217457 .taskTextOutside0,#mermaid-1785331217457 .taskTextOutside2{fill:#333;}#mermaid-1785331217457 .taskTextOutside1,#mermaid-1785331217457 .taskTextOutside3{fill:#333;}#mermaid-1785331217457 .active0,#mermaid-1785331217457 .active1,#mermaid-1785331217457 .active2,#mermaid-1785331217457 .active3{fill:#eee;stroke:hsl(0, 0%, 33.9215686275%);}#mermaid-1785331217457 .activeText0,#mermaid-1785331217457 .activeText1,#mermaid-1785331217457 .activeText2,#mermaid-1785331217457 .activeText3{fill:#333!important;}#mermaid-1785331217457 .done0,#mermaid-1785331217457 .done1,#mermaid-1785331217457 .done2,#mermaid-1785331217457 .done3{stroke:#666;fill:#bbb;stroke-width:2;}#mermaid-1785331217457 .doneText0,#mermaid-1785331217457 .doneText1,#mermaid-1785331217457 .doneText2,#mermaid-1785331217457 .doneText3{fill:#333!important;}#mermaid-1785331217457 .crit0,#mermaid-1785331217457 .crit1,#mermaid-1785331217457 .crit2,#mermaid-1785331217457 .crit3{stroke:hsl(10.9090909091, 73.3333333333%, 40%);fill:#d42;stroke-width:2;}#mermaid-1785331217457 .activeCrit0,#mermaid-1785331217457 .activeCrit1,#mermaid-1785331217457 .activeCrit2,#mermaid-1785331217457 .activeCrit3{stroke:hsl(10.9090909091, 73.3333333333%, 40%);fill:#eee;stroke-width:2;}#mermaid-1785331217457 .doneCrit0,#mermaid-1785331217457 .doneCrit1,#mermaid-1785331217457 .doneCrit2,#mermaid-1785331217457 .doneCrit3{stroke:hsl(10.9090909091, 73.3333333333%, 40%);fill:#bbb;stroke-width:2;cursor:pointer;shape-rendering:crispEdges;}#mermaid-1785331217457 .milestone{transform:rotate(45deg) scale(0.8,0.8);}#mermaid-1785331217457 .milestoneText{font-style:italic;}#mermaid-1785331217457 .doneCritText0,#mermaid-1785331217457 .doneCritText1,#mermaid-1785331217457 .doneCritText2,#mermaid-1785331217457 .doneCritText3{fill:#333!important;}#mermaid-1785331217457 .activeCritText0,#mermaid-1785331217457 .activeCritText1,#mermaid-1785331217457 .activeCritText2,#mermaid-1785331217457 .activeCritText3{fill:#333!important;}#mermaid-1785331217457 .titleText{text-anchor:middle;font-size:18px;fill:#333;font-family:var(--mermaid-font-family, "trebuchet ms", verdana, arial, sans-serif);}#mermaid-1785331217457 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g></g><g class="grid" transform="translate(75, 170)" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle"><path class="domain" stroke="currentColor" d="M0,-135V0H722V-135"></path><g class="tick" opacity="1" transform="translate(13,0)"><line stroke="currentColor" y2="-135"></line><text fill="#000" y="3" dy="1em" stroke="none" font-size="10" style="text-anchor: middle;">08月01日</text></g><g class="tick" opacity="1" transform="translate(146,0)"><line stroke="currentColor" y2="-135"></line><text fill="#000" y="3" dy="1em" stroke="none" font-size="10" style="text-anchor: middle;">09月01日</text></g><g class="tick" opacity="1" transform="translate(275,0)"><line stroke="currentColor" y2="-135"></line><text fill="#000" y="3" dy="1em" stroke="none" font-size="10" style="text-anchor: middle;">10月01日</text></g><g class="tick" opacity="1" transform="translate(408,0)"><line stroke="currentColor" y2="-135"></line><text fill="#000" y="3" dy="1em" stroke="none" font-size="10" style="text-anchor: middle;">11月01日</text></g><g class="tick" opacity="1" transform="translate(537,0)"><line stroke="currentColor" y2="-135"></line><text fill="#000" y="3" dy="1em" stroke="none" font-size="10" style="text-anchor: middle;">12月01日</text></g><g class="tick" opacity="1" transform="translate(670,0)"><line stroke="currentColor" y2="-135"></line><text fill="#000" y="3" dy="1em" stroke="none" font-size="10" style="text-anchor: middle;">01月01日</text></g></g><g><rect x="0" y="48" width="834.5" height="24" class="section section0"></rect><rect x="0" y="72" width="834.5" height="24" class="section section1"></rect><rect x="0" y="96" width="834.5" height="24" class="section section2"></rect><rect x="0" y="120" width="834.5" height="24" class="section section3"></rect><rect x="0" y="144" width="834.5" height="24" class="section section0"></rect></g><g><rect id="a0" rx="3" ry="3" x="75" y="50" width="60" height="20" transform-origin="105px 60px" class="task task0 "></rect><rect id="a1" rx="3" ry="3" x="135" y="74" width="181" height="20" transform-origin="225.5px 84px" class="task task1 "></rect><rect id="a2" rx="3" ry="3" x="316" y="98" width="180" height="20" transform-origin="406px 108px" class="task task2 "></rect><rect id="a3" rx="3" ry="3" x="496" y="122" width="181" height="20" transform-origin="586.5px 132px" class="task task3 "></rect><rect id="a4" rx="3" ry="3" x="677" y="146" width="120" height="20" transform-origin="737px 156px" class="task task0 "></rect><text id="a0-text" font-size="11" x="140" y="63.5" text-height="20" class=" taskTextOutsideRight taskTextOutside0  width-125.9423828125">Phase0 定向与双框架地基          </text><text id="a1-text" font-size="11" x="225.5" y="87.5" text-height="20" class=" taskText taskText1  width-163.4375">Phase1 RAG全链路 + 生产级项目1    </text><text id="a2-text" font-size="11" x="406" y="111.5" text-height="20" class=" taskText taskText2  width-172.8874969482422">Phase2 微服务 + Agent进阶 + 项目2  </text><text id="a3-text" font-size="11" x="586.5" y="135.5" text-height="20" class=" taskText taskText3  width-114.14238739013672">Phase3 面试造飞机冲刺             </text><text id="a4-text" font-size="11" x="737" y="159.5" text-height="20" class=" taskText taskText0  width-92.9423828125">Phase4 投递与迭代                 </text></g><g><text dy="0em" x="10" y="62" font-size="11" class="sectionTitle sectionTitle0"><tspan alignment-baseline="central" x="10">地基</tspan></text><text dy="0em" x="10" y="86" font-size="11" class="sectionTitle sectionTitle1"><tspan alignment-baseline="central" x="10">刚需闭环</tspan></text><text dy="0em" x="10" y="110" font-size="11" class="sectionTitle sectionTitle2"><tspan alignment-baseline="central" x="10">工程化进阶</tspan></text><text dy="0em" x="10" y="134" font-size="11" class="sectionTitle sectionTitle3"><tspan alignment-baseline="central" x="10">冲刺</tspan></text><text dy="0em" x="10" y="158" font-size="11" class="sectionTitle sectionTitle0"><tspan alignment-baseline="central" x="10">上岸</tspan></text></g><g class="today"><line x1="79" x2="79" y1="25" y2="195" class="today"></line></g><text x="436" y="25" class="titleText">路线图时间轴（在职 2-4h/天，起始 2026-07-29）</text></svg></pre>
+  <figcaption>五阶段时间轴：Phase 0 → 4，约 24 周</figcaption>
+</figure>
+
+<!-- Phase 0 -->
+<div class="phase">
+  <div class="phase-head">
+    <span class="ph-badge">PHASE 0</span>
+    <h3>定向与双框架地基</h3>
+    <span class="ph-time">第 1–2 周 · 14 天</span>
+  </div>
+  <p style="margin:0 0 4px"><strong>目标：</strong>锁定 10–15 个目标 JD 建立能力基线；补齐 Spring AI，形成 LangChain4j + Spring AI 双框架认知；搭好本地开发环境。</p>
+  <div class="phase-grid">
+    <div>
+      <h4>每日安排（约 2.5h）</h4>
+      <ul>
+        <li>1h Spring AI 官方文档 + 核心 API（ChatClient / Advisors / Tool / MCP）</li>
+        <li>1h 跑通 Spring AI 基础 demo（RAG + Tool Calling）</li>
+        <li>0.5h 收集整理目标 JD 到表格，提取刚需能力</li>
+      </ul>
+    </div>
+    <div>
+      <h4>核心内容</h4>
+      <ul>
+        <li>Spring AI ChatClient / Advisors / Tool Calling / 可观测性（Micrometer）</li>
+        <li>本地 Ollama 部署 Qwen，PGVector 或 Milvus 本地起</li>
+        <li>Spring AI vs LangChain4j 选型对比笔记</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verify"><b>验收标准：</b>能口述 Spring AI 与 LangChain4j 各自优劣与选型场景（面试高频题）；本地 demo 跑通"提问 → 检索本地文档 → 回答"；目标 JD 清单 + 刚需提取表完成。</div>
+</div>
+
+<!-- Phase 1 -->
+<div class="phase">
+  <div class="phase-head">
+    <span class="ph-badge">PHASE 1</span>
+    <h3>RAG 刚需闭环 + 生产级项目 1</h3>
+    <span class="ph-time">第 3–8 周 · 42 天</span>
+  </div>
+  <p style="margin:0 0 4px"><strong>目标：</strong>把 RAG 从"会调 API"升级到"能讲清每个环节 why"；交付一个企业知识库 RAG 项目，做到生产级深度（带真实评测数字）。</p>
+  <div class="phase-grid">
+    <div>
+      <h4>每日安排（约 3h）</h4>
+      <ul>
+        <li>1.5h 项目开发</li>
+        <li>1h RAG 进阶理论（切分 / 混合检索 / rerank / 评测）</li>
+        <li>0.5h 记录技术决策日志（为什么这么选）</li>
+      </ul>
+    </div>
+    <div>
+      <h4>核心内容</h4>
+      <ul>
+        <li>文档解析（PDF / Word / 表格）→ 智能切分（多粒度）→ Embedding</li>
+        <li>混合检索（向量 + BM25）→ Rerank → 上下文组装 → 引用防幻觉</li>
+        <li>RAG 评测：Recall@K / nDCG / LLM-as-Judge</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verify"><b>验收标准：</b>能讲清"为什么 pgvector 够用 / 混合检索 recall 提升多少 / rerank 延迟代价 / 评测怎么设计"；GitHub 项目含完整工程结构 + README + 决策文档；评测报告有改切分 / 加 rerank 前后的真实对比数字（如 Recall@5 从 62% → 89%）。</div>
+</div>
+
+<!-- Phase 2 -->
+<div class="phase">
+  <div class="phase-head">
+    <span class="ph-badge">PHASE 2</span>
+    <h3>工程化补齐 + Agent 进阶 + 项目 2</h3>
+    <span class="ph-time">第 9–14 周 · 42 天</span>
+  </div>
+  <p style="margin:0 0 4px"><strong>目标：</strong>补 SpringCloud 微服务 + 分布式中间件（硬门槛）；掌握 Agent 编排 / Multi-Agent / MCP；交付智能客服 Agent 项目 + 一个 MCP Server（差异化筹码）。</p>
+  <div class="phase-grid">
+    <div>
+      <h4>每日安排（约 3h）</h4>
+      <ul>
+        <li>1h 微服务 + 中间件（SpringCloud / Redis / MQ）</li>
+        <li>1.5h Agent 进阶 + 项目 2 开发</li>
+        <li>0.5h 工程化（限流 / 熔断 / 可观测 / 成本）</li>
+      </ul>
+    </div>
+    <div>
+      <h4>核心内容</h4>
+      <ul>
+        <li>SpringCloud（Nacos / Gateway / OpenFeign）；Redis 会话记忆 + 缓存；MQ 异步文档入库</li>
+        <li>ReAct / Plan-Execute；Multi-Agent；MCP 协议（写一个 MCP Server）</li>
+        <li>流式输出 SSE；令牌桶限流；Micrometer 全链路追踪</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verify"><b>验收标准：</b>能讲 Agent 死循环防护三方法 / Function Call 底层（LLM 不执行函数）/ Agent vs Workflow；MCP Server 能被任意 MCP 客户端调用；项目 1 微服务化改造完成；智能客服项目含意图路由 + 多轮记忆 + 流式 + 工具调用。</div>
+</div>
+
+<!-- Phase 3 -->
+<div class="phase">
+  <div class="phase-head">
+    <span class="ph-badge">PHASE 3</span>
+    <h3>面试"造飞机"冲刺</h3>
+    <span class="ph-time">第 15–20 周 · 42 天</span>
+  </div>
+  <p style="margin:0 0 4px"><strong>目标：</strong>把原理深度练到超出项目一个数量级；系统设计题能白板画完整架构。</p>
+  <div class="phase-grid">
+    <div>
+      <h4>每日安排（约 3h）</h4>
+      <ul>
+        <li>1.5h 八股原理（Transformer / RAG / Agent）</li>
+        <li>1h 系统设计题（企业知识库 RAG / 智能客服架构）</li>
+        <li>0.5h 模拟面试 / 录音复盘</li>
+      </ul>
+    </div>
+    <div>
+      <h4>核心内容</h4>
+      <ul>
+        <li>第一梯队 10 道硬骨头（见面试体系）</li>
+        <li>第二梯队加分项；各公司面经（字节 / 阿里 / 智谱）</li>
+        <li>每题三步：翻车点 → 原理 → 合上资料自己复述</li>
+      </ul>
+    </div>
+  </div>
+  <div class="verify"><b>验收标准：</b>第一梯队 10 题能脱稿讲 + 被追问能下钻 2–3 层；能白板画出 RAG / 智能客服完整架构；完成 2–3 次模拟面试并复盘。</div>
+</div>
+
+<!-- Phase 4 -->
+<div class="phase">
+  <div class="phase-head">
+    <span class="ph-badge">PHASE 4</span>
+    <h3>投递与迭代</h3>
+    <span class="ph-time">第 21 周起 · 持续</span>
+  </div>
+  <p style="margin:0 0 4px"><strong>目标：</strong>投递 → 面试 → 复盘 → 补漏，边投边修。不必等"全部学完"再投，Phase 3 中后期即可开始小规模投递试水。</p>
+  <div class="phase-grid">
+    <div>
+      <h4>优先投递</h4>
+      <ul>
+        <li>Java-only 或 Python 为加分项的岗（腾讯 AI 应用开发 / 美团 Agent 框架 / 中科昊萌 / 鑫锡 / 环绕智能）</li>
+        <li>中小企业 AI Agent 岗练手面试感</li>
+      </ul>
+    </div>
+    <div>
+      <h4>迭代节奏</h4>
+      <ul>
+        <li>每次面试后 24h 内复盘，补进面试笔记</li>
+        <li>暂避要求 Java+Python 双能力的智谱核心岗，等 Python 补完再冲</li>
+        <li>根据面试反馈动态调整 Phase 3 重点</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<h3>贯穿线（与阶段并行）</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>Python 脚本级补齐</h4>
+    <div class="meta">Phase 1 起并行 · 每天 20–30min · 约 3 周</div>
+    <p style="font-size:0.9rem;margin:0">目标：能读 Python、能写数据处理脚本、能调 transformers / langchain 基础。<strong>不求精通，求不被 Python 要求卡掉初筛</strong>。重点补：语法、requests / pandas 数据处理、调用大模型 API。</p>
+  </div>
+  <div class="card">
+    <h4>技术决策日志</h4>
+    <div class="meta">全程 · 每次 5–10min</div>
+    <p style="font-size:0.9rem;margin:0">每个技术选型都记"为什么选它 / 放弃了什么 / 代价是什么"。这份日志就是面试时"讲清 why"的弹药库，也是简历量化结果的来源。</p>
+  </div>
+</div>
+</section>
+
+<!-- ============ 6. 项目清单 ============ -->
+<section id="projects">
+<h2>六、生产级项目实战清单</h2>
+<p>框架选型结论：<strong>Spring AI 是企业集成基础设施层，LangChain4j 是灵活 LLM 工具箱，Spring AI Alibaba 是多智能体 / 工作流应用层（中文生态最佳）</strong><sup><a href="#cite-11">[11]</a></sup><sup><a href="#cite-12">[12]</a></sup><sup><a href="#cite-13">[13]</a></sup>。三者分层互补，不是三选一。学习路径：已学 LangChain4j → 补 Spring AI → 用 Spring AI Alibaba 做生产级项目。</p>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>推荐项目</th><th>技术栈</th><th>学习重点</th><th>对应面试考点</th></tr></thead>
+<tbody>
+<tr><td><strong>springboot-ai-rag-tutorial</strong><br><a href="#cite-18">[18]</a> 教学但工程完整</td><td>Spring Boot 4 + Spring AI + PGVector</td><td>最小可运行 RAG 链路、引用可追溯、防幻觉拒答</td><td>RAG 基础链路、防幻觉</td></tr>
+<tr><td><strong>knowledgeops-agent</strong><br><a href="#cite-16">[16]</a> 生产级平台</td><td>Spring AI + Prometheus/Loki/Tempo + RBAC</td><td>多租户隔离、RBAC + 审计、异步文档入库、可观测三件套</td><td>demo→生产差距的最佳参照</td></tr>
+<tr><td><strong>spring-al-alibaba-customer</strong><br><a href="#cite-15">[15]</a> 企业级客服</td><td>Spring AI Alibaba + pgvector + tsvector</td><td>意图识别路由、混合检索、两层记忆、自适应 rerank</td><td>智能客服设计、混合检索</td></tr>
+<tr><td><strong>Java-LLM-integration (LCallAI)</strong><br><a href="#cite-17">[17]</a> 呼叫中心引擎</td><td>Java + RAG + ASR/TTS</td><td>两阶段检索（粗排 + LLM rerank）、异步并行重排、混合部署</td><td>RAG 检索优化、部署架构</td></tr>
+<tr><td><strong>Spring AI Alibaba 官方生态</strong><br><a href="#cite-13">[13]</a> JManus / DataAgent / DeepResearch</td><td>Spring AI Alibaba Graph</td><td>Graph 工作流编排、多智能体协作、A2A(Nacos) 通信</td><td>Multi-Agent、A2A 协议</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Demo → 生产级的五层升级路径</h3>
+<p>这是面试官追问的深水区，也是你项目区别于 demo 的关键<sup><a href="#cite-19">[19]</a></sup>。每一层都对应可讲的面试点：</p>
+<div class="card-grid">
+  <div class="card">
+    <h4>① 可靠性</h4>
+    <p style="font-size:0.9rem;margin:0">端到端超时 + 指数退避重试、熔断（错误率超阈值快速失败）、容量规划按峰值而非平均。</p>
+  </div>
+  <div class="card">
+    <h4>② 可观测性</h4>
+    <p style="font-size:0.9rem;margin:0">结构化日志、p50/p95/p99 时延、错误率分类、每请求成本、分布式追踪（Micrometer 自动传播 HTTP→DB→LLM）。</p>
+  </div>
+  <div class="card">
+    <h4>③ 安全合规</h4>
+    <p style="font-size:0.9rem;margin:0">输入 / 输出护栏（防注入 / 越狱 / 提示词泄露）、RBAC + 多租户隔离、审计日志。</p>
+  </div>
+  <div class="card">
+    <h4>④ 质量评测</h4>
+    <p style="font-size:0.9rem;margin:0">RAG 评测管道（Recall@K / nDCG / LLM-judge）、黄金集回归测试、A/B 测试。</p>
+  </div>
+  <div class="card">
+    <h4>⑤ 成本与规模化</h4>
+    <p style="font-size:0.9rem;margin:0">token 预算控制、每日花费上限、非实时任务转后台、嵌入 / prompt 缓存、水平扩展验证。</p>
+  </div>
+  <div class="card">
+    <h4>面试讲深技巧</h4>
+    <p style="font-size:0.9rem;margin:0">别停在"我用了 RAG"，要讲"为什么 pgvector 够用、混合检索 recall 提升多少、rerank 延迟代价、评测指标怎么设计、p99 怎么压"。</p>
+  </div>
+</div>
+</section>
+
+<!-- ============ 7. 面试体系 ============ -->
+<section id="interview">
+<h2>七、面试"造飞机"体系</h2>
+<p>应用方向（Java Web 转 AI）主攻 <strong>Agent + RAG + LLM 工具调用</strong>三大块即可覆盖 90% 的一面二面追问；大模型工程底层（Transformer / Flash Attention / 量化）作为进阶选看<sup><a href="#cite-22">[22]</a></sup>。以下按优先级分三梯队。</p>
+
+<h3>第一梯队：必须答出深度才能过（硬骨头）</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>题目</th><th>为什么是硬骨头</th><th>深度要求</th></tr></thead>
+<tbody>
+<tr><td>Attention 公式 + √d_k 缩放原理</td><td>一面必考，手撕 + 原理组合</td><td>能手推 softmax(QKᵀ/√d_k)V + 解释方差缩放数学本质</td></tr>
+<tr><td>Function Call 底层（LLM 不执行函数）</td><td>答错暴露没理解</td><td>四步流程 + 并行调用 + 各厂商格式差异</td></tr>
+<tr><td>ReAct 死循环防护三方法</td><td>生产可靠性必问</td><td>最大步数 + 重复检测 + 超时，能写伪代码</td></tr>
+<tr><td>RAG 完整链路 + Chunking 策略</td><td>几乎每家必问</td><td>离线 / 在线两阶段 + 四种切分 + 多粒度索引</td></tr>
+<tr><td>混合检索 + Rerank 原理</td><td>检索优化核心</td><td>稠密 / 稀疏互补 + RRF 融合 + Cross-Encoder 精排</td></tr>
+<tr><td>Agent 记忆系统设计</td><td>字节高频</td><td>短期 + 长期 + 窗口管理 + compact 压缩</td></tr>
+<tr><td>MCP vs Function Call 本质区别</td><td>2026 已写进 JD</td><td>协议标准化 vs 模型能力 + Client-Server 架构</td></tr>
+<tr><td>RAG 评测三层指标</td><td>量化能力考察</td><td>检索 Recall/MRR + 生成 Faithfulness + 端到端</td></tr>
+<tr><td>Agent vs Workflow + 混合架构</td><td>生产落地判断力</td><td>控制权归属 + Token 对比 + 混合才是正确姿势</td></tr>
+<tr><td>Spring AI vs LangChain4j 选型</td><td>Java 差异化核心</td><td>能按场景给选型理由 + AI Services 机制</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>第二梯队：理解原理能展开讲（加分项）</h3>
+<p>MQA / GQA / Flash Attention 演进、RoPE 位置编码、KV Cache + Prompt Caching、量化 INT8/INT4/AWQ/GPTQ 选型、Plan-Execute vs ReAct 选型、Reflection 自我反思、Multi-Agent 框架对比（能提到"不要过早引入"即出彩）、A2A 协议、HyDE / Multi-Query 查询改写、多模态 RAG（表格单独提取转 Markdown）、RAG 与长上下文关系、LangChain4j ChatMemory 两种实现、流式输出 SSE 实现、成本延迟优化（模型路由 / 缓存）<sup><a href="#cite-20">[20]</a></sup><sup><a href="#cite-22">[22]</a></sup><sup><a href="#cite-23">[23]</a></sup>。</p>
+
+<h3>第三梯队：了解概念即可</h3>
+<p>LoRA / RLHF / DPO / GRPO 对齐训练（应用方向了解概念即可，算法岗才深挖）、Scaling Law、MoE、CoT 局限性、向量索引 IVF 细节、Beam Search、Tokenizer（BPE）、大模型训练流程（预训练 / SFT / 对齐）<sup><a href="#cite-22">[22]</a></sup>。</p>
+
+<div class="callout">
+  <span class="label">各公司考察特点</span>
+  <p><strong>字节</strong>考察最全面，五大领域全覆盖，高频追问 Agent 记忆、RAG 多模态、检索优化；<strong>阿里 / 蚂蚁</strong>偏工程落地，System/User Prompt 优先级、生产可靠性、Java 工程化集成；<strong>智谱 / 月之暗面</strong>偏模型原理深度，Plan-Execute vs ReAct、RAG 与长上下文、GraphRAG；<strong>MiniMax / 百度</strong>Chunking 策略深度、RAG 评测、Few-shot 与 CoT<sup><a href="#cite-21">[21]</a></sup><sup><a href="#cite-24">[24]</a></sup>。面试通常 3–4 轮：一面基础八股 → 二面系统设计 → 三面技术深水区 → 终面落地与视野。</p>
+</div>
+
+<div class="callout warn">
+  <span class="label">备考方法（三步走）</span>
+  <p>每道题按"先看面试翻车现场 → 再看图解原理 → 合上网页自己复述"三步走<sup><a href="#cite-22">[22]</a></sup>。时间紧时按 Agent → RAG → 工具调用顺序系统刷。对 Java Web 工程师，<strong>Java AI 工程化（框架机制 / 向量库选型 / 高并发 / SSE）是最大差异化优势</strong>，务必答到能写代码的程度。</p>
+</div>
+</section>
+
+<!-- ============ 8. 投递策略 ============ -->
+<section id="apply">
+<h2>八、投递策略与简历</h2>
+
+<h3>投递优先级</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>优先级</th><th>岗位类型</th><th>代表公司 / 岗位</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td><span class="tag lo">第一梯队</span></td><td>Java-only 或 Python 加分</td><td>腾讯 AI 应用开发、美团 Agent 框架、中科昊萌、鑫锡、环绕智能</td><td>匹配度最高，可立即投</td></tr>
+<tr><td><span class="tag mid">第二梯队</span></td><td>ToB / 中小企业 AI Agent</td><td>软通动力、复旦类脑、各行业 AI 解决方案</td><td>练面试感、积累面经</td></tr>
+<tr><td><span class="tag hi">冲刺目标</span></td><td>大厂 Agent / 应用开发</td><td>字节 AI Coding、阿里千问 Agent、京东电商 Agent</td><td>履历加分，Phase 3 后冲</td></tr>
+<tr><td><span class="tag hi">暂避</span></td><td>明确 Java+Python 双硬性</td><td>智谱 Agent 后端核心岗</td><td>等 Python 补完再投</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>简历包装要点</h3>
+<div class="card-grid">
+  <div class="card">
+    <h4>项目放显眼，写"决策 + 量化"</h4>
+    <p style="font-size:0.9rem;margin:0">每个项目突出技术决策与可量化结果，如"混合检索（向量+BM25）使 Recall@5 从 62% 提升至 89%""rerank 使答案准确率提升但 p99 时延增加 280ms，通过异步并行重排压到 120ms"。有数字才有说服力。</p>
+  </div>
+  <div class="card">
+    <h4>突出 Java 工程化差异化</h4>
+    <p style="font-size:0.9rem;margin:0">显式写"高并发限流（令牌桶）、全链路追踪（Micrometer）、成本控制（token 预算 + 模型路由）"——这是 Python 候选人没有的标签，对创业公司尤其吃香<sup><a href="#cite-3">[3]</a></sup>。</p>
+  </div>
+  <div class="card">
+    <h4>双框架 + 差异化筹码</h4>
+    <p style="font-size:0.9rem;margin:0">写"熟悉 Spring AI + LangChain4j 双框架选型"；把 MCP Server 项目作为亮点单列——2026 多数候选人没有，是记忆点<sup><a href="#cite-2">[2]</a></sup>。</p>
+  </div>
+  <div class="card">
+    <h4>GitHub 可见度</h4>
+    <p style="font-size:0.9rem;margin:0">两个项目都放 GitHub，README 写清架构图 + 决策文档 + 评测报告。面试官会点开看，README 质量直接影响第一印象。</p>
+  </div>
+</div>
+</section>
+
+<!-- ============ 9. 资源清单 ============ -->
+<section id="resources">
+<h2>九、资源清单</h2>
+
+<h3>框架官方仓库（P0）</h3>
+<ul>
+  <li>Spring AI — <a href="https://github.com/spring-projects/spring-ai" target="_blank" rel="noopener">github.com/spring-projects/spring-ai</a></li>
+  <li>LangChain4j — <a href="https://github.com/langchain4j/langchain4j" target="_blank" rel="noopener">github.com/langchain4j/langchain4j</a></li>
+  <li>Spring AI Alibaba — <a href="https://github.com/alibaba/spring-ai-alibaba" target="_blank" rel="noopener">github.com/alibaba/spring-ai-alibaba</a>（中文文档 java2ai.com）</li>
+</ul>
+
+<h3>生产级参考项目</h3>
+<ul>
+  <li>springboot-ai-rag-tutorial — <a href="https://github.com/tucanoo/springboot-ai-rag-tutorial" target="_blank" rel="noopener">github.com/tucanoo/springboot-ai-rag-tutorial</a></li>
+  <li>knowledgeops-agent — <a href="https://github.com/however-yir/knowledgeops-agent" target="_blank" rel="noopener">github.com/however-yir/knowledgeops-agent</a></li>
+  <li>spring-al-alibaba-customer — <a href="https://github.com/yuquanquan/spring-al-alibaba-customer" target="_blank" rel="noopener">github.com/yuquanquan/spring-al-alibaba-customer</a></li>
+  <li>Java-LLM-integration — <a href="https://github.com/lhw300/Java-LLM-integration" target="_blank" rel="noopener">github.com/lhw300/Java-LLM-integration</a></li>
+</ul>
+
+<h3>面试题库（P1/P2）</h3>
+<ul>
+  <li>小林coding AI 大模型八股（74 题 / 615 图）— <a href="https://www.cnblogs.com/xiaolincoding/p/20534325" target="_blank" rel="noopener">cnblogs.com/xiaolincoding/p/20534325</a></li>
+  <li>卡码笔记 Agent 大厂面试题 — <a href="https://notes.kamacoder.com/interview/llm/agent_interview.html" target="_blank" rel="noopener">notes.kamacoder.com/interview/llm/agent_interview.html</a></li>
+  <li>CSDN 2025–2026 AI Agent 面试真题 — <a href="https://blog.csdn.net/weixin_43726381/article/details/160897821" target="_blank" rel="noopener">blog.csdn.net/weixin_43726381/article/details/160897821</a></li>
+  <li>Javapedia LangChain4j 面试题 — <a href="https://www.javapedia.net/LangChain4j-interview-questions" target="_blank" rel="noopener">javapedia.net/LangChain4j-interview-questions</a></li>
+</ul>
+
+<h3>RAG 工程化进阶</h3>
+<ul>
+  <li>RAG in Production 2026 — <a href="https://ailearningguides.com/rag-in-production-2026/" target="_blank" rel="noopener">ailearningguides.com/rag-in-production-2026</a></li>
+  <li>Production AI Systems: Demos vs Deployments — <a href="https://www.metacto.com/blogs/production-ai-systems-demos-to-deployments" target="_blank" rel="noopener">metacto.com/blogs/production-ai-systems-demos-to-deployments</a></li>
+</ul>
+</section>
+
+</div><!-- /wrap -->
+
+<footer>
+  <div class="sources">
+    <h2>Sources</h2>
+    <ol>
+      <li id="cite-1"><span class="src-title">智联招聘，鑫锡软件 Java 开发工程师（AI Agent / 智能体方向）JD。</span><a class="src-url" href="https://m.zhaopin.com/jobs/CCL1387109580J40848673705.htm" target="_blank" rel="noopener">https://m.zhaopin.com/jobs/CCL1387109580J40848673705.htm</a></li>
+      <li id="cite-2"><span class="src-title">企查查，金水永利大模型应用开发工程师 JD（含 MCP / A2A / 微调要求）。</span><a class="src-url" href="https://m.qcc.com/jobdetail/59e5e49ca6a5c463e1603fdab2c31e04.html" target="_blank" rel="noopener">https://m.qcc.com/jobdetail/59e5e49ca6a5c463e1603fdab2c31e04.html</a></li>
+      <li id="cite-3"><span class="src-title">Boss 直聘，智谱华章 Agent 后端工程师（Java）JD，明确 Java+Python 双能力与成本/延迟/高并发要求。</span><a class="src-url" href="https://refund.zhipin.com/job_detail/40d497dfc47474eb0nd639-7EFdZ.html" target="_blank" rel="noopener">https://refund.zhipin.com/job_detail/40d497dfc47474eb0nd639-7EFdZ.html</a></li>
+      <li id="cite-4"><span class="src-title">GitHub，2026 年 AI Agent 企业招聘分析（腾讯/字节/阿里/小红书 JD 整理）。</span><a class="src-url" href="https://github.com/bcefghj/travel-agent-guide/blob/main/docs/02-%E4%BC%81%E4%B8%9A%E6%8B%9B%E8%81%98%E5%88%86%E6%9E%90/README.md" target="_blank" rel="noopener">https://github.com/bcefghj/travel-agent-guide</a></li>
+      <li id="cite-5"><span class="src-title">美团招聘官网，Agent 基础框架设计与开发 JD（Multi-Agent / Workflow 引擎）。</span><a class="src-url" href="https://zhaopin.meituan.com/m/position/detail?highlightType=social&amp;jobUnionId=3300885674" target="_blank" rel="noopener">https://zhaopin.meituan.com/m/position/detail?jobUnionId=3300885674</a></li>
+      <li id="cite-6"><span class="src-title">Boss 直聘，阿里巴巴千问大模型 Agent 算法专家 JD（skill-based Agent 架构）。</span><a class="src-url" href="https://refund.zhipin.com/job_detail/65e85694eefea73a0nZ-09m6EFFZ.html" target="_blank" rel="noopener">https://refund.zhipin.com/job_detail/65e85694eefea73a0nZ-09m6EFFZ.html</a></li>
+      <li id="cite-7"><span class="src-title">Boss 直聘，百川智能大模型应用后端开发工程师 JD（分布式 / 微服务 / Spring）。</span><a class="src-url" href="https://m.zhipin.com/job_detail/94876291dbfe641f0nR809q4ElFV.html" target="_blank" rel="noopener">https://m.zhipin.com/job_detail/94876291dbfe641f0nR809q4ElFV.html</a></li>
+      <li id="cite-8"><span class="src-title">猎聘，Agent 开发工程师（AIGC）JD，要求分布式 / Redis / MQ / 高并发高可用。</span><a class="src-url" href="https://m.liepin.com/a/78248537.shtml" target="_blank" rel="noopener">https://m.liepin.com/a/78248537.shtml</a></li>
+      <li id="cite-9"><span class="src-title">猎聘，中科昊萌软件开发工程师 JD，SpringAI / LangChain4j，Python 为加分项。</span><a class="src-url" href="https://www.liepin.com/job/1977811403.shtml" target="_blank" rel="noopener">https://www.liepin.com/job/1977811403.shtml</a></li>
+      <li id="cite-10"><span class="src-title">企查查，环绕智能 AI Java 后端工程师 JD（LangChain4j / Spring AI / 向量库）。</span><a class="src-url" href="https://m.qcc.com/jobdetail/7f280ee6bf09aaeb1baa0187ae1914ee.html" target="_blank" rel="noopener">https://m.qcc.com/jobdetail/7f280ee6bf09aaeb1baa0187ae1914ee.html</a></li>
+      <li id="cite-11"><span class="src-title">Spring AI 官方仓库（ChatClient / Advisors / Tool / Micrometer 可观测性）。</span><a class="src-url" href="https://github.com/spring-projects/spring-ai" target="_blank" rel="noopener">https://github.com/spring-projects/spring-ai</a></li>
+      <li id="cite-12"><span class="src-title">LangChain4j 官方仓库（AI Services / Chat Memory / RAG / agentic 模块）。</span><a class="src-url" href="https://github.com/langchain4j/langchain4j" target="_blank" rel="noopener">https://github.com/langchain4j/langchain4j</a></li>
+      <li id="cite-13"><span class="src-title">Spring AI Alibaba 官方仓库（Agent Framework / Graph / JManus / DataAgent / DeepResearch）。</span><a class="src-url" href="https://github.com/alibaba/spring-ai-alibaba" target="_blank" rel="noopener">https://github.com/alibaba/spring-ai-alibaba</a></li>
+      <li id="cite-14"><span class="src-title">Springdevpro，Spring AI vs LangChain4j: Which Java AI Framework to Choose?</span><a class="src-url" href="https://springdevpro.com/spring-ai/spring-ai-vs-langchain4j-java-framework-comparison/" target="_blank" rel="noopener">https://springdevpro.com/spring-ai-vs-langchain4j-java-framework-comparison</a></li>
+      <li id="cite-15"><span class="src-title">yuquanquan/spring-al-alibaba-customer，基于 Spring AI Alibaba 的企业级智能客服系统。</span><a class="src-url" href="https://github.com/yuquanquan/spring-al-alibaba-customer" target="_blank" rel="noopener">https://github.com/yuquanquan/spring-al-alibaba-customer</a></li>
+      <li id="cite-16"><span class="src-title">however-yir/knowledgeops-agent，基于 Spring AI 的生产级多 Agent 平台（多租户 / RBAC / 可观测）。</span><a class="src-url" href="https://github.com/however-yir/knowledgeops-agent" target="_blank" rel="noopener">https://github.com/however-yir/knowledgeops-agent</a></li>
+      <li id="cite-17"><span class="src-title">lhw300/Java-LLM-integration (LCallAI)，企业级智能呼叫中心 AI 引擎。</span><a class="src-url" href="https://github.com/lhw300/Java-LLM-integration" target="_blank" rel="noopener">https://github.com/lhw300/Java-LLM-integration</a></li>
+      <li id="cite-18"><span class="src-title">tucanoo/springboot-ai-rag-tutorial，Spring Boot 4 + Spring AI + PGVector 完整可运行 RAG 应用。</span><a class="src-url" href="https://github.com/tucanoo/springboot-ai-rag-tutorial" target="_blank" rel="noopener">https://github.com/tucanoo/springboot-ai-rag-tutorial</a></li>
+      <li id="cite-19"><span class="src-title">Metacto，Production AI Systems: Demos vs Deployments（demo→生产工程环节）。</span><a class="src-url" href="https://www.metacto.com/blogs/production-ai-systems-demos-to-deployments" target="_blank" rel="noopener">https://www.metacto.com/blogs/production-ai-systems-demos-to-deployments</a></li>
+      <li id="cite-20"><span class="src-title">卡码笔记，Agent 大厂面试题汇总：ReAct / Function Calling / MCP / RAG。</span><a class="src-url" href="https://notes.kamacoder.com/interview/llm/agent_interview.html" target="_blank" rel="noopener">https://notes.kamacoder.com/interview/llm/agent_interview.html</a></li>
+      <li id="cite-21"><span class="src-title">CSDN，2025–2026 AI Agent 开发岗面试真题大全（双视角答案版，含各公司面经）。</span><a class="src-url" href="https://blog.csdn.net/weixin_43726381/article/details/160897821" target="_blank" rel="noopener">https://blog.csdn.net/weixin_43726381/article/details/160897821</a></li>
+      <li id="cite-22"><span class="src-title">博客园·小林coding，AI 大模型八股面试题，覆盖 Agent / RAG / LLM（74 题 / 615 图 / 25 万字）。</span><a class="src-url" href="https://www.cnblogs.com/xiaolincoding/p/20534325" target="_blank" rel="noopener">https://www.cnblogs.com/xiaolincoding/p/20534325</a></li>
+      <li id="cite-23"><span class="src-title">CSDN，Java AI 面试常见问题（Spring AI / LangChain4j / RAG / Function Calling / 部署）。</span><a class="src-url" href="https://blog.csdn.net/wjianwei666/article/details/159617268" target="_blank" rel="noopener">https://blog.csdn.net/wjianwei666/article/details/159617268</a></li>
+      <li id="cite-24"><span class="src-title">CSDN，2026 大厂大模型 / Agent 面试题（GraphRAG / 灾难性遗忘 / 豆包开放题）。</span><a class="src-url" href="https://blog.csdn.net/weixin_44151034/article/details/161729146" target="_blank" rel="noopener">https://blog.csdn.net/weixin_44151034/article/details/161729146</a></li>
+    </ol>
+  </div>
+  <p class="foot-note">说明：JD 频率排序基于约 15 个样本集，反映趋势而非全市场统计；招聘平台 JD 可能变动 / 下架，URL 以调研时（2026-07-29）可访问为准。开源项目 star / 活跃度变化快，建议点击链接二次核验当前状态。能力雷达图为基于 JD 要求与候选人自述水平的定性评估，非精确测量。</p>
+</footer>
+
+<script src="./_shared/js/echarts.min.js"></script>
+<script src="./_shared/js/mermaid.min.js"></script>
+<script>
+mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+</script>
+<script src="assets/charts.js"></script><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: 0px auto auto 0px !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: 0px 0px auto auto !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: auto auto 0px 0px !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: auto 0px 0px auto !important;"></div><div class=""></div>
+
+
+<div data-trae-edit-ui="true"><div data-trae-edit-ui="true" class="trae-browser-inspect-highlight-tag"></div><div data-trae-edit-ui="true" class="trae-browser-inspect-highlight-tag"></div><div data-trae-edit-ui="true" class="trae-browser-inspect-highlight-box"></div><div data-trae-edit-ui="true" class="trae-browser-inspect-highlight-box trae-browser-inspect-select-highlight-box"></div><div data-trae-edit-ui="true" class="trae-add-to-chat-card trae-browser-inspect-select-button" style="display: none;"><div data-trae-edit-ui="true" class="trae-add-to-chat-content"><div data-trae-edit-ui="true" class="trae-buttons-view"><button data-trae-edit-ui="true" type="button" class="trae-action-button"><span data-trae-edit-ui="true" class="trae-action-button-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M14.3332 8.0013C14.3332 11.3346 11.8702 13.3346 7.99984 13.3346C6.8331 13.3346 5.60267 13.2116 4.56857 12.668C4.56857 12.668 3.07391 13.7639 1.6665 13.0972C2.70858 11.7228 2.44754 10.7933 2.38257 10.6161C2.37481 10.595 2.36622 10.576 2.35754 10.5552C2.26265 10.3277 1.6665 8.86419 1.6665 8.0013C1.6665 4.66797 4.12947 2.66797 7.99984 2.66797" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path>
+    <path d="M5.99951 7.41797C6.32157 7.41797 6.58332 7.67896 6.5835 8.00098C6.5835 8.32314 6.32168 8.58496 5.99951 8.58496C5.6775 8.58479 5.4165 8.32303 5.4165 8.00098C5.41668 7.67907 5.6776 7.41814 5.99951 7.41797ZM9.99951 7.41797C10.3216 7.41797 10.5833 7.67896 10.5835 8.00098C10.5835 8.32314 10.3217 8.58496 9.99951 8.58496C9.6775 8.58479 9.4165 8.32303 9.4165 8.00098C9.41668 7.67907 9.6776 7.41814 9.99951 7.41797Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="square"></path>
+    <path d="M15.001 4L13 3L12 1L11 3L9 4L11 5L12 7L13 5L15.001 4Z" fill="currentColor"></path>
+  </svg></span><span data-trae-edit-ui="true" class="trae-action-button-title" data-i18n="commentToChat">添加评论到对话</span><span data-trae-edit-ui="true" class="trae-action-button-shortcut"><span data-trae-edit-ui="true" class="trae-shortcut-container"><span data-trae-edit-ui="true" class="trae-shortcut-key">Ctrl</span><span data-trae-edit-ui="true" class="trae-shortcut-key">J</span></span></span></button><div data-trae-edit-ui="true" class="trae-add-to-chat-divider"></div><button data-trae-edit-ui="true" type="button" class="trae-action-button"><span data-trae-edit-ui="true" class="trae-action-button-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M14.3333 8.0013C14.3333 4.66797 11.8703 2.66797 7.99996 2.66797C4.12959 2.66797 1.66663 4.66797 1.66663 8.0013C1.66663 8.86419 2.26277 10.3277 2.35767 10.5552C2.36634 10.576 2.37493 10.595 2.38269 10.6161C2.44766 10.7933 2.7087 11.7228 1.66663 13.0972C3.07403 13.7639 4.5687 12.668 4.5687 12.668C5.60279 13.2116 6.83323 13.3346 7.99996 13.3346C11.8703 13.3346 14.3333 11.3346 14.3333 8.0013Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"></path>
+    <path d="M4.99963 7.41797C5.32169 7.41797 5.58344 7.67896 5.58362 8.00098C5.58362 8.32314 5.3218 8.58496 4.99963 8.58496C4.67762 8.58479 4.41663 8.32303 4.41663 8.00098C4.4168 7.67907 4.67773 7.41814 4.99963 7.41797ZM7.99963 7.41797C8.32169 7.41797 8.58344 7.67896 8.58362 8.00098C8.58362 8.32314 8.3218 8.58496 7.99963 8.58496C7.67762 8.58479 7.41663 8.32303 7.41663 8.00098C7.4168 7.67907 7.67773 7.41814 7.99963 7.41797ZM10.9996 7.41797C11.3217 7.41797 11.5834 7.67896 11.5836 8.00098C11.5836 8.32314 11.3218 8.58496 10.9996 8.58496C10.6776 8.58479 10.4166 8.32303 10.4166 8.00098C10.4168 7.67907 10.6777 7.41814 10.9996 7.41797Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="square"></path>
+  </svg></span><span data-trae-edit-ui="true" class="trae-action-button-title" data-i18n="addToChat">添加到对话</span><span data-trae-edit-ui="true" class="trae-action-button-shortcut"><span data-trae-edit-ui="true" class="trae-shortcut-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <path d="M9.5 3V6.5C9.5 7.05228 9.05228 7.5 8.5 7.5H3M3 7.5L5 5.5M3 7.5L5 9.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+  </svg></span></span></button></div></div></div><div data-trae-edit-ui="true" class="trae-browser-inspect-overlay" style="display: none;"></div></div><div data-trae-edit-ui="true" class="trae-add-to-chat-card" style="display: none; position: fixed; z-index: 90030;"><div data-trae-edit-ui="true" class="trae-add-to-chat-content"><div data-trae-edit-ui="true" class="trae-buttons-view"><button data-trae-edit-ui="true" type="button" class="trae-action-button"><span data-trae-edit-ui="true" class="trae-action-button-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M14.3332 8.0013C14.3332 11.3346 11.8702 13.3346 7.99984 13.3346C6.8331 13.3346 5.60267 13.2116 4.56857 12.668C4.56857 12.668 3.07391 13.7639 1.6665 13.0972C2.70858 11.7228 2.44754 10.7933 2.38257 10.6161C2.37481 10.595 2.36622 10.576 2.35754 10.5552C2.26265 10.3277 1.6665 8.86419 1.6665 8.0013C1.6665 4.66797 4.12947 2.66797 7.99984 2.66797" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path>
+    <path d="M5.99951 7.41797C6.32157 7.41797 6.58332 7.67896 6.5835 8.00098C6.5835 8.32314 6.32168 8.58496 5.99951 8.58496C5.6775 8.58479 5.4165 8.32303 5.4165 8.00098C5.41668 7.67907 5.6776 7.41814 5.99951 7.41797ZM9.99951 7.41797C10.3216 7.41797 10.5833 7.67896 10.5835 8.00098C10.5835 8.32314 10.3217 8.58496 9.99951 8.58496C9.6775 8.58479 9.4165 8.32303 9.4165 8.00098C9.41668 7.67907 9.6776 7.41814 9.99951 7.41797Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="square"></path>
+    <path d="M15.001 4L13 3L12 1L11 3L9 4L11 5L12 7L13 5L15.001 4Z" fill="currentColor"></path>
+  </svg></span><span data-trae-edit-ui="true" class="trae-action-button-title" data-i18n="commentToChat">添加评论到对话</span><span data-trae-edit-ui="true" class="trae-action-button-shortcut"><span data-trae-edit-ui="true" class="trae-shortcut-container"><span data-trae-edit-ui="true" class="trae-shortcut-key">Ctrl</span><span data-trae-edit-ui="true" class="trae-shortcut-key">J</span></span></span></button><div data-trae-edit-ui="true" class="trae-add-to-chat-divider"></div><button data-trae-edit-ui="true" type="button" class="trae-action-button"><span data-trae-edit-ui="true" class="trae-action-button-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M14.3333 8.0013C14.3333 4.66797 11.8703 2.66797 7.99996 2.66797C4.12959 2.66797 1.66663 4.66797 1.66663 8.0013C1.66663 8.86419 2.26277 10.3277 2.35767 10.5552C2.36634 10.576 2.37493 10.595 2.38269 10.6161C2.44766 10.7933 2.7087 11.7228 1.66663 13.0972C3.07403 13.7639 4.5687 12.668 4.5687 12.668C5.60279 13.2116 6.83323 13.3346 7.99996 13.3346C11.8703 13.3346 14.3333 11.3346 14.3333 8.0013Z" stroke="currentColor" stroke-width="1.2" stroke-linecap="square"></path>
+    <path d="M4.99963 7.41797C5.32169 7.41797 5.58344 7.67896 5.58362 8.00098C5.58362 8.32314 5.3218 8.58496 4.99963 8.58496C4.67762 8.58479 4.41663 8.32303 4.41663 8.00098C4.4168 7.67907 4.67773 7.41814 4.99963 7.41797ZM7.99963 7.41797C8.32169 7.41797 8.58344 7.67896 8.58362 8.00098C8.58362 8.32314 8.3218 8.58496 7.99963 8.58496C7.67762 8.58479 7.41663 8.32303 7.41663 8.00098C7.4168 7.67907 7.67773 7.41814 7.99963 7.41797ZM10.9996 7.41797C11.3217 7.41797 11.5834 7.67896 11.5836 8.00098C11.5836 8.32314 11.3218 8.58496 10.9996 8.58496C10.6776 8.58479 10.4166 8.32303 10.4166 8.00098C10.4168 7.67907 10.6777 7.41814 10.9996 7.41797Z" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="square"></path>
+  </svg></span><span data-trae-edit-ui="true" class="trae-action-button-title" data-i18n="addToChat">添加到对话</span><span data-trae-edit-ui="true" class="trae-action-button-shortcut"><span data-trae-edit-ui="true" class="trae-shortcut-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <path d="M9.5 3V6.5C9.5 7.05228 9.05228 7.5 8.5 7.5H3M3 7.5L5 5.5M3 7.5L5 9.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+  </svg></span></span></button></div></div></div></body><div id="transmart-crx-shadow-root" style="all: initial;"></div></html>
