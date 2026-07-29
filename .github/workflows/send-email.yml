@@ -1,0 +1,32 @@
+name: Daily Email Roadmap
+
+# 每天 07:15 (Asia/Shanghai) 将 java-ai-agent-roadmap.html 发送至 QQ 邮箱
+# 07:15 UTC+8 = 23:15 UTC (前一天)
+on:
+  schedule:
+    - cron: '15 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Send roadmap HTML to mailbox
+        uses: dawidd6/action-send-mail@v3
+        with:
+          # QQ 邮箱 SMTP
+          server_address: smtp.qq.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASS }}
+          subject: Java AI Agent Roadmap - 每日推送
+          to: 547499298@qq.com
+          from: 'Java AI Agent Roadmap <${{ secrets.SMTP_USER }}>'
+          # 以 HTML 正文形式发送，同时附上原始文件
+          html_body: file://java-ai-agent-roadmap.html
+          attachments: java-ai-agent-roadmap.html
+          priority: normal
