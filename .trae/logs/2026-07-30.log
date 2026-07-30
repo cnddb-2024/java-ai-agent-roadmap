@@ -1,5 +1,6 @@
 ===== 每日维护日志 2026-07-30 =====
 运行时间: 2026-07-30 (北京时间, 学习第2天)
+运行类型: 定时任务（同日二次运行）
 
 【步骤1】git clone 仓库
 状态: 成功
@@ -11,30 +12,36 @@ mkdir -p .trae/logs
 
 【步骤3】飞书token检查
 状态: 飞书可用
-说明: auth status 命令在此环境不支持交互式管理，但直接调用 task API 验证通过
+说明: auth status 命令在此环境不支持交互式管理（credentials are provided externally）
+验证方式: 直接调用 lark-cli task tasklists list --as user 验证通过
 清单「Java AI Agent 转型学习计划」已存在
 清单guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
 
 【步骤4】更新反馈层（必须执行，不依赖飞书）
+4a. 日期计算:
+    今天: 2026-07-30, 起始日: 2026-07-29
+    第几天: (2026-07-30 - 2026-07-29) + 1 = 2
+    当前Phase: Phase 0 (第1-14天)
 4b. today-marker 更新: 成功
     java-ai-agent-roadmap.html
-    「当前：Phase 0 · 第 1/168 天」→「当前：Phase 0 · 第 2/168 天」
+    值已正确: 「当前：Phase 0 · 第 2/168 天」
+    sed正则替换执行，值保持不变
 4c. RADAR_GAP me 数组更新: 成功
     assets/charts.js
-    me: [45,40,10,30,45,5,25] → [46,40,11,30,45,6,25]
-    微调说明: 第2天Phase0，小幅推进当前正在学习的维度
-    - RAG全链路 45→46 (开始RAG核心概念学习)
-    - Spring AI 10→11 (开始Spring AI入门)
-    - Python 5→6 (开始Python基础环境搭建)
+    me: [46, 40, 11, 30, 45, 6, 25] (保持不变)
+    说明: 同日二次运行，所有飞书任务未完成，无作业产出，me值不推进
     jd数组[90,90,85,80,85,70,90] 未变
-4d. RADAR_DAILY 数组: 保持 [0,0,0,0,0,0]
-    飞书可用，按真实完成率计算
+4d. RADAR_DAILY 数组: [0, 0, 0, 0, 0, 0] (保持不变)
+    飞书可用但无完成任务，assignments目录不存在
     计划完成率=0 (今天到期3个任务全未完成)
-    学习时长/知识输入/实战输出/复习覆盖=0 (无完成任务可统计)
-    连续打卡=0 (任务全未完成，无法确认打卡)
-更新文件: java-ai-agent-roadmap.html, assets/charts.js
+    学习时长=0 (无完成任务可统计)
+    知识输入=0 (无作业notes.md，无完成任务)
+    实战输出=0 (无作业代码产出，无完成任务)
+    复习覆盖=0 (无作业内容，无完成任务)
+    连续打卡=0 (无连续完成任务记录)
+更新文件: java-ai-agent-roadmap.html (sed确认), assets/charts.js (sed确认)
 
-【步骤5】采集飞书任务完成度
+【步骤5】采集飞书任务完成度 + 扫描作业目录
 5a. 清单查找: 成功 (已存在)
     guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
 5b. 任务统计:
@@ -42,19 +49,26 @@ mkdir -p .trae/logs
     已完成: 0
     未完成: 9
     昨日(2026-07-29)及之前到期任务: 0个 (所有任务今天及未来到期)
-    7天滚动完成率: 0% (今天到期3个任务全未完成)
+    7天滚动完成率: 0% (无已完成任务)
     任务截止日分布:
       2026-07-30 (今天): 3个 (RAG核心概念/Spring AI入门/Python基础环境)
       2026-07-31 (明天): 3个 (Java转AI思维导图/LangChain4j研读/Python数据结构)
       2026-08-01 (后天): 3个 (第一周笔记/Spring AI ChatClient/Qdrant部署)
-5c. snapshot diff: 首次运行，snapshot.json此前不存在，无diff，无被删除任务
-5d. snapshot.json 已创建并保存当前9个任务
+5c. 作业扫描: assignments/ 目录不存在，跳过
+    仅使用飞书数据
+5d. snapshot diff:
+    上次snapshot: 9个任务 (全部未完成)
+    当前列表: 9个任务 (全部未完成)
+    diff结果: 无任务消失，无需更新excluded.json
+5e. snapshot.json 已覆盖保存当前9个任务
 
 【步骤6】容量模型规划未来3天飞书任务
-6a. 估容量: 无历史数据(首次运行)，默认9
+6a. 估容量: 过去14天完成任务数=0，无历史默认9
     容量 = 9
-6b. 已占用: 未来3天窗口(2026-07-30, 07-31, 08-01)已存在未完成任务9个
-6c. 顺延逾期: 无逾期任务(所有任务今天及未来到期)，跳过
+6b. 已占用: 未来3天窗口(2026-07-30~08-01)已存在未完成任务9个
+    已占用 = 9
+6c. 顺延逾期: 无逾期任务
+    今天到期3个任务(全天任务，当天内未过截止日)，不算逾期
 6d. 松弛 = 容量9 - 已占用9 = 0
     松弛≤0，记录"超载"，不加新任务
 6e-6g. 跳过 (无松弛空间)
@@ -63,12 +77,13 @@ mkdir -p .trae/logs
 新增任务: 0
 顺延任务: 0
 容量估算: 9 (默认), 已占用9, 松弛0, 状态=超载
+作业扫描结果: assignments/目录不存在，跳过
 
 更新文件清单:
-  - java-ai-agent-roadmap.html (today-marker)
-  - assets/charts.js (RADAR_GAP.me, RADAR_DAILY确认)
-  - .trae/snapshot.json (新建)
-  - .trae/excluded.json (新建)
+  - java-ai-agent-roadmap.html (today-marker 确认)
+  - assets/charts.js (RADAR_GAP.me 确认, RADAR_DAILY 确认)
+  - .trae/snapshot.json (覆盖保存)
+  - .trae/excluded.json (无变化)
   - .trae/logs/2026-07-30.log (本日志)
 
 ===== 运行结束 =====
