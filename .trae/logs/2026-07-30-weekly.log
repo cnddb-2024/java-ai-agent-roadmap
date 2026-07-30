@@ -1,0 +1,37 @@
+=== 周度内容刷新日志 2026-07-30 (北京时间) ===
+运行时间: 2026-07-30 (沙箱UTC) / 北京时间 2026-07-30
+当前Phase: Phase 0 · 第2/168天 (由 today-marker 推断, 路线图起始 2026-07-29)
+snapshot.json: 仅含任务清单(9条, 全部 completed=false), 无显式掌握度字段 -> 淘汰依据退化为"仅时效性淘汰"
+
+【区块1 岗位JD清单 (#jd-list tbody)】
+- 容量上限: 固定20条
+- 淘汰: 0条 (原1条"智谱华章"保留并重分类为"暂避"; 经时效性核验无失效/已掌握/非目标项)
+- 新增: 19条
+  数据来源: WebSearch(Boss直聘/猎聘/智联/企查查/今日招聘) + CSDN《2026年第30周 Agent+Java岗位观察》官方JD(腾讯混元Harness/海康威视Java方向等)
+  匹配度规则: Java-only优先 > Java+Python加分 > 双硬性暂避
+- 当前总数: 20条 (高14 / 中5 / 暂避1)
+
+【区块2 实战项目 (#projects 状态列)】
+- 动态上限: Phase0 = base 3 (在学)
+- 淘汰: 0条 (无"已完成"可改"参考")
+- 新增: 0条 (在学已达上限3, 无空位; 遵循抗堆叠"仅补空位"原则)
+- 仓库存活核验(全部HTTP 200): tucanoo/springboot-ai-rag-tutorial / however-yir/knowledgeops-agent / yuquanquan/spring-al-alibaba-customer / lhw300/Java-LLM-integration / alibaba/spring-ai-alibaba
+  注: knowledgeops-agent 首次API探测403系GitHub临时限流, 页面与API复核均为200/public
+- 当前总数: 在学3 + 参考2 = 5
+
+【区块3 面试题 (#interview-t1 / #interview-t2 / #interview-t3)】
+- 动态上限: Phase0 = 5-10 (第一梯队计数)
+- 第一梯队 #interview-t1: 淘汰0 / 新增0, 当前10条 (达上限; 无掌握度数据可淘汰; 10题均为2026常青硬骨头: Attention/FunctionCall/ReAct/RAG/混合检索/Agent记忆/MCP/RAG评测/Agent vs Workflow/双框架选型)
+- 第二梯队 #interview-t2: 新增2个2026新趋势主题
+  + Agent Harness 评测体系 (任务成功率/平均推理步数/工具调用准确率, 2026已进大厂JD)
+  + Agent Skills 能力封装 (提示词+工具+知识+执行规范按需加载)
+- 第三梯队 #interview-t3: 无变更
+- 当前总数: t1=10, t2=新增2主题, t3=不变
+
+【完整性校验】
+- HTML标签平衡: tbody 6/6, table 6/6, section 10/10, div 89/89 (开闭相等)
+- JD区块精确20行; 第一梯队10行; 项目5行不变
+
+【写回】
+- git add . && git commit -m "chore(weekly): 2026-07-30 内容刷新" && git push main
+- 状态: 成功
