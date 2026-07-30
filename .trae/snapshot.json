@@ -1,5 +1,5 @@
 {
-  "snapshot_date": "2026-07-30",
+  "snapshot_date": "2026-07-31",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
     {
@@ -41,19 +41,19 @@
     {
       "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
       "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记",
-      "due": "2026-07-30",
+      "due": "2026-08-02",
       "completed": false
     },
     {
       "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
       "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖",
-      "due": "2026-07-30",
+      "due": "2026-08-02",
       "completed": false
     },
     {
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
       "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
-      "due": "2026-07-30",
+      "due": "2026-08-02",
       "completed": false
     }
   ]
