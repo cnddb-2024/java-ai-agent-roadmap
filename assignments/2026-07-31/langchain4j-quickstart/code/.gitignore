@@ -1,0 +1,18 @@
+# Build artifacts
+target/
+build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Maven wrapper (optional, can be regenerated)
+.mvn/
+
+# OS files
+.DS_Store
+Thumbs.db
