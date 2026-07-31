@@ -1,0 +1,126 @@
+===== 每日维护日志 2026-08-01 (北京时间) =====
+运行时间: 2026-08-01 第4天/168天 Phase0
+
+【步骤1】git clone 仓库
+  状态: 成功
+  仓库: https://github.com/cnddb-2024/java-ai-agent-roadmap.git → roadmap-repo
+
+【步骤2】创建日志目录
+  状态: 成功（目录已存在）
+  路径: .trae/logs/
+
+【步骤3】飞书token状态检查
+  状态: auth status命令不支持(凭据外部提供)，但lark-cli task命令直接可用(--as user)
+  飞书可用性: 可用
+  清单: "Java AI Agent 转型学习计划" (guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d)
+
+【步骤4】更新反馈层 (必须执行)
+  4a. 当前日期: 2026-08-01, 起始日2026-07-29, 第4天, Phase0(第1-14天)
+  4b. HTML today-marker 更新:
+      旧值: "当前：Phase 0 · 第 3/168 天"
+      新值: "当前：Phase 0 · 第 4/168 天"
+      文件: java-ai-agent-roadmap.html
+  4c. charts.js __RADAR_GAP__.me 更新:
+      旧值: [47, 40, 12, 30, 45, 8, 26]
+      新值: [48, 41, 13, 30, 45, 8, 27]
+      维度: RAG全链路/Agent编排/Spring AI/分布式中间件/工程化/Python/面试原理深度
+      推进依据: 2个飞书任务completed=true (思维导图+LangChain4j)
+      - RAG全链路 47→48: LangChain4j任务RAG模块(Metadata Filtering/Query Compress/Query Router/ReRanking)
+      - Agent编排 40→41: 思维导图Agent编排/Function Calling + LangChain4j Agentic模块
+      - Spring AI 12→13: LangChain4j任务含与Spring AI对比
+      - 面试原理深度 26→27: 思维导图Phase0验收项知识体系构建
+      - 分布式中间件/工程化/Python: 无对应完成任务，不变
+      jd数组不变: [90, 90, 85, 80, 85, 70, 90]
+  4d. charts.js __RADAR_DAILY__ 重算:
+      旧值: [15, 20, 20, 10, 5, 25]
+      新值: [70, 60, 55, 55, 30, 35]
+      维度: 计划完成率/学习时长/知识输入/实战输出/复习覆盖/连续打卡
+      数据来源: 飞书任务(2完成/9总数) + assignments/2026-07-31(2任务有summary.md)
+      - 计划完成率70: 飞书2/3昨日到期任务完成(67%) + 作业2/2有summary(100%)
+      - 学习时长60: 2任务完成+LangChain4j有完整SpringBoot项目代码+思维导图notes.md
+      - 知识输入55: 作业notes/summary覆盖15+知识点(RAG全链路/Agent编排/Function Calling/MCP/LangChain4j结构/AI Services/Chat Memory/RAG模块4子特性/Agentic/Spring AI对比)
+      - 实战输出55: LangChain4j有完整code目录(pom.xml/多Config类/resources) + 思维导图笔记
+      - 复习覆盖30: 思维导图Java Web→AI Agent知识映射 + LangChain4j与Spring AI框架对比
+      - 连续打卡35: assignments 2026-07-31首日提交 + 飞书2任务完成
+
+【步骤5】采集飞书任务完成度 + 扫描作业目录 + 补写学习指引
+  5a. 飞书清单查找: 成功 (guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d)
+  5b. 飞书任务统计:
+      总任务数: 9 (运行前)
+      已完成: 2 (思维导图72a66dc2, LangChain4j 922cb234, 均due 2026-07-31)
+      未完成: 7
+      今日(8/1)到期: 3个 (第一周笔记/Spring AI集成OpenAI/向量数据库部署)
+      明日(8/2)到期: 3个 (RAG核心概念/Spring AI入门/Python基础环境搭建)
+      昨日(7/31)到期: 3个 (思维导图✓/LangChain4j✓/Python数据结构✗)
+      7天滚动完成率: 67% (2/3到期任务完成)
+  5c. 作业扫描:
+      assignments/2026-07-31/ 存在, 含2个任务目录:
+      - java-web-to-ai-agent-mindmap/: 有summary.md(覆盖RAG/Agent/工具调用/双框架/工程化)
+        + notes.md(详细知识点:RAG全链路/Agent编排/Function Calling/双框架/MCP协议)
+      - langchain4j-quickstart/: 有summary.md(LangChain4j结构/AI Services/Chat Memory/RAG模块/Agentic)
+        + code/目录(完整SpringBoot项目:pom.xml/多Config类/application.yml/资源文件)
+      作业完成数: 2 (2/2有summary.md)
+      知识点提取: RAG全链路/Agent编排/Function Calling/MCP协议/LangChain4j结构/AI Services/Chat Memory/Metadata Filtering/Query Compress/Query Router/ReRanking/Agentic模块/Spring AI对比
+  5d. 快照diff:
+      上次快照(2026-07-31): 9任务, 全部completed=false
+      当前列表: 9任务, 2个completed=true (72a66dc2, 922cb234)
+      消失任务: 无 → excluded.json无变更
+  5e. 快照保存: .trae/snapshot.json 已更新 (snapshot_date: 2026-08-01, 含11任务含2新增)
+  5f. 补写学习指引: 检查9个任务description，全部已有学习指引内容，无需补写
+
+【步骤6】滑动窗口任务规划
+  6a. 完成数C: 统计due在昨天(7/31)及之前且completed=true的任务数 = 2
+      (思维导图72a66dc2 + LangChain4j 922cb234)
+  6b. C = 2 > 0，继续规划
+  6c. 顺延未完成任务:
+      顺延1个: b0342461 (Python数据结构实战, due 2026-07-31→2026-08-03)
+      原因: due昨天且completed=false, 不在excluded.json中
+      3天窗口分布(顺延后):
+        2026-08-01: 3个 (第一周笔记/Spring AI集成OpenAI/向量数据库部署)
+        2026-08-02: 3个 (RAG核心概念/Spring AI入门/Python基础环境搭建)
+        2026-08-03: 1个 (Python数据结构实战-顺延)
+  6d. 新增任务: 2个 (= C)
+      挑选依据: 雷达图最弱维度(Python=8, Spring AI=13, 面试原理深度=27) + Phase0核心内容 + HTML中验收项缺口
+      新增1: "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）"
+        - guid: b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7
+        - due: 2026-08-03
+        - 目标维度: Spring AI + 面试原理深度
+        - 依据: Phase0验收标准"能口述Spring AI与LangChain4j各自优劣与选型场景"
+      新增2: "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）"
+        - guid: a5931ab7-af12-4f17-9d22-354133594103
+        - due: 2026-08-03
+        - 目标维度: Python
+        - 依据: Python维度最弱(8)，已有Python基础/数据结构任务，需进阶OOP
+      3天窗口最终分布:
+        2026-08-01: 3个 | 2026-08-02: 3个 | 2026-08-03: 3个
+  6e. 排除规则: excluded.json为空，无标题被排除
+  6f. 学习指引: 2个新任务均已附带description学习指引(学习目标/知识点/学习资源/验收标准/相关面试题)
+
+【步骤7】写回与兜底
+  7a. 日志写入: .trae/logs/2026-08-01.log
+  7b. git commit & push: 执行中
+  7c. 汇报: 见下方
+
+【更新文件清单】
+  - java-ai-agent-roadmap.html (today-marker: 第3天→第4天)
+  - assets/charts.js (RADAR_GAP.me: [47,40,12,30,45,8,26]→[48,41,13,30,45,8,27]; RADAR_DAILY: [15,20,20,10,5,25]→[70,60,55,55,30,35])
+  - .trae/snapshot.json (snapshot_date: 2026-08-01, 11任务含2新增+1顺延)
+  - .trae/logs/2026-08-01.log (本次日志)
+  - .trae/excluded.json (无变更)
+
+【飞书操作清单】
+  - 顺延任务: 1个 (b0342461 Python数据结构 due 7/31→8/3)
+  - 新增任务: 2个 (b92b1e0d Spring AI vs LangChain4j选型对比 / a5931ab7 Python OOP实战)
+  - 补写学习指引: 0个 (全部已有)
+
+【关键指标摘要】
+  当前阶段: Phase0 第4天/168天
+  飞书任务总数: 11 (运行前9 + 新增2)
+  已完成: 2 (思维导图 + LangChain4j)
+  7天完成率: 67% (2/3)
+  逾期顺延: 1个
+  新增任务: 2个
+  补写学习指引: 0个(全部已有)
+  作业扫描: assignments/2026-07-31, 2任务有summary.md+notes.md/code
+  me雷达推进: 4维 (RAG全链路/Agent编排/Spring AI/面试原理深度 各+1)
+===== 日志结束 =====

@@ -1,5 +1,5 @@
 {
-  "snapshot_date": "2026-07-31",
+  "snapshot_date": "2026-08-01",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
     {
@@ -24,18 +24,18 @@
       "guid": "72a66dc2-1adc-4061-8139-abcddd47f09c",
       "summary": "Java Web 转 AI Agent 知识体系思维导图输出（Phase0 验收项）",
       "due": "2026-07-31",
-      "completed": false
+      "completed": true
     },
     {
       "guid": "922cb234-2017-4885-ac2d-9e17b0826aa8",
       "summary": "LangChain4j 框架结构研读：克隆官方仓库并跑通 QuickStart 示例",
       "due": "2026-07-31",
-      "completed": false
+      "completed": true
     },
     {
       "guid": "b0342461-c918-42e9-85bf-105d616fe135",
       "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
-      "due": "2026-07-31",
+      "due": "2026-08-03",
       "completed": false
     },
     {
@@ -54,6 +54,18 @@
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
       "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
       "due": "2026-08-02",
+      "completed": false
+    },
+    {
+      "guid": "b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7",
+      "summary": "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）",
+      "due": "2026-08-03",
+      "completed": false
+    },
+    {
+      "guid": "a5931ab7-af12-4f17-9d22-354133594103",
+      "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
+      "due": "2026-08-03",
       "completed": false
     }
   ]
