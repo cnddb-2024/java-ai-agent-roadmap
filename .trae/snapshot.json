@@ -1,25 +1,7 @@
 {
-  "snapshot_date": "2026-08-01",
+  "snapshot_date": "2026-08-02",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
-    {
-      "guid": "3d7d245d-d674-4268-9a8a-2ca72e8384d9",
-      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
-      "due": "2026-08-01",
-      "completed": false
-    },
-    {
-      "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
-      "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
-      "due": "2026-08-01",
-      "completed": false
-    },
-    {
-      "guid": "2ae5ce56-78b1-46cc-90a6-79ffb28cb000",
-      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
-      "due": "2026-08-01",
-      "completed": false
-    },
     {
       "guid": "72a66dc2-1adc-4061-8139-abcddd47f09c",
       "summary": "Java Web 转 AI Agent 知识体系思维导图输出（Phase0 验收项）",
@@ -33,9 +15,27 @@
       "completed": true
     },
     {
-      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
-      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
-      "due": "2026-08-03",
+      "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
+      "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖",
+      "due": "2026-08-02",
+      "completed": true
+    },
+    {
+      "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
+      "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
+      "due": "2026-08-02",
+      "completed": true
+    },
+    {
+      "guid": "3d7d245d-d674-4268-9a8a-2ca72e8384d9",
+      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
+      "due": "2026-08-02",
+      "completed": false
+    },
+    {
+      "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
+      "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
+      "due": "2026-08-02",
       "completed": false
     },
     {
@@ -45,15 +45,9 @@
       "completed": false
     },
     {
-      "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
-      "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖",
-      "due": "2026-08-02",
-      "completed": false
-    },
-    {
-      "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
-      "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
-      "due": "2026-08-02",
+      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
+      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
+      "due": "2026-08-03",
       "completed": false
     },
     {
@@ -66,6 +60,24 @@
       "guid": "a5931ab7-af12-4f17-9d22-354133594103",
       "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
       "due": "2026-08-03",
+      "completed": false
+    },
+    {
+      "guid": "2ae5ce56-78b1-46cc-90a6-79ffb28cb000",
+      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
+      "due": "2026-08-04",
+      "completed": false
+    },
+    {
+      "guid": "93591038-7487-443d-83f1-fdc5e540476a",
+      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
+      "due": "2026-08-04",
+      "completed": false
+    },
+    {
+      "guid": "5b941005-5b33-49d1-ab41-4fad9500f36b",
+      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
+      "due": "2026-08-04",
       "completed": false
     }
   ]
