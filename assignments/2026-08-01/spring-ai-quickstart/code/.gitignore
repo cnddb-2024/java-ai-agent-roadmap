@@ -1,0 +1,24 @@
+# Build artifacts
+target/
+build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Maven wrapper
+.mvn/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
