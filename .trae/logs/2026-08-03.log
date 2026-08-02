@@ -1,0 +1,108 @@
+===== 每日维护日志 2026-08-03 (北京时间) =====
+运行时间: 2026-08-03 第6天/168天 Phase0
+
+【步骤1】git clone 仓库
+  状态: 成功
+  仓库: https://github.com/cnddb-2024/java-ai-agent-roadmap.git → roadmap-repo
+
+【步骤2】创建日志目录
+  状态: 成功（目录已存在）
+  路径: .trae/logs/
+
+【步骤3】飞书token状态检查
+  状态: 失败
+  原因: lark-cli auth status 返回 "credentials are provided externally and do not support interactive management"
+  RequestAuthorization: 请求 trae-remote-official:lark::feishu 授权，用户跳过(user_cancel)
+  飞书可用性: 不可用
+  降级处理: 跳过步骤5(5a/5b/5d/5e/5f)和步骤6，步骤4必须执行，步骤5c(作业扫描)独立执行
+
+【步骤4】更新反馈层 (必须执行)
+  4a. 当前日期: 2026-08-03, 起始日2026-07-29, 第6天, Phase0(第1-14天)
+      计算: (2026-08-03 - 2026-07-29) + 1 = 5 + 1 = 6
+  4b. HTML today-marker 更新:
+      旧值: "当前：Phase 0 · 第 5/168 天"
+      新值: "当前：Phase 0 · 第 6/168 天"
+      文件: java-ai-agent-roadmap.html (替换成功)
+  4c. charts.js __RADAR_GAP__.me 更新:
+      旧值: [48, 41, 14, 30, 46, 9, 27]
+      新值: [48, 41, 14, 30, 46, 9, 27] (不变)
+      维度: RAG全链路/Agent编排/Spring AI/分布式中间件/工程化/Python/面试原理深度
+      推进依据: 飞书不可用，无法验证任务completed=true
+      作业数据: 无新增作业(08-02和08-03无assignment目录)
+      结论: 无新完成任务，me值保持不变
+      jd数组不变: [90, 90, 85, 80, 85, 70, 90]
+  4d. charts.js __RADAR_DAILY__ 重算:
+      旧值: [65, 70, 72, 68, 45, 50]
+      新值: [45, 48, 52, 48, 32, 20]
+      维度: 计划完成率/学习时长/知识输入/实战输出/复习覆盖/连续打卡
+      数据来源: 仅作业数据(飞书不可用)
+      7天窗口: 2026-07-28 至 2026-08-03
+      活跃天数: 2天(07-31: 2任务, 08-01: 2任务), 08-02和08-03无活动
+      - 计划完成率45: 4作业有summary.md, 但连续2天无新提交, 无飞书计划数据
+      - 学习时长48: 19个代码文件+notes.md(12行), 7天滚动均值下降
+      - 知识输入52: 4份summary覆盖30+知识点(RAG/Agent/Function Calling/MCP/LangChain4j/Python/Spring AI), 无新输入
+      - 实战输出48: LangChain4j完整SpringBoot项目+Spring AI项目+Python测试文件, 无新代码
+      - 复习覆盖32: 作业含对比(Python vs Java, Spring AI vs LangChain4j), 但无近期复习
+      - 连续打卡20: 最后提交08-01, 08-02和08-03连续2天未提交, 打卡中断
+
+【步骤5】采集飞书任务完成度 + 扫描作业目录 + 补写学习指引 (可降级)
+  5a. 飞书清单查找: 跳过(飞书不可用)
+  5b. 飞书任务统计: 跳过(飞书不可用)
+  5c. 作业扫描 (不依赖飞书, 已执行):
+      assignments/ 目录存在, 扫描结果:
+      - assignments/2026-07-31/: 2个任务目录
+        · java-web-to-ai-agent-mindmap/: summary.md ✓ (RAG全链路/Agent编排/Function Calling/双框架/MCP协议)
+          notes.md ✓ (12行, Java Web→AI Agent映射, RAG全链路, Agent编排, Function Calling, MCP协议)
+        · langchain4j-quickstart/: summary.md ✓ (LangChain4j结构/AI Services/Chat Memory/RAG模块4子特性)
+          code/ ✓ (完整SpringBoot项目, 14个Java文件)
+      - assignments/2026-08-01/: 2个任务目录
+        · python-quickstart/: summary.md ✓ (Python基础语法/列表/字典/for循环/range/if-else)
+          code/ ✓ (1个Python测试文件)
+        · spring-ai-quickstart/: summary.md ✓ (Spring Boot 3/Spring AI BOM/ChatClient API/REST API)
+          code/ ✓ (3个Java文件)
+      - assignments/2026-08-02/: 不存在
+      - assignments/2026-08-03/: 不存在
+      作业完成数: 4 (4/4有summary.md)
+      昨日(08-02)作业完成数: 0 (目录不存在)
+      连续提交天数: 0 (最后提交08-01, 已中断2天)
+      知识点提取: RAG全链路/Agent编排/Function Calling/MCP协议/LangChain4j结构/AI Services/Chat Memory/Metadata Filtering/Query Compress/Query Router/ReRanking/Agentic/Python基础语法/列表/字典/for循环/range/if-else/break-continue/f-string/Spring Boot 3/Spring AI BOM/ChatClient API/System Prompt/REST API/Advisors
+      代码文件统计: 19个(18个Java + 1个Python)
+  5d. 快照diff: 跳过(飞书不可用, 保留上次快照 snapshot_date: 2026-08-02)
+  5e. 快照保存: 跳过(飞书不可用, 不覆盖现有快照)
+  5f. 补写学习指引: 跳过(飞书不可用)
+
+【步骤6】滑动窗口任务规划 (依赖飞书, 可降级)
+  状态: 跳过(飞书不可用)
+  上次快照(08-02)记录: 13任务, 4完成, 9未完成
+  今日(08-03)到期任务(上次快照): 3个
+    · b0342461 (Python数据结构实战, due 08-03, completed=false)
+    · b92b1e0d (Spring AI vs LangChain4j选型对比, due 08-03, completed=false)
+    · a5931ab7 (Python OOP实战, due 08-03, completed=false)
+  无法验证完成状态, 无法顺延/新增任务
+
+【步骤7】写回与兜底
+  7a. 日志写入: .trae/logs/2026-08-03.log
+  7b. git commit & push: 执行中
+  7c. 汇报: 见下方
+
+【更新文件清单】
+  - java-ai-agent-roadmap.html (today-marker: 第5天→第6天)
+  - assets/charts.js (RADAR_GAP.me: [48,41,14,30,46,9,27]不变; RADAR_DAILY: [65,70,72,68,45,50]→[45,48,52,48,32,20])
+  - .trae/logs/2026-08-03.log (本次日志)
+  - .trae/snapshot.json (不变, 保留08-02快照)
+  - .trae/excluded.json (不变)
+
+【飞书操作清单】
+  无(飞书不可用)
+
+【关键指标摘要】
+  当前阶段: Phase0 第6天/168天
+  飞书可用性: 不可用(用户跳过授权)
+  飞书任务总数: 13 (上次快照08-02, 无法更新)
+  已完成: 4 (上次快照, 无法验证今日变化)
+  作业扫描: assignments/2026-07-31(2任务) + 2026-08-01(2任务), 共4任务有summary.md
+  昨日(08-02)作业: 0 (无目录)
+  连续提交天数: 0 (中断2天)
+  me雷达推进: 0维 (无新完成任务)
+  RADAR_DAILY下降原因: 飞书不可用+连续2天无作业提交
+===== 日志结束 =====
