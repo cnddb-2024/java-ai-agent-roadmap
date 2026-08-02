@@ -1,0 +1,48 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-08-02 (北京时间)
+当前Phase: Phase 0 (第5/168天)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定)
+- 淘汰: 3条
+  * 海康威视·应用软件开发(Java方向) — 时效过期(2026-06-10, 超1.5月)
+  * AI Agent应用开发(合肥来点酷) — 时效过期(2026-06-22)
+  * 大模型平台后端工程师(Java/Go) — 不匹配(5-10年硕士要求过高)
+- 新增: 3条
+  * 宁波全拓海伦数智科技·Java Agent开发工程师 (Boss直聘, 2026-08-02, 高匹配)
+  * 炎科技术·AI Agent应用开发工程师(Java方向) (Boss直聘, 2026-08-01, 高匹配)
+  * 猎头·Java研发工程师(Agent方向·北京) (猎聘, 2026-08-01, 高匹配)
+- 当前总数: 20条 (高匹配16 / 中匹配3 / 暂避1)
+
+【区块2 实战项目】
+- 动态上限: 3条在学 (Phase 0 base)
+- 淘汰: 1条移入参考池
+  * springboot-ai-rag-tutorial — Spring AI基础已掌握(snapshot标记完成), 状态"在学"→"参考"
+- 新增: 1条
+  * spring-ai-alibaba-playground (Spring AI Alibaba官方综合示例, 覆盖对话/Tool Calling/RAG/MCP/图片生成, Phase 0综合实践)
+- 当前总数: 6条 (在学3 / 参考3)
+  * 在学: spring-ai-alibaba-playground, knowledgeops-agent, spring-al-alibaba-customer
+  * 参考: springboot-ai-rag-tutorial, Java-LLM-integration, Spring AI Alibaba官方生态
+
+【区块3 面试题】
+- 动态上限: 5-10条T1 (Phase 0)
+- 淘汰: 0条 (snapshot无面试题掌握度数据, 仅时效性淘汰; 现有题目均2026时效内)
+- 新增:
+  * T1: 0条 (已达上限10, 现有题目均高度相关保留)
+  * T2: +4个新trending题目
+    - GraphRAG图谱增强检索(实体关系抽取+社区摘要+全局查询)
+    - Agentic RAG主动检索范式(Agent自主决策检索 vs 传统被动管道, 2026新趋势)
+    - 情景记忆Episodic Memory(跨会话任务经历回放与反思)
+    - 检索记忆vs权重记忆(港中大/浙大论文核心发现)
+  * T3: +2个新概念
+    - Constitutional AI(宪法AI对齐方法)
+    - In-context Learning vs Fine-tuning选型
+- 当前总数: T1=10题 / T2=24题点 / T3=12题点
+
+【运行状态】
+- 搜索来源: WebSearch (Boss直聘/猎聘/智联/CSDN/掘金/小林coding/GitHub)
+- snapshot掌握度: 读取.tras/snapshot.json, 含任务完成数据但无面试题维度掌握度
+- excluded.json: 空列表, 无排除项
+- 运行结果: 成功
