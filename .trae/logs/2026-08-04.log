@@ -1,0 +1,158 @@
+===== 每日维护日志 2026-08-04 (北京时间) =====
+运行时间: 2026-08-04 第7天/168天 Phase0
+
+【步骤1】git clone 仓库
+  状态: 成功
+  仓库: https://github.com/cnddb-2024/java-ai-agent-roadmap.git → roadmap-repo
+
+【步骤2】创建日志目录
+  状态: 成功（目录已存在）
+  路径: .trae/logs/
+
+【步骤3】飞书token状态检查
+  状态: lark-cli auth status 不支持（credentials are provided externally）
+  降级处理: 直接调用 lark-cli task tasklists list --as user 验证可用性
+  结果: 飞书可用！清单"Java AI Agent 转型学习计划"已找到
+  清单guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+
+【步骤4】更新反馈层 (必须执行)
+  4a. 当前日期: 2026-08-04, 起始日2026-07-29, 第7天, Phase0(第1-14天)
+      计算: (2026-08-04 - 2026-07-29) + 1 = 6 + 1 = 7
+  4b. HTML today-marker 更新:
+      旧值: "当前：Phase 0 · 第 6/168 天"
+      新值: "当前：Phase 0 · 第 7/168 天"
+      文件: java-ai-agent-roadmap.html (替换成功)
+  4c. charts.js __RADAR_GAP__.me 更新:
+      旧值: [48, 41, 14, 30, 46, 9, 27]
+      新值: [48, 41, 14, 30, 46, 9, 27] (不变)
+      维度: RAG全链路/Agent编排/Spring AI/分布式中间件/工程化/Python/面试原理深度
+      推进依据: 飞书任务completed=true（4个已完成任务在上次快照中已标记完成，无新增完成）
+      作业数据: 4个summary.md（07-31: 2个, 08-01: 2个），08-02/03/04无新增作业
+      结论: 无新完成任务，me值保持不变
+      jd数组不变: [90, 90, 85, 80, 85, 70, 90]
+  4d. charts.js __RADAR_DAILY__ 重算:
+      旧值: [45, 48, 52, 48, 32, 20]
+      新值: [42, 50, 55, 52, 35, 15]
+      维度: 计划完成率/学习时长/知识输入/实战输出/复习覆盖/连续打卡
+      数据来源: 飞书数据（主）+ 作业数据（辅），飞书本次可用
+      7天窗口: 2026-07-28 至 2026-08-04
+      飞书任务统计(7天窗口):
+        - 07-31到期: 2任务, 2完成 (100%)
+        - 08-02到期: 5任务, 2完成 (40%)
+        - 08-03到期: 3任务, 0完成 (0%)
+        - 08-04到期: 3任务, 0完成 (今天, 未计入逾期)
+      作业统计:
+        - 07-31: 2个summary.md
+        - 08-01: 2个summary.md
+        - 08-02/03/04: 无作业
+      - 计划完成率42: 飞书4/10=40% + 作业4个summary.md, 综合偏低
+      - 学习时长50: 飞书4任务完成 + 19个代码文件 + notes.md, 但连续3天无活动
+      - 知识输入55: 30+知识点覆盖(RAG/Agent/Function Calling/MCP/LangChain4j/Python/Spring AI), 飞书确认4任务完成
+      - 实战输出52: 19个代码文件(LangChain4j项目+Spring AI项目+Python测试), 飞书2个项目类任务完成
+      - 复习覆盖35: 作业含对比(Python vs Java, Spring AI vs LangChain4j), 但无近期复习
+      - 连续打卡15: 最后作业提交08-01(3天前), 最后飞书完成08-02(2天前), 打卡持续中断
+
+【步骤5】采集飞书任务完成度 + 扫描作业目录 + 补写学习指引
+  5a. 飞书清单查找: 成功
+      清单: "Java AI Agent 转型学习计划" (guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d)
+  5b. 飞书任务统计: 成功
+      任务总数: 13 (运行前)
+      已完成: 4 (72a66dc2, 922cb234, 3b6c3874, d181d3e6)
+      未完成: 9
+      7天滚动完成率: 4/10 = 40% (due≤昨日的10个任务中4个完成)
+      昨日(08-03)到期未完成: 3个 (b0342461, b92b1e0d, a5931ab7)
+  5c. 作业扫描 (不依赖飞书):
+      assignments/ 目录存在, 扫描结果:
+      - assignments/2026-07-31/: 2个任务目录
+        · java-web-to-ai-agent-mindmap/: summary.md ✓ (RAG全链路/Agent编排/Function Calling/双框架/MCP协议)
+          notes.md ✓ (12行, Java Web→AI Agent映射, RAG全链路, Agent编排, Function Calling, MCP协议)
+        · langchain4j-quickstart/: summary.md ✓ (LangChain4j结构/AI Services/Chat Memory/RAG模块4子特性)
+          code/ ✓ (完整SpringBoot项目, 14个Java文件)
+      - assignments/2026-08-01/: 2个任务目录
+        · python-quickstart/: summary.md ✓ (Python基础语法/列表/字典/for循环/range/if-else)
+          code/ ✓ (1个Python测试文件)
+        · spring-ai-quickstart/: summary.md ✓ (Spring Boot 3/Spring AI BOM/ChatClient API/REST API)
+          code/ ✓ (3个Java文件)
+      - assignments/2026-08-02/: 不存在
+      - assignments/2026-08-03/: 不存在
+      - assignments/2026-08-04/: 不存在
+      作业完成数: 4 (4/4有summary.md)
+      昨日(08-03)作业完成数: 0 (目录不存在)
+      连续提交天数: 0 (最后提交08-01, 已中断3天)
+      知识点提取: RAG全链路/Agent编排/Function Calling/MCP协议/LangChain4j结构/AI Services/Chat Memory/Metadata Filtering/Query Compress/Query Router/ReRanking/Agentic/Python基础语法/列表/字典/for循环/range/if-else/break-continue/f-string/Spring Boot 3/Spring AI BOM/ChatClient API/System Prompt/REST API/Advisors
+      代码文件统计: 19个(18个Java + 1个Python)
+  5d. 快照diff: 无任务消失
+      上次快照(08-02): 13任务
+      本次任务: 13任务
+      所有guid匹配, 无任务被删除, excluded.json不变
+  5e. 快照保存: 成功写入 .trae/snapshot.json (snapshot_date: 2026-08-04, 17任务含新增)
+  5f. 补写学习指引: 不需要
+      检查全部13个任务的description字段, 均已包含完整学习指引(学习目标/知识点/学习资源/验收标准/相关面试题)
+      无空description任务, 无需补写
+
+【步骤6】滑动窗口任务规划 (飞书可用)
+  6a. 完成数C: 4
+      统计: due在昨天(08-03)及之前且completed=true的任务数 = 4
+      (72a66dc2 due 07-31 ✓, 922cb234 due 07-31 ✓, 3b6c3874 due 08-02 ✓, d181d3e6 due 08-02 ✓)
+  6b. C > 0, 继续规划
+  6c. 顺延未完成任务: 6个
+      顺延规则: 按原顺序分配到3天窗口(08-04/08-05/08-06), 优先填今天
+      - 3d7d245d (整理第一周学习笔记) → 08-04 ✓
+      - 0e1d9f3a (Spring AI OpenAI API) → 08-05 ✓
+      - 53707db7 (RAG核心概念学习) → 08-05 ✓
+      - b0342461 (Python数据结构实战) → 08-05 ✓
+      - b92b1e0d (Spring AI vs LangChain4j) → 08-06 ✓
+      - a5931ab7 (Python OOP实战) → 08-06 ✓
+      全部patch成功
+  6d. 新增任务: 4个 (= C)
+      挑选依据: 雷达图最弱维度(Python=9, Spring AI=14) + Phase0核心内容 + HTML缺口
+      - Task1: Python 模块与包管理实战 (Python维度最弱) → due 08-05 ✓
+        guid: e95ce895-0bc8-4dfd-ba8e-05f9d11f64a3
+      - Task2: Spring AI Advisors 机制实战 (Spring AI维度弱, Phase0核心) → due 08-05 ✓
+        guid: 18083ca2-cc88-4115-93f5-3a423b775b50
+      - Task3: Spring AI Tool Calling 实战 (Spring AI+Agent维度, Phase0核心) → due 08-06 ✓
+        guid: 6f237cc8-07e8-4ab6-81d9-6ebb05a5f7b6
+      - Task4: 目标 JD 收集与刚需能力提取表 (Phase0验收项) → due 08-06 ✓
+        guid: d11df11c-1038-4f7e-a964-c7f91324cafc
+      全部create成功, 已加入清单
+  6e. 排除规则: excluded.json为空, 无需排除
+  6f. 学习指引: 4个新任务均附带完整学习指引(学习目标/知识点/学习资源/验收标准/相关面试题)
+
+  3天窗口最终分布:
+  - 08-04(今天): 4任务 (2ae5ce56向量DB + 93591038 Function Calling + 5b941005 RAG demo + 3d7d245d 第一周笔记)
+  - 08-05(明天): 5任务 (0e1d9f3a Spring AI API + 53707db7 RAG概念 + b0342461 Python数据结构 + e95ce895 Python模块 + 18083ca2 Spring AI Advisors)
+  - 08-06(后天): 5任务 (b92b1e0d 框架选型 + a5931ab7 Python OOP + 6f237cc8 Spring AI Tool + d11df11c JD收集)
+
+【步骤7】写回与兜底
+  7a. 日志写入: .trae/logs/2026-08-04.log
+  7b. git commit & push: 执行中
+  7c. 汇报: 见下方
+
+【更新文件清单】
+  - java-ai-agent-roadmap.html (today-marker: 第6天→第7天)
+  - assets/charts.js (RADAR_GAP.me: [48,41,14,30,46,9,27]不变; RADAR_DAILY: [45,48,52,48,32,20]→[42,50,55,52,35,15])
+  - .trae/logs/2026-08-04.log (本次日志)
+  - .trae/snapshot.json (更新至08-04, 17任务含4个新增)
+  - .trae/excluded.json (不变)
+
+【飞书操作清单】
+  - 顺延任务: 6个 (3d7d245d, 0e1d9f3a, 53707db7, b0342461, b92b1e0d, a5931ab7)
+  - 新增任务: 4个 (e95ce895, 18083ca2, 6f237cc8, d11df11c)
+  - 补写学习指引: 0个 (所有任务已有description)
+
+【关键指标摘要】
+  当前阶段: Phase0 第7天/168天
+  飞书可用性: 可用
+  飞书任务总数(运行前): 13
+  已完成: 4 (自上次快照无新增完成)
+  完成数C: 4
+  顺延任务数: 6
+  新增任务数: 4
+  补写学习指引数: 0
+  飞书任务总数(运行后): 17
+  作业扫描: assignments/2026-07-31(2任务) + 2026-08-01(2任务), 共4任务有summary.md
+  昨日(08-03)作业: 0 (无目录)
+  连续提交天数: 0 (中断3天)
+  me雷达推进: 0维 (无新完成任务)
+  RADAR_DAILY变化: 飞书可用后数据更准确, 连续打卡因3天无活动继续下降
+===== 日志结束 =====
