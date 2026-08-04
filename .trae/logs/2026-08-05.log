@@ -1,0 +1,143 @@
+========================================
+每日维护日志 2026-08-05 (北京时间)
+========================================
+
+【环境信息】
+- 沙箱UTC时间: 2026-08-04
+- 北京时间: 2026-08-05
+- 起始日: 2026-07-29
+- 第几天: 8/168
+- 当前Phase: Phase 0 (第1-14天)
+
+【步骤1: git clone】
+- 状态: 成功
+- 仓库: cnddb-2024/java-ai-agent-roadmap.git
+
+【步骤2: 创建日志目录】
+- 状态: 成功
+- 路径: .trae/logs/
+
+【步骤3: 飞书token状态检查】
+- 状态: 可用 (auth status不支持交互式管理，但whoami确认身份有效)
+- 用户: cnddb (open_id: ou_0cca5c0dbe2c383b42cf523538b250bf)
+- tokenStatus: ready
+- 清单「Java AI Agent 转型学习计划」已存在
+- 清单guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+
+【步骤4: 更新反馈层 (HTML + charts.js)】
+4a. 日期计算:
+    - 今天: 2026-08-05, 第8天, Phase 0
+4b. HTML更新:
+    - 文件: java-ai-agent-roadmap.html
+    - 更新: id="today-marker" div, "第 7/168 天" → "第 8/168 天"
+    - 状态: 成功
+4c. RADAR_GAP me数组:
+    - 当前值: [48, 41, 14, 30, 46, 9, 27]
+    - 维度: RAG全链路/Agent编排/Spring AI/分布式中间件/工程化/Python/面试原理深度
+    - 分析: 4个已完成任务(思维导图/LangChain4j/Spring AI入门/Python基础)均在上次快照(2026-08-04)前完成
+    - 本次无新完成任务, me值保持不变
+    - 状态: 无变更 (符合原则: 仅completed=true才推进)
+4d. RADAR_DAILY数组:
+    - 旧值: [42, 50, 55, 52, 35, 15]
+    - 新值: [50, 50, 55, 52, 35, 15]
+    - 维度: 计划完成率/学习时长/知识输入/实战输出/复习覆盖/连续打卡
+    - 计算依据:
+      * 计划完成率: 42→50 (4/8到期任务完成=50%, 4个作业summary.md确认)
+      * 学习时长: 50 (4完成任务, 2活跃天, LangChain4j~15Java文件/SpringAI~3Java文件/Python~1文件)
+      * 知识输入: 55 (~23知识点: RAG/Agent/SpringAI/Python/LangChain4j)
+      * 实战输出: 52 (2个Java项目+1个Python文件)
+      * 复习覆盖: 35 (Java↔Python/SpringAI↔LangChain4j交叉引用)
+      * 连续打卡: 15 (7/31-8/1连续2天后中断4天)
+    - 状态: 成功
+
+【步骤5: 飞书任务采集 + 作业扫描 + 学习指引】
+5a. 清单查找: 成功 (guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d)
+5b. 任务列表统计:
+    - 总任务数: 17
+    - 已完成: 4 (思维导图/LangChain4j/Spring AI入门/Python基础)
+    - 未完成: 13
+    - 7天滚动完成率(到期≤昨日): 4/8 = 50%
+5c. 作业扫描:
+    - assignments/目录: 存在
+    - 作业目录数: 4 (2026-07-31×2, 2026-08-01×2)
+    - 有summary.md的任务数: 4
+    - 知识点提取:
+      * java-web-to-ai-agent-mindmap: RAG全链路/Agent编排/Function Calling/Spring AI+LangChain4j/MCP协议
+      * langchain4j-quickstart: AI Services/Chat Memory/RAG(Metadata Filtering/Query Compress/Query Router/ReRanking)/Agentic
+      * python-quickstart: 变量/数据类型/列表/字典/for循环/range/if-else/break-continue/f-string
+      * spring-ai-quickstart: Spring Boot 3/spring-ai-openai-starter/ChatClient API/System Prompt/REST API
+    - 代码产出:
+      * langchain4j-quickstart: ~15 Java文件(含Config/Controller/Model/Router等)
+      * spring-ai-quickstart: 3 Java文件(Application/ChatController/Test)
+      * python-quickstart: 1 Python测试文件
+      * java-web-to-ai-agent-mindmap: notes.md(概念性,无代码)
+5d. 快照diff:
+    - 上次快照(2026-08-04): 17任务
+    - 当前列表: 17任务(相同guid)
+    - 消失任务: 0 (无需更新excluded.json)
+5e. 快照保存: 成功 (.trae/snapshot.json, 21任务含新增)
+5f. 学习指引检查:
+    - 检查17个任务的description字段
+    - 结果: 全部17个任务已有description(学习指引)
+    - 需补写: 0
+    - 状态: 无需补写
+
+【步骤6: 滑动窗口任务规划】
+6a. 完成数C:
+    - due≤2026-08-04且completed=true的任务数: C=4
+    (思维导图7/31✓, LangChain4j 7/31✓, Spring AI入门8/2✓, Python基础8/2✓)
+6b. 判断: C=4 > 0, 继续执行
+6c. 顺延未完成任务(4个, due 2026-08-04):
+    1. 3d7d245d "整理第一周学习笔记" → 2026-08-05 (今天) ✓
+    2. 2ae5ce56 "向量数据库本地部署" → 2026-08-05 (今天) ✓
+    3. 93591038 "Function Calling原理实战" → 2026-08-06 (明天) ✓
+    4. 5b941005 "RAG知识库问答demo" → 2026-08-07 (后天) ✓
+    - 顺延成功数: 4/4
+6d. 新增任务(4个, =C):
+    挑选依据: 雷达图最弱维度(Python=9, Spring AI=14) + Phase0核心内容 + HTML面试题缺口
+    1. "Spring AI 可观测性实战：Micrometer集成/Token计数/调用链路追踪"
+       - 维度: Spring AI, due 2026-08-05
+       - guid: 529165b4-c44d-43c3-bc6b-95d4ec051503
+       - 依据: Phase0核心内容含"可观测性(Micrometer)"但无对应任务
+    2. "Ollama 本地部署 Qwen 模型 + Spring AI 对接本地模型"
+       - 维度: Spring AI/工程化, due 2026-08-06
+       - guid: a466e258-c556-4c28-ad9a-e2dfecf39130
+       - 依据: Phase0核心内容含"本地Ollama部署Qwen"但无对应任务
+    3. "MCP 协议概念学习与 Spring AI MCP 集成初探"
+       - 维度: Agent编排/面试原理, due 2026-08-07
+       - guid: 4eaa0c30-6bc5-48c1-bee8-17a0a1a3b299
+       - 依据: 第一梯队面试题"MCP vs Function Call本质区别"无对应任务
+    4. "Python 文件IO与异常处理实战：文件读写/JSON处理/异常捕获"
+       - 维度: Python(最弱维度=9), due 2026-08-07
+       - guid: 11cb0e1a-9ddb-435d-8fa2-ea5caa689d53
+       - 依据: Python维度最弱, Phase0需补齐Python基础
+    - 新增成功数: 4/4
+6e. 排除规则: excluded.json为空, 无需排除
+6f. 新任务学习指引: 4个新任务均含description(学习指引), 格式符合要求
+
+【步骤7: 写回与提交】
+7a. 日志文件: .trae/logs/2026-08-05.log
+7b. 更新文件清单:
+    - java-ai-agent-roadmap.html (today-marker: 第8/168天)
+    - assets/charts.js (RADAR_DAILY: [50, 50, 55, 52, 35, 15])
+    - .trae/snapshot.json (21任务, 含4顺延+4新增)
+    - .trae/logs/2026-08-05.log (本日志)
+7c. 飞书操作汇总:
+    - 顺延任务: 4个
+    - 新增任务: 4个
+    - 补写学习指引: 0个(全部已有)
+    - 排除任务: 0个
+
+【运行摘要】
+- 总体状态: 全部步骤成功
+- 飞书状态: 可用
+- 完成数C: 4
+- 顺延任务数: 4
+- 新增任务数: 4
+- 补写学习指引数: 0
+- 当前清单总任务数: 21 (17原有 + 4新增)
+- 3天窗口分布:
+  * 2026-08-05(今天): 8任务 (5原有 + 2顺延 + 1新增)
+  * 2026-08-06(明天): 6任务 (4原有 + 1顺延 + 1新增)
+  * 2026-08-07(后天): 3任务 (0原有 + 1顺延 + 2新增)
+========================================
