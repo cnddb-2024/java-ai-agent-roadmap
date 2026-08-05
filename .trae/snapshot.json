@@ -3,45 +3,66 @@
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
     {
-      "guid": "d11df11c-1038-4f7e-a964-c7f91324cafc",
-      "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
-      "due": "2026-08-06",
-      "completed": false
-    },
-    {
-      "guid": "6f237cc8-07e8-4ab6-81d9-6ebb05a5f7b6",
-      "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",
-      "due": "2026-08-06",
-      "completed": false
-    },
-    {
-      "guid": "18083ca2-cc88-4115-93f5-3a423b775b50",
-      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
+      "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
+      "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记",
       "due": "2026-08-05",
+      "created_at": "1785400457200",
       "completed": false
     },
     {
-      "guid": "e95ce895-0bc8-4dfd-ba8e-05f9d11f64a3",
-      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
+      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
+      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
       "due": "2026-08-05",
-      "completed": false
-    },
-    {
-      "guid": "a5931ab7-af12-4f17-9d22-354133594103",
-      "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
-      "due": "2026-08-06",
-      "completed": false
-    },
-    {
-      "guid": "b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7",
-      "summary": "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）",
-      "due": "2026-08-06",
+      "created_at": "1785400471330",
       "completed": false
     },
     {
       "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
       "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
       "due": "2026-08-05",
+      "created_at": "1785400489687",
+      "completed": false
+    },
+    {
+      "guid": "b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7",
+      "summary": "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）",
+      "due": "2026-08-06",
+      "created_at": "1785537370288",
+      "completed": false
+    },
+    {
+      "guid": "a5931ab7-af12-4f17-9d22-354133594103",
+      "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
+      "due": "2026-08-06",
+      "created_at": "1785537379687",
+      "completed": false
+    },
+    {
+      "guid": "e95ce895-0bc8-4dfd-ba8e-05f9d11f64a3",
+      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
+      "due": "2026-08-06",
+      "created_at": "1785638172",
+      "completed": false
+    },
+    {
+      "guid": "18083ca2-cc88-4115-93f5-3a423b775b50",
+      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
+      "due": "2026-08-07",
+      "created_at": "1785639254",
+      "completed": false
+    },
+    {
+      "guid": "6f237cc8-07e8-4ab6-81d9-6ebb05a5f7b6",
+      "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",
+      "due": "2026-08-07",
+      "created_at": "1785640191",
+      "completed": false
+    },
+    {
+      "guid": "d11df11c-1038-4f7e-a964-c7f91324cafc",
+      "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
+      "due": "2026-08-07",
+      "created_at": "1785641257",
       "completed": false
     },
     {
@@ -55,18 +76,6 @@
       "summary": "LangChain4j 框架结构研读：克隆官方仓库并跑通 QuickStart 示例",
       "due": "2026-07-31",
       "completed": true
-    },
-    {
-      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
-      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
-      "due": "2026-08-05",
-      "completed": false
-    },
-    {
-      "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
-      "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记",
-      "due": "2026-08-05",
-      "completed": false
     },
     {
       "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
