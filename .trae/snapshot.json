@@ -29,13 +29,13 @@
     {
       "guid": "5b941005-5b33-49d1-ab41-4fad9500f36b",
       "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
-      "due": "2026-08-07",
+      "due": "2026-08-11",
       "completed": false
     },
     {
       "guid": "93591038-7487-443d-83f1-fdc5e540476a",
       "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
-      "due": "2026-08-06",
+      "due": "2026-08-10",
       "completed": false
     },
     {
@@ -53,7 +53,7 @@
     {
       "guid": "3d7d245d-d674-4268-9a8a-2ca72e8384d9",
       "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
-      "due": "2026-08-05",
+      "due": "2026-08-08",
       "completed": false
     },
     {
@@ -65,7 +65,7 @@
     {
       "guid": "2ae5ce56-78b1-46cc-90a6-79ffb28cb000",
       "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
-      "due": "2026-08-05",
+      "due": "2026-08-09",
       "completed": false
     },
     {
@@ -103,30 +103,6 @@
       "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
       "due": "2026-08-02",
       "completed": true
-    },
-    {
-      "guid": "529165b4-c44d-43c3-bc6b-95d4ec051503",
-      "summary": "Spring AI 可观测性实战：Micrometer集成/Token计数/调用链路追踪",
-      "due": "2026-08-05",
-      "completed": false
-    },
-    {
-      "guid": "a466e258-c556-4c28-ad9a-e2dfecf39130",
-      "summary": "Ollama 本地部署 Qwen 模型 + Spring AI 对接本地模型",
-      "due": "2026-08-06",
-      "completed": false
-    },
-    {
-      "guid": "4eaa0c30-6bc5-48c1-bee8-17a0a1a3b299",
-      "summary": "MCP 协议概念学习与 Spring AI MCP 集成初探",
-      "due": "2026-08-07",
-      "completed": false
-    },
-    {
-      "guid": "11cb0e1a-9ddb-435d-8fa2-ea5caa689d53",
-      "summary": "Python 文件IO与异常处理实战：文件读写/JSON处理/异常捕获",
-      "due": "2026-08-07",
-      "completed": false
     }
   ]
 }
