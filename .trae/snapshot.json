@@ -19,16 +19,16 @@
     {
       "guid": "2f060e48-34a6-46eb-b1b4-9dd24cc8f53c",
       "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
-      "due": "2026-08-05",
-      "created_at": "1785400480000",
+      "due": "2026-08-06",
+      "created_at": "1785400493000",
       "original_guid": "2ae5ce56-78b1-46cc-90a6-79ffb28cb000",
-      "original_created_at_note": "原任务2ae5ce56于2026-07-30创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
+      "original_created_at_note": "原任务2ae5ce56于2026-07-30创建，2026-08-05修正时重建为新GUID。created_at修正为1785400493000（晚于3112e317的1785400492000），反映原始创建顺序：0e1d9f3a < 3d7d245d < 2ae5ce56",
       "completed": false
     },
     {
       "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
       "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
-      "due": "2026-08-06",
+      "due": "2026-08-05",
       "created_at": "1785400489687",
       "completed": false
     },
