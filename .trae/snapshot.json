@@ -27,18 +27,6 @@
       "completed": false
     },
     {
-      "guid": "5b941005-5b33-49d1-ab41-4fad9500f36b",
-      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
-      "due": "2026-08-11",
-      "completed": false
-    },
-    {
-      "guid": "93591038-7487-443d-83f1-fdc5e540476a",
-      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
-      "due": "2026-08-10",
-      "completed": false
-    },
-    {
       "guid": "a5931ab7-af12-4f17-9d22-354133594103",
       "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
       "due": "2026-08-06",
@@ -51,21 +39,9 @@
       "completed": false
     },
     {
-      "guid": "3d7d245d-d674-4268-9a8a-2ca72e8384d9",
-      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
-      "due": "2026-08-08",
-      "completed": false
-    },
-    {
       "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
       "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
       "due": "2026-08-05",
-      "completed": false
-    },
-    {
-      "guid": "2ae5ce56-78b1-46cc-90a6-79ffb28cb000",
-      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
-      "due": "2026-08-09",
       "completed": false
     },
     {

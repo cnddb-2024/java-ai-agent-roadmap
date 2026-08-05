@@ -1,0 +1,26 @@
+{
+  "description": "从飞书清单中暂时移除的任务，等3天窗口有空位时重新创建",
+  "updated": "2026-08-05",
+  "backlog_tasks": [
+    {
+      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
+      "original_due": "2026-08-04",
+      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+    },
+    {
+      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
+      "original_due": "2026-08-04",
+      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+    },
+    {
+      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
+      "original_due": "2026-08-04",
+      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+    },
+    {
+      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
+      "original_due": "2026-08-04",
+      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+    }
+  ]
+}
