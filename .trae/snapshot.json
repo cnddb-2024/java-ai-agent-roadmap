@@ -17,10 +17,28 @@
       "completed": false
     },
     {
+      "guid": "2f060e48-34a6-46eb-b1b4-9dd24cc8f53c",
+      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
+      "due": "2026-08-05",
+      "created_at": "1785400480000",
+      "original_guid": "2ae5ce56-78b1-46cc-90a6-79ffb28cb000",
+      "original_created_at_note": "原任务2ae5ce56于2026-07-30创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
+      "completed": false
+    },
+    {
       "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
       "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
-      "due": "2026-08-05",
+      "due": "2026-08-06",
       "created_at": "1785400489687",
+      "completed": false
+    },
+    {
+      "guid": "3112e317-9976-4eb3-84e6-d0a3e7304cb3",
+      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
+      "due": "2026-08-06",
+      "created_at": "1785400492000",
+      "original_guid": "3d7d245d-d674-4268-9a8a-2ca72e8384d9",
+      "original_created_at_note": "原任务3d7d245d于2026-07-30创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
       "completed": false
     },
     {
@@ -33,60 +51,54 @@
     {
       "guid": "a5931ab7-af12-4f17-9d22-354133594103",
       "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
-      "due": "2026-08-06",
+      "due": "2026-08-07",
       "created_at": "1785537379687",
       "completed": false
     },
     {
-      "guid": "e95ce895-0bc8-4dfd-ba8e-05f9d11f64a3",
-      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
-      "due": "2026-08-06",
-      "created_at": "1785638172",
+      "guid": "a0c5dd2a-1de3-4d88-898a-680a1c7204a4",
+      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
+      "due": "2026-08-07",
+      "created_at": "1785590400000",
+      "original_guid": "93591038-7487-443d-83f1-fdc5e540476a",
+      "original_created_at_note": "原任务93591038于2026-08-02创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
       "completed": false
     },
     {
-      "guid": "18083ca2-cc88-4115-93f5-3a423b775b50",
-      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
+      "guid": "40ae67ff-da61-4d73-b826-b49b8c06ef75",
+      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
       "due": "2026-08-07",
-      "created_at": "1785639254",
-      "completed": false
-    },
-    {
-      "guid": "6f237cc8-07e8-4ab6-81d9-6ebb05a5f7b6",
-      "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",
-      "due": "2026-08-07",
-      "created_at": "1785640191",
-      "completed": false
-    },
-    {
-      "guid": "d11df11c-1038-4f7e-a964-c7f91324cafc",
-      "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
-      "due": "2026-08-07",
-      "created_at": "1785641257",
+      "created_at": "1785590500000",
+      "original_guid": "5b941005-5b33-49d1-ab41-4fad9500f36b",
+      "original_created_at_note": "原任务5b941005于2026-08-02创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
       "completed": false
     },
     {
       "guid": "72a66dc2-1adc-4061-8139-abcddd47f09c",
       "summary": "Java Web 转 AI Agent 知识体系思维导图输出（Phase0 验收项）",
       "due": "2026-07-31",
+      "created_at": "1785400474470",
       "completed": true
     },
     {
       "guid": "922cb234-2017-4885-ac2d-9e17b0826aa8",
       "summary": "LangChain4j 框架结构研读：克隆官方仓库并跑通 QuickStart 示例",
       "due": "2026-07-31",
+      "created_at": "1785400472739",
       "completed": true
     },
     {
       "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
       "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖",
       "due": "2026-08-02",
+      "created_at": "1785400455301",
       "completed": true
     },
     {
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
       "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
       "due": "2026-08-02",
+      "created_at": "1785400453431",
       "completed": true
     }
   ]

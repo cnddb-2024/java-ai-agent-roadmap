@@ -3,24 +3,36 @@
   "updated": "2026-08-05",
   "backlog_tasks": [
     {
-      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
-      "original_due": "2026-08-04",
-      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+      "original_guid": "e95ce895-0bc8-4dfd-ba8e-05f9d11f64a3",
+      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
+      "original_due": "2026-08-06",
+      "created_at": "1785796638172",
+      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
+      "description": "【学习目标】该任务对应Phase0，目标是补齐Python工程基础，掌握模块化开发与包管理能力，为后续Python+AI开发打基础\n【知识点】pip包管理/venv虚拟环境/模块import机制/标准库速览(os/sys/json/pathlib)/__name__与__main__/包结构与__init__.py\n【学习资源】Python官方教程-模块: https://docs.python.org/zh-cn/3/tutorial/modules.html ; pip文档: https://pip.pypa.io/en/stable/ ; 小林coding八股: https://www.cnblogs.com/xiaolincoding/p/20534325\n【验收标准】能创建venv虚拟环境并用pip管理依赖；能口述Python模块搜索路径与import机制；能对比Java的Maven/Gradle与Python的pip/venv\n【相关面试题】Python GIL原理（第二梯队）; Python vs Java内存管理对比（第二梯队）"
     },
     {
-      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
-      "original_due": "2026-08-04",
-      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+      "original_guid": "18083ca2-cc88-4115-93f5-3a423b775b50",
+      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
+      "original_due": "2026-08-07",
+      "created_at": "1785796639254",
+      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
+      "description": "【学习目标】该任务对应Phase0核心内容，目标是掌握Spring AI Advisors机制，理解请求/响应拦截链路，类比LangChain4j中间件链\n【知识点】Advisor接口/RequestResponseAdvisor/AdvisorChain链式编排/日志审计Advisor/内容过滤Advisor/Spring AI Advisors vs LangChain4j中间件对比\n【学习资源】Spring AI Advisors文档: https://docs.spring.io/spring-ai/reference/api/advisors.html ; Spring AI参考代码: https://github.com/spring-projects/spring-ai\n【验收标准】编写自定义Advisor实现请求日志记录或内容过滤；能口述Advisor链式调用流程；能对比Spring AI Advisors与LangChain4j中间件机制\n【相关面试题】Spring AI vs LangChain4j选型（第一梯队）; Function Call底层原理-LLM不执行函数（第一梯队）"
     },
     {
-      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
-      "original_due": "2026-08-04",
-      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+      "original_guid": "6f237cc8-07e8-4ab6-81d9-6ebb05a5f7b6",
+      "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",
+      "original_due": "2026-08-07",
+      "created_at": "1785796640191",
+      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
+      "description": "【学习目标】该任务对应Phase0核心内容，目标是掌握Spring AI Tool Calling机制，实现LLM工具调用的完整demo\n【知识点】@Tool注解/@ToolParam参数描述/FunctionCallback/工具注册(ToolCallbackProvider)/自动工具发现/工具调用流程(LLM决策→业务执行→结果返回)/Spring AI Tool vs LangChain4j Tools对比\n【学习资源】Spring AI Tool Calling文档: https://docs.spring.io/spring-ai/reference/api/toolcalling.html ; Spring AI示例: https://github.com/spring-projects/spring-ai-examples\n【验收标准】编写Spring AI Tool Calling demo，注册至少2个工具(如查天气/查数据库)，LLM能自动选择并调用；能口述Tool Calling完整流程\n【相关面试题】Function Call底层原理-LLM不执行函数（第一梯队）; Agent死循环防护三方法（第二梯队）"
     },
     {
-      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
-      "original_due": "2026-08-04",
-      "removed_reason": "3天窗口已满(9/9)，从飞书暂时移除，存入backlog等待空位"
+      "original_guid": "d11df11c-1038-4f7e-a964-c7f91324cafc",
+      "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
+      "original_due": "2026-08-07",
+      "created_at": "1785796641257",
+      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
+      "description": "【学习目标】该任务对应Phase0验收标准，目标是收集10-15个Java AI Agent岗位JD，提取刚需能力清单，建立能力基线\n【知识点】JD分析方法论/刚需能力vs加分项识别/能力矩阵构建/市场趋势分析/薪资与能力对应关系\n【学习资源】本项目HTML中JD要求矩阵: https://github.com/cnddb-2024/java-ai-agent-roadmap ; 拉勾/Boss直聘搜索Java AI Agent岗位\n【验收标准】Excel或Markdown表格包含10-15个JD，每个JD提取：公司/薪资/核心要求/加分项/能力维度映射；总结Top5刚需能力\n【相关面试题】Spring AI vs LangChain4j选型（第一梯队）; RAG完整链路+Chunking策略（第一梯队）"
     }
   ]
 }
