@@ -1,23 +1,7 @@
 {
   "description": "从飞书清单中暂时移除的任务，等3天窗口有空位时重新创建",
-  "updated": "2026-08-06",
+  "updated": "2026-08-07",
   "backlog_tasks": [
-    {
-      "original_guid": "e95ce895-0bc8-4dfd-ba8e-05f9d11f64a3",
-      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
-      "original_due": "2026-08-06",
-      "created_at": "1785796638172",
-      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
-      "description": "【学习目标】该任务对应Phase0，目标是补齐Python工程基础，掌握模块化开发与包管理能力，为后续Python+AI开发打基础\n【知识点】pip包管理/venv虚拟环境/模块import机制/标准库速览(os/sys/json/pathlib)/__name__与__main__/包结构与__init__.py\n【学习资源】Python官方教程-模块: https://docs.python.org/zh-cn/3/tutorial/modules.html ; pip文档: https://pip.pypa.io/en/stable/ ; 小林coding八股: https://www.cnblogs.com/xiaolincoding/p/20534325\n【验收标准】能创建venv虚拟环境并用pip管理依赖；能口述Python模块搜索路径与import机制；能对比Java的Maven/Gradle与Python的pip/venv\n【相关面试题】Python GIL原理（第二梯队）; Python vs Java内存管理对比（第二梯队）"
-    },
-    {
-      "original_guid": "18083ca2-cc88-4115-93f5-3a423b775b50",
-      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
-      "original_due": "2026-08-07",
-      "created_at": "1785796639254",
-      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
-      "description": "【学习目标】该任务对应Phase0核心内容，目标是掌握Spring AI Advisors机制，理解请求/响应拦截链路，类比LangChain4j中间件链\n【知识点】Advisor接口/RequestResponseAdvisor/AdvisorChain链式编排/日志审计Advisor/内容过滤Advisor/Spring AI Advisors vs LangChain4j中间件对比\n【学习资源】Spring AI Advisors文档: https://docs.spring.io/spring-ai/reference/api/advisors.html ; Spring AI参考代码: https://github.com/spring-projects/spring-ai\n【验收标准】编写自定义Advisor实现请求日志记录或内容过滤；能口述Advisor链式调用流程；能对比Spring AI Advisors与LangChain4j中间件机制\n【相关面试题】Spring AI vs LangChain4j选型（第一梯队）; Function Call底层原理-LLM不执行函数（第一梯队）"
-    },
     {
       "original_guid": "6f237cc8-07e8-4ab6-81d9-6ebb05a5f7b6",
       "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",

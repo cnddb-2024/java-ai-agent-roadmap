@@ -1,77 +1,13 @@
 {
-  "snapshot_date": "2026-08-06",
+  "snapshot_date": "2026-08-07",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
-    {
-      "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
-      "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记",
-      "due": "2026-08-06",
-      "created_at": "1785400457200",
-      "completed": false
-    },
-    {
-      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
-      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
-      "due": "2026-08-06",
-      "created_at": "1785400471330",
-      "completed": false
-    },
-    {
-      "guid": "2f060e48-34a6-46eb-b1b4-9dd24cc8f53c",
-      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
-      "due": "2026-08-07",
-      "created_at": "1785400493000",
-      "original_guid": "2ae5ce56-78b1-46cc-90a6-79ffb28cb000",
-      "original_created_at_note": "原任务2ae5ce56于2026-07-30创建，2026-08-05修正时重建为新GUID。created_at修正为1785400493000（晚于3112e317的1785400492000），反映原始创建顺序：0e1d9f3a < 3d7d245d < 2ae5ce56",
-      "completed": false
-    },
     {
       "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
       "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
       "due": "2026-08-06",
       "created_at": "1785400489687",
-      "completed": false
-    },
-    {
-      "guid": "3112e317-9976-4eb3-84e6-d0a3e7304cb3",
-      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
-      "due": "2026-08-07",
-      "created_at": "1785400492000",
-      "original_guid": "3d7d245d-d674-4268-9a8a-2ca72e8384d9",
-      "original_created_at_note": "原任务3d7d245d于2026-07-30创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
-      "completed": false
-    },
-    {
-      "guid": "b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7",
-      "summary": "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）",
-      "due": "2026-08-07",
-      "created_at": "1785537370288",
-      "completed": false
-    },
-    {
-      "guid": "a5931ab7-af12-4f17-9d22-354133594103",
-      "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
-      "due": "2026-08-08",
-      "created_at": "1785537379687",
-      "completed": false
-    },
-    {
-      "guid": "a0c5dd2a-1de3-4d88-898a-680a1c7204a4",
-      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
-      "due": "2026-08-08",
-      "created_at": "1785590400000",
-      "original_guid": "93591038-7487-443d-83f1-fdc5e540476a",
-      "original_created_at_note": "原任务93591038于2026-08-02创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
-      "completed": false
-    },
-    {
-      "guid": "40ae67ff-da61-4d73-b826-b49b8c06ef75",
-      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
-      "due": "2026-08-08",
-      "created_at": "1785590500000",
-      "original_guid": "5b941005-5b33-49d1-ab41-4fad9500f36b",
-      "original_created_at_note": "原任务5b941005于2026-08-02创建，2026-08-05修正时重建为新GUID，created_at保留原始估算值用于排序",
-      "completed": false
+      "completed": true
     },
     {
       "guid": "72a66dc2-1adc-4061-8139-abcddd47f09c",
@@ -88,6 +24,13 @@
       "completed": true
     },
     {
+      "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
+      "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记",
+      "due": "2026-08-06",
+      "created_at": "1785400457200",
+      "completed": true
+    },
+    {
       "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
       "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖",
       "due": "2026-08-02",
@@ -100,6 +43,69 @@
       "due": "2026-08-02",
       "created_at": "1785400453431",
       "completed": true
+    },
+    {
+      "guid": "40ae67ff-da61-4d73-b826-b49b8c06ef75",
+      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
+      "due": "2026-08-09",
+      "created_at": "1785590500000",
+      "completed": false
+    },
+    {
+      "guid": "a0c5dd2a-1de3-4d88-898a-680a1c7204a4",
+      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
+      "due": "2026-08-08",
+      "created_at": "1785590400000",
+      "completed": false
+    },
+    {
+      "guid": "3112e317-9976-4eb3-84e6-d0a3e7304cb3",
+      "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）",
+      "due": "2026-08-07",
+      "created_at": "1785400492000",
+      "completed": false
+    },
+    {
+      "guid": "2f060e48-34a6-46eb-b1b4-9dd24cc8f53c",
+      "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试",
+      "due": "2026-08-07",
+      "created_at": "1785400493000",
+      "completed": false
+    },
+    {
+      "guid": "a5931ab7-af12-4f17-9d22-354133594103",
+      "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）",
+      "due": "2026-08-08",
+      "created_at": "1785537379687",
+      "completed": false
+    },
+    {
+      "guid": "b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7",
+      "summary": "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）",
+      "due": "2026-08-08",
+      "created_at": "1785537370288",
+      "completed": false
+    },
+    {
+      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
+      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
+      "due": "2026-08-07",
+      "created_at": "1785400471330",
+      "completed": false
+    },
+    {
+      "guid": "3091bd59-fc44-44fc-86d2-292633ef7c63",
+      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
+      "due": "2026-08-09",
+      "created_at": "1785796638172",
+      "completed": false
+    },
+    {
+      "guid": "ff91fc34-b270-448b-a963-72e9422bdc20",
+      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
+      "due": "2026-08-09",
+      "created_at": "1785796639254",
+      "completed": false
     }
   ]
 }
