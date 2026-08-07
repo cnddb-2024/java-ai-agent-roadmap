@@ -1,22 +1,5 @@
 {
   "description": "从飞书清单中暂时移除的任务，等3天窗口有空位时重新创建",
-  "updated": "2026-08-07",
-  "backlog_tasks": [
-    {
-      "original_guid": "6f237cc8-07e8-4ab6-81d9-6ebb05a5f7b6",
-      "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",
-      "original_due": "2026-08-07",
-      "created_at": "1785796640191",
-      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
-      "description": "【学习目标】该任务对应Phase0核心内容，目标是掌握Spring AI Tool Calling机制，实现LLM工具调用的完整demo\n【知识点】@Tool注解/@ToolParam参数描述/FunctionCallback/工具注册(ToolCallbackProvider)/自动工具发现/工具调用流程(LLM决策→业务执行→结果返回)/Spring AI Tool vs LangChain4j Tools对比\n【学习资源】Spring AI Tool Calling文档: https://docs.spring.io/spring-ai/reference/api/toolcalling.html ; Spring AI示例: https://github.com/spring-projects/spring-ai-examples\n【验收标准】编写Spring AI Tool Calling demo，注册至少2个工具(如查天气/查数据库)，LLM能自动选择并调用；能口述Tool Calling完整流程\n【相关面试题】Function Call底层原理-LLM不执行函数（第一梯队）; Agent死循环防护三方法（第二梯队）"
-    },
-    {
-      "original_guid": "d11df11c-1038-4f7e-a964-c7f91324cafc",
-      "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
-      "original_due": "2026-08-07",
-      "created_at": "1785796641257",
-      "removed_reason": "按创建时间排序，此任务(创建于2026-08-03)比9个窗口内任务更新，移入backlog",
-      "description": "【学习目标】该任务对应Phase0验收标准，目标是收集10-15个Java AI Agent岗位JD，提取刚需能力清单，建立能力基线\n【知识点】JD分析方法论/刚需能力vs加分项识别/能力矩阵构建/市场趋势分析/薪资与能力对应关系\n【学习资源】本项目HTML中JD要求矩阵: https://github.com/cnddb-2024/java-ai-agent-roadmap ; 拉勾/Boss直聘搜索Java AI Agent岗位\n【验收标准】Excel或Markdown表格包含10-15个JD，每个JD提取：公司/薪资/核心要求/加分项/能力维度映射；总结Top5刚需能力\n【相关面试题】Spring AI vs LangChain4j选型（第一梯队）; RAG完整链路+Chunking策略（第一梯队）"
-    }
-  ]
+  "updated": "2026-08-08",
+  "backlog_tasks": []
 }

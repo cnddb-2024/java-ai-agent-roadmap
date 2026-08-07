@@ -1,0 +1,101 @@
+===== 每日维护日志 2026-08-08 (北京时间) =====
+运行时间: 2026-08-08 UTC 22:3x (北京时间 2026-08-09 06:3x)
+
+【步骤1】git clone 路线图仓库
+  状态: 成功
+  仓库: https://github.com/cnddb-2024/java-ai-agent-roadmap.git
+
+【步骤2】创建 .trae/logs 目录
+  状态: 成功
+
+【步骤3】飞书token状态检查
+  状态: 飞书可用 (auth status命令不支持--as参数，但task命令直接可用)
+  tasklist_guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+
+【步骤4】更新反馈层 (HTML + charts.js)
+  4a: TODAY=2026-08-08, 起始日=2026-07-29, 第11天, Phase 0
+  4b: HTML today-marker 更新: "当前：Phase 0 · 第 11/168 天" (原: 第10天) ✓
+  4c: RADAR_GAP.me 更新: [56,41,22,30,46,9,27] → [61,41,22,34,50,15,27]
+      新完成任务对应维度递增:
+      - RAG全链路 +5 (Qdrant部署)
+      - 分布式中间件 +4 (Qdrant部署)
+      - 工程化 +4 (第一周笔记整理)
+      - Python +6 (Python数据结构实战)
+  4d: RADAR_DAILY 更新: [40,45,50,48,30,5] → [70,68,65,60,50,20]
+      基于最近7天作业完成情况: 5个作业目录含summary.md
+
+【步骤5】采集飞书任务状态 + 扫描作业
+  5a: tasklist_guid = 5a08bfe3-e67f-49d7-9a33-f5681f22648d ✓
+  5b: 列出15个飞书任务 (9已完成, 6未完成)
+  5c: 扫描assignments目录: 4个日期目录, 9个作业子目录
+  5d: Diff结果:
+      - NEW_DONE (3个): 
+        1. 3112e317 - 整理第一周学习笔记并推送到GitHub
+        2. 2f060e48 - 向量数据库本地部署：Docker部署Qdrant
+        3. b0342461 - Python数据结构实战
+      - VANISHED: 无
+      - NEW_APPEARED: 无
+      C = 3 (自上次运行以来新完成3个任务)
+  5e: 所有6个未完成任务均有description，无需补写
+
+【步骤6】滑动窗口任务规划
+  C = 3 > 0, 执行6c-6d流程
+  6c: 汇总未完成任务 = 飞书6个 + backlog 2个 = 8个
+      按snapshot中created_at排序:
+      1. b92b1e0d (1785537370288) - Spring AI vs LangChain4j 选型对比 [飞书]
+      2. a5931ab7 (1785537379687) - Python OOP实战 [飞书]
+      3. a0c5dd2a (1785590400000) - Function Calling与Tool Use [飞书]
+      4. 40ae67ff (1785590500000) - RAG知识库问答demo [飞书]
+      5. 3091bd59 (1785796638172) - Python模块与包管理 [飞书]
+      6. ff91fc34 (1785796639254) - Spring AI Advisors机制 [飞书]
+      7. 6f237cc8 (1785796640191) - Spring AI Tool Calling实战 [backlog]
+      8. d11df11c (1785796641257) - 目标JD收集 [backlog]
+  
+  6d: 8个任务 < 9, 全部放入飞书
+      前3个 (due今天 2026-08-08, TS=1786147200000):
+        - b92b1e0d: due已是今天, 无需patch ✓
+        - a5931ab7: due已是今天, 无需patch ✓
+        - a0c5dd2a: due已是今天, 无需patch ✓
+      中3个 (due明天 2026-08-09, TS=1786233600000):
+        - 40ae67ff: due已是明天, 无需patch ✓
+        - 3091bd59: due已是明天, 无需patch ✓
+        - ff91fc34: due已是明天, 无需patch ✓
+      后2个 (due后天 2026-08-10, TS=1786320000000) - 从backlog创建:
+        - ee7c02ae-4537-4773-807f-7d6d7f3afbb4: Spring AI Tool Calling实战 (created_at保留backlog原始值1785796640191)
+        - 004da9dc-6c2a-4dcd-b79e-1c1f4347d8db: 目标JD收集 (created_at保留backlog原始值1785796641257)
+      
+  6g: backlog.json更新: 2个任务已创建到飞书, backlog清空
+  6h: snapshot.json保存: 17个任务 (9已完成 + 8未完成)
+
+【步骤7】融合教程生成
+  7a: 待处理任务3个 (均为今天due, 无逾期):
+      1. b92b1e0d - Spring AI vs LangChain4j 选型对比笔记与口述练习
+      2. a5931ab7 - Python 面向对象编程实战
+      3. a0c5dd2a - Function Calling 与 Tool Use 原理实战
+  7b: 幂等检查: assignments/2026-08-08/目录不存在, 3个任务均需生成
+  7c: 教程生成结果:
+      1. spring-ai-vs-langchain4j-comparison/tutorial.html - 生成成功 (65K, 21个来源)
+      2. python-oop-practice/tutorial.html - 生成成功 (53K, 14个来源)
+      3. function-calling-tool-use/tutorial.html - 生成成功 (72K, 17个来源)
+  7e: 飞书评论添加:
+      - b92b1e0d: 评论已添加 ✓ (id: 7671425034098854859)
+      - a5931ab7: 评论已添加 ✓ (id: 7671425037580127443)
+      - a0c5dd2a: 评论已添加 ✓ (id: 7671425041577282511)
+  7f: 无失败
+
+【步骤8】写回与兜底
+  8a: 日志写入 .trae/logs/2026-08-08.log ✓
+  8b: git add + commit + push (待执行)
+
+===== 汇总 =====
+- C值: 3 (3个新完成任务)
+- 新完成任务: 整理第一周笔记、Qdrant部署、Python数据结构
+- 从backlog创建到飞书: 2个 (Spring AI Tool Calling实战、目标JD收集)
+- 从飞书删除: 0个
+- backlog剩余: 0个
+- 教程生成: 3个生成成功, 0个跳过, 0个失败
+- 飞书评论: 3条已添加
+- 飞书清单当前状态: 17个任务 (9已完成, 8未完成)
+  - 今天due(3): Spring AI vs LangChain4j、Python OOP、Function Calling
+  - 明天due(3): RAG知识库问答、Python模块、Spring AI Advisors
+  - 后天due(2): Spring AI Tool Calling、目标JD收集

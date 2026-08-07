@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring AI vs LangChain4j 选型对比笔记与口述练习 | Phase 0 验收项</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --bg-soft:#161d2e;
+    --card:#1a2236;
+    --card-2:#1f2940;
+    --border:#2a3550;
+    --text:#e6ebf5;
+    --text-dim:#9aa7c2;
+    --text-mute:#6b7794;
+    --primary:#5b8def;
+    --primary-soft:#2c3a63;
+    --spring:#6db33f;
+    --spring-soft:#23331a;
+    --lc4j:#f59e0b;
+    --lc4j-soft:#3a2a0e;
+    --accent:#a78bfa;
+    --danger:#f87171;
+    --warn:#fbbf24;
+    --ok:#34d399;
+    --code-bg:#0d111c;
+    --code-border:#222c44;
+    --kw:#ff7b72;
+    --str:#a5d6ff;
+    --com:#768390;
+    --num:#79c0ff;
+    --type:#ffa657;
+    --anno:#d2a8ff;
+    --fn:#d2a8ff;
+    --punc:#c9d1e0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.75;
+    font-size:15.5px;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ---------- 顶部头信息 ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:linear-gradient(135deg,rgba(15,20,32,.96),rgba(26,34,54,.96));
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .topbar-inner{
+    max-width:1080px;margin:0 auto;padding:14px 24px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:600;letter-spacing:.3px;
+    padding:4px 10px;border-radius:999px;
+  }
+  .badge-phase{background:var(--primary-soft);color:#9cc0ff;border:1px solid #3a4d7a}
+  .badge-time{background:var(--lc4j-soft);color:#fcd34d;border:1px solid #5a4220}
+  .badge-task{background:var(--spring-soft);color:#a3e063;border:1px solid #3a5224}
+  .topbar h1{
+    font-size:16px;font-weight:700;color:var(--text);
+    flex:1;min-width:240px;
+  }
+  .topbar .small{font-size:12px;color:var(--text-dim)}
+  .progress-track{
+    width:100%;height:4px;background:var(--border);border-radius:4px;overflow:hidden;
+  }
+  .progress-bar{
+    height:100%;width:0;background:linear-gradient(90deg,var(--spring),var(--primary),var(--lc4j));
+    transition:width .2s;
+  }
+  /* ---------- 主体 ---------- */
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 24px 80px}
+  section{margin-bottom:56px;scroll-margin-top:80px}
+  h2{
+    font-size:26px;font-weight:800;letter-spacing:-.5px;
+    margin-bottom:8px;display:flex;align-items:center;gap:12px;
+  }
+  h2 .ico{
+    width:34px;height:34px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;
+    font-size:18px;flex-shrink:0;
+  }
+  h3{font-size:19px;font-weight:700;margin:28px 0 10px;color:#dce4f7}
+  h4{font-size:16px;font-weight:700;margin:18px 0 8px;color:#cdd8f0}
+  p{margin:10px 0;color:var(--text-dim)}
+  p strong,li strong{color:var(--text)}
+  .lead{font-size:16px;color:var(--text-dim);margin-bottom:18px}
+  a{color:#7db4ff;text-decoration:none;border-bottom:1px dotted #3a4d7a}
+  a:hover{color:#a8caff}
+  .anchor-nav{
+    display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 8px;
+  }
+  .anchor-nav a{
+    font-size:13px;padding:5px 12px;border-radius:8px;
+    background:var(--card);border:1px solid var(--border);border-bottom:1px solid var(--border);
+    color:var(--text-dim);
+  }
+  .anchor-nav a:hover{background:var(--card-2);color:var(--text)}
+
+  /* ---------- 关键洞察卡片 ---------- */
+  .insight{
+    background:linear-gradient(135deg,var(--primary-soft),var(--card));
+    border:1px solid #34446e;border-left:4px solid var(--primary);
+    border-radius:14px;padding:22px 26px;margin:22px 0;
+  }
+  .insight .label{font-size:12px;font-weight:700;letter-spacing:1px;color:#9cc0ff;text-transform:uppercase}
+  .insight .core{font-size:18px;font-weight:700;color:var(--text);margin-top:6px}
+  .insight .sub{font-size:14px;color:var(--text-dim);margin-top:8px}
+
+  /* ---------- 双栏对比 ---------- */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+  .duo .col{border-radius:14px;padding:18px 20px;border:1px solid var(--border)}
+  .col.spring{background:linear-gradient(180deg,var(--spring-soft),transparent);border-top:3px solid var(--spring)}
+  .col.lc4j{background:linear-gradient(180deg,var(--lc4j-soft),transparent);border-top:3px solid var(--lc4j)}
+  .col .tag{font-size:12px;font-weight:700;letter-spacing:.5px}
+  .col.spring .tag{color:var(--spring)}
+  .col.lc4j .tag{color:var(--lc4j)}
+  .col h4{margin-top:6px;font-size:16px}
+  .col ul{margin:8px 0 0 0;padding-left:18px}
+  .col li{font-size:13.5px;color:var(--text-dim);margin:4px 0}
+  .col li b{color:var(--text)}
+  @media(max-width:720px){.duo{grid-template-columns:1fr}}
+
+  /* ---------- 表格 ---------- */
+  .tbl-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);margin:16px 0}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:var(--card-2);color:#cdd8f0;font-weight:700;position:sticky;top:0}
+  td{color:var(--text-dim)}
+  td b,th b{color:var(--text)}
+  tr:hover td{background:rgba(91,141,239,.05)}
+  .t-spring{color:var(--spring)!important;font-weight:600}
+  .t-lc4j{color:var(--lc4j)!important;font-weight:600}
+  .t-dim{color:var(--text-mute)!important}
+  .pill{display:inline-block;padding:2px 9px;border-radius:6px;font-size:12px;font-weight:600}
+  .pill-ok{background:#15301f;color:var(--ok)}
+  .pill-warn{background:#3a2a0e;color:var(--warn)}
+  .pill-dim{background:#262d40;color:var(--text-dim)}
+
+  /* ---------- 代码块 ---------- */
+  .code-card{margin:16px 0;border-radius:12px;overflow:hidden;border:1px solid var(--code-border);background:var(--code-bg)}
+  .code-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:9px 16px;background:#141b2c;border-bottom:1px solid var(--code-border);
+  }
+  .code-head .lang{font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--text-mute);text-transform:uppercase}
+  .code-head .file{font-size:12px;color:var(--text-dim)}
+  .code-head .copy{
+    cursor:pointer;font-size:12px;color:var(--text-dim);
+    border:1px solid var(--border);background:var(--card);padding:3px 10px;border-radius:6px;
+    transition:.15s;
+  }
+  .code-head .copy:hover{color:var(--text);border-color:#3d4d72}
+  pre{margin:0;padding:16px 18px;overflow-x:auto;font-size:13px;line-height:1.65}
+  code{font-family:"JetBrains Mono","Fira Code","SF Mono",Consolas,"Liberation Mono",Menlo,monospace}
+  pre code{color:#c9d1e0;white-space:pre}
+  .tok-kw{color:var(--kw)}
+  .tok-str{color:var(--str)}
+  .tok-com{color:var(--com);font-style:italic}
+  .tok-num{color:var(--num)}
+  .tok-type{color:var(--type)}
+  .tok-anno{color:var(--anno)}
+  .tok-fn{color:var(--fn)}
+  .tok-punc{color:var(--punc)}
+  .tok-ykey{color:var(--type)}
+  .tok-yval{color:var(--str)}
+  .tok-xmltag{color:var(--kw)}
+  .tok-xmlattr{color:var(--type)}
+  .tok-xmlval{color:var(--str)}
+
+  /* ---------- 决策树 ---------- */
+  .tree{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:24px 20px;font-family:"JetBrains Mono",Consolas,monospace;font-size:13px;line-height:1.9;
+    overflow-x:auto;
+  }
+  .tree .yes{color:var(--ok)}
+  .tree .no{color:var(--text-dim)}
+  .tree .q{color:#cdd8f0}
+  .tree .pick{color:var(--warn);font-weight:700}
+  .tree .arrow{color:var(--primary)}
+
+  /* ---------- 选型维度卡片 ---------- */
+  .dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin:18px 0}
+  .dim{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;
+    border-left:3px solid var(--primary);
+  }
+  .dim .n{font-size:11px;font-weight:700;color:var(--primary);letter-spacing:1px}
+  .dim h4{margin:4px 0 8px;font-size:15.5px}
+  .dim p{font-size:13px;margin:6px 0}
+  .dim .vs{display:flex;gap:8px;margin-top:8px}
+  .dim .vs span{flex:1;font-size:12px;padding:5px 8px;border-radius:7px}
+  .dim .vs .s{background:var(--spring-soft);color:#a3e063}
+  .dim .vs .l{background:var(--lc4j-soft);color:#fcd34d}
+
+  /* ---------- 口述脚本 ---------- */
+  .script-card{
+    background:linear-gradient(135deg,var(--card),var(--bg-soft));
+    border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin:16px 0;
+  }
+  .script-card .q{font-size:14px;font-weight:700;color:#fcd34d;margin-bottom:10px}
+  .script-card .a{font-size:14.5px;color:var(--text-dim)}
+  .script-card .a strong{color:var(--text)}
+  .script-card .marker{
+    display:inline-block;width:22px;height:22px;border-radius:6px;background:var(--primary-soft);
+    color:#9cc0ff;font-size:12px;font-weight:700;text-align:center;line-height:22px;margin-right:8px;
+  }
+  .qa-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+  @media(min-width:820px){.qa-grid{grid-template-columns:1fr 1fr}}
+
+  /* ---------- 自测清单 ---------- */
+  .checklist{list-style:none;margin:14px 0}
+  .checklist li{
+    display:flex;align-items:flex-start;gap:10px;padding:9px 0;
+    border-bottom:1px dashed var(--border);font-size:14px;color:var(--text-dim);
+  }
+  .checklist li:last-child{border-bottom:none}
+  .checklist .box{
+    width:18px;height:18px;border-radius:5px;border:2px solid var(--border);
+    flex-shrink:0;margin-top:2px;cursor:pointer;
+  }
+  .checklist .box.done{background:var(--spring);border-color:var(--spring);position:relative}
+  .checklist .box.done::after{content:"";position:absolute;left:4px;top:0px;width:6px;height:11px;border:solid #0f1420;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .checklist li.done{color:var(--text);text-decoration:line-through;text-decoration-color:var(--text-mute)}
+
+  /* ---------- 来源 ---------- */
+  .sources ol{counter-reset:s;margin:12px 0 0;padding-left:0;list-style:none}
+  .sources li{
+    counter-increment:s;display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);
+    font-size:13.5px;
+  }
+  .sources li::before{
+    content:counter(s);min-width:26px;height:26px;border-radius:7px;
+    background:var(--primary-soft);color:#9cc0ff;font-weight:700;font-size:13px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .sources li a{border-bottom:none}
+  .sources .src-title{color:var(--text);font-weight:600}
+  .sources .src-desc{color:var(--text-mute);font-size:12px;margin-top:2px}
+
+  footer{border-top:1px solid var(--border);padding-top:20px;color:var(--text-mute);font-size:12.5px}
+  .note{
+    font-size:12.5px;color:var(--text-mute);background:var(--bg-soft);
+    border:1px dashed var(--border);border-radius:8px;padding:10px 14px;margin:12px 0;
+  }
+  .tag-line{display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .tag-line span{font-size:11px;padding:2px 8px;border-radius:5px;background:var(--card-2);color:var(--text-dim)}
+</style>
+</head>
+<body>
+
+<!-- ============ 顶部 ============ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="badge badge-phase">Phase 0</span>
+    <span class="badge badge-time">总预估时长 ≤ 60 分钟</span>
+    <span class="badge badge-task">验收项</span>
+    <h1>Spring AI vs LangChain4j 选型对比笔记与口述练习</h1>
+  </div>
+  <div style="max-width:1080px;margin:0 auto;padding:0 24px 12px">
+    <div class="progress-track"><div class="progress-bar" id="prog"></div></div>
+    <div class="small" style="font-size:12px;color:var(--text-mute);margin-top:6px">
+      定向与双框架地基（第 1-14 天）· 验收标准：能口述 Spring AI 与 LangChain4j 各自优劣与选型场景（面试高频题）
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ 导航 ============ -->
+  <nav class="anchor-nav">
+    <a href="#insight">核心洞察</a>
+    <a href="#compare">框架对比表</a>
+    <a href="#spring-ai">Spring AI 核心 API</a>
+    <a href="#langchain4j">LangChain4j 核心模块</a>
+    <a href="#api-map">核心 API 对照</a>
+    <a href="#decision">选型决策树</a>
+    <a href="#dims">选型五维度</a>
+    <a href="#interview">面试口述要点</a>
+    <a href="#selftest">Phase 0 验收自测</a>
+    <a href="#sources">教程来源</a>
+  </nav>
+
+  <!-- ============ 核心洞察 ============ -->
+  <section id="insight">
+    <h2><span class="ico" style="background:var(--primary-soft);color:#9cc0ff">01</span>核心洞察：分层互补，不是二选一</h2>
+    <p class="lead">面试官最想听到的不是"哪个更好"，而是你对两者<b>定位差异</b>的理解。请先记住下面这句话，它是整个口述的"定调句"。</p>
+
+    <div class="insight">
+      <div class="label">一句话定调</div>
+      <div class="core">Spring AI 是"企业集成基础设施层"，LangChain4j 是"灵活 LLM 工具箱"，两者分层互补，并非互斥二选一。</div>
+      <div class="sub">在企业 Spring 体系中，可以让 Spring AI 承担配置治理、可观测性与安全编排，而把 LangChain4j 作为独立 Agent / PoC 服务的实现库；大型组织完全可以混用。</div>
+    </div>
+
+    <div class="duo">
+      <div class="col spring">
+        <span class="tag">SPRING AI</span>
+        <h4>Portable Service Abstraction（可移植服务抽象）</h4>
+        <p>Spring 官方出品，把 AI 能力作为 Spring 生态的"一等公民"。像当年抽象 JDBC / JMS 一样抽象底层模型，<b>换模型只改配置不改代码</b>。</p>
+        <ul>
+          <li>设计理念：<b>约定优于配置</b>，配置驱动</li>
+          <li>核心价值：与 Boot / Security / Actuator / Micrometer 深度集成</li>
+          <li>适合：已有 Spring 体系、长期维护、强治理要求</li>
+        </ul>
+      </div>
+      <div class="col lc4j">
+        <span class="tag">LANGCHAIN4J</span>
+        <h4>Java 原生 LLM 编排库（框架无关）</h4>
+        <p>社区驱动，借鉴 Python LangChain 但为 JVM 从零设计。<b>不绑定 Spring</b>，可用于 Quarkus / Micronaut / 纯 Java，启动快、耦合低。</p>
+        <ul>
+          <li>设计理念：<b>灵活组合</b>，声明式 AI Services</li>
+          <li>核心价值：功能全面、迭代快、跨框架</li>
+          <li>适合：快速原型、独立 Agent、非 Spring 项目</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">口述技巧：先用"定调句"亮明观点，再用两个标签词（基础设施层 vs 工具箱）锚定差异，最后给一句"可以混用"展现工程视野。这样比直接背功能表更稳。</p>
+  </section>
+
+  <!-- ============ 框架对比表 ============ -->
+  <section id="compare">
+    <h2><span class="ico" style="background:var(--spring-soft);color:var(--spring)">02</span>框架全景对比表</h2>
+    <p class="lead">下表覆盖开发团队、设计理念到生态集成等 16 个维度，是口述时的"弹药库"——不必全背，但要能说出每个维度的大致倾向。</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:22%">对比维度</th><th class="t-spring" style="width:39%">Spring AI</th><th class="t-lc4j" style="width:39%">LangChain4j</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>开发团队</b></td><td>Spring 官方（VMware / Broadcom 背书）</td><td>社区驱动（开源，迭代迅速）</td></tr>
+          <tr><td><b>设计理念</b></td><td>约定优于配置，PSA 可移植服务抽象</td><td>灵活组合，声明式接口 + 注解</td></tr>
+          <tr><td><b>核心抽象</b></td><td>ChatClient / Advisor 链</td><td>AiServices / ChatLanguageModel</td></tr>
+          <tr><td><b>配置方式</b></td><td>application.yml 配置驱动（支持配置中心）</td><td>Builder 代码配置为主</td></tr>
+          <tr><td><b>API 风格</b></td><td>Fluent API（类 WebClient / JdbcTemplate）</td><td>声明式接口代理（类 Spring Data JPA）</td></tr>
+          <tr><td><b>会话记忆</b></td><td>ChatMemory + MessageChatMemoryAdvisor</td><td>ChatMemory / MessageWindowChatMemory + @MemoryId</td></tr>
+          <tr><td><b>RAG 实现</b></td><td>QuestionAnswerAdvisor + VectorStore</td><td>ContentRetriever + Easy RAG + Ingestor</td></tr>
+          <tr><td><b>工具调用</b></td><td>@Tool / Function + MCP Client</td><td>@Tool + ToolExecutor + MCP</td></tr>
+          <tr><td><b>流式输出</b></td><td>Flux&lt;String&gt;（Reactor 响应式）</td><td>TokenStream（回调模式）</td></tr>
+          <tr><td><b>MCP 支持</b></td><td>原生 Client + Server Boot Starters</td><td>原生 Client + Server</td></tr>
+          <tr><td><b>可观测性</b></td><td><span class="pill pill-ok">原生</span> Micrometer 指标 + 链路追踪</td><td><span class="pill pill-warn">需集成</span> 提供 Listener 扩展点</td></tr>
+          <tr><td><b>Spring 生态集成</b></td><td><span class="pill pill-ok">原生</span> 官方 starter，深度集成</td><td><span class="pill pill-dim">社区</span> langchain4j-spring-boot-starter</td></tr>
+          <tr><td><b>跨框架支持</b></td><td><span class="pill pill-warn">强依赖</span> 仅 Spring</td><td><span class="pill pill-ok">框架无关</span> Quarkus / Micronaut / 纯 Java</td></tr>
+          <tr><td><b>文档加载器</b></td><td>基础 Reader（PDF/TXT/Markdown）</td><td><span class="pill pill-ok">更全</span> PDF/Word/HTML/Notion 等丰富格式</td></tr>
+          <tr><td><b>学习曲线</b></td><td>Spring 团队低，非 Spring 团队偏高</td><td>Java 开发者普遍较低</td></tr>
+          <tr><td><b>迭代节奏</b></td><td>稳定、谨慎，优先 API 兼容性</td><td>快速，新功能常领先数天上线</td></tr>
+          <tr><td><b>模型 / 向量库覆盖</b></td><td>主流厂商深度支持（OpenAI / Azure / Bedrock / Ollama）</td><td>广度优先（20+ LLM、30+ 向量库）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">速记口诀：<b>"Spring AI 重治理、LangChain4j 重灵活"</b>。可观测性、配置治理、Spring 集成三项 Spring AI 占优；功能广度、跨框架、启动速度三项 LangChain4j 占优。</p>
+  </section>
+
+  <!-- ============ Spring AI 核心 API ============ -->
+  <section id="spring-ai">
+    <h2><span class="ico" style="background:var(--spring-soft);color:var(--spring)">03</span>Spring AI 核心 API 速览</h2>
+    <p class="lead">五大核心：ChatClient、Advisors、Tool Calling、MCP、Micrometer 可观测性。每个都配最小可运行示例，主线语言 Java 21 + Spring Boot。</p>
+
+    <!-- ChatClient -->
+    <h3>3.1 ChatClient —— 流式 Fluent API</h3>
+    <p>ChatClient 是 Spring AI 的中枢入口，风格类似 WebClient / JdbcTemplate：<code>.prompt().system().user().call().content()</code> 一步步链式表达，显式且可读。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">Java</span><span class="file">ChatService.java</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-anno">@Service</span>
+<span class="tok-kw">public class</span> <span class="tok-type">ChatService</span> {
+
+    <span class="tok-kw">private final</span> <span class="tok-type">ChatClient</span> chatClient;
+
+    <span class="tok-kw">public</span> <span class="tok-type">ChatService</span>(<span class="tok-type">ChatClient.Builder</span> builder) {
+        <span class="tok-kw">this</span>.chatClient = builder.build();
+    }
+
+    <span class="tok-kw">public</span> <span class="tok-type">String</span> <span class="tok-fn">chat</span>(<span class="tok-type">String</span> userMessage) {
+        <span class="tok-kw">return</span> chatClient.prompt()
+                .<span class="tok-fn">system</span>(<span class="tok-str">"你是企业 AI 助手，回答专业、简洁。"</span>)
+                .<span class="tok-fn">user</span>(userMessage)
+                .<span class="tok-fn">call</span>()
+                .<span class="tok-fn">content</span>();
+    }
+}</code></pre>
+    </div>
+
+    <!-- Advisors -->
+    <h3>3.2 Advisors —— 拦截器链（核心扩展点）</h3>
+    <p>Advisor 是 Spring AI 的"灵魂"：以链式拦截器方式在请求前后插入逻辑（RAG 检索、记忆注入、Token 追踪、日志等）。内置 <code>QuestionAnswerAdvisor</code>（RAG）、<code>MessageChatMemoryAdvisor</code>（记忆）、<code>ToolCallingAdvisor</code>（工具）等。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">Java</span><span class="file">RagService.java — QuestionAnswerAdvisor 实现 RAG</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-anno">@Service</span>
+<span class="tok-kw">public class</span> <span class="tok-type">RagService</span> {
+
+    <span class="tok-kw">private final</span> <span class="tok-type">ChatClient</span> chatClient;
+    <span class="tok-kw">private final</span> <span class="tok-type">VectorStore</span> vectorStore;
+
+    <span class="tok-kw">public</span> <span class="tok-type">RagService</span>(<span class="tok-type">ChatClient.Builder</span> builder, <span class="tok-type">VectorStore</span> vectorStore) {
+        <span class="tok-kw">this</span>.vectorStore = vectorStore;
+        <span class="tok-kw">this</span>.chatClient = builder
+                .<span class="tok-fn">defaultAdvisors</span>(
+                    <span class="tok-type">QuestionAnswerAdvisor</span>.<span class="tok-fn">builder</span>(vectorStore)
+                        .<span class="tok-fn">searchRequest</span>(<span class="tok-type">SearchRequest</span>.<span class="tok-fn">builder</span>()
+                            .<span class="tok-fn">topK</span>(<span class="tok-num">5</span>)
+                            .<span class="tok-fn">similarityThreshold</span>(<span class="tok-num">0.7</span>)
+                            .<span class="tok-fn">build</span>())
+                        .<span class="tok-fn">build</span>())
+                .<span class="tok-fn">build</span>();
+    }
+
+    <span class="tok-kw">public</span> <span class="tok-type">String</span> <span class="tok-fn">ask</span>(<span class="tok-type">String</span> question) {
+        <span class="tok-kw">return</span> chatClient.prompt().<span class="tok-fn">user</span>(question).<span class="tok-fn">call</span>().<span class="tok-fn">content</span>();
+    }
+}</code></pre>
+    </div>
+
+    <!-- Tool Calling -->
+    <h3>3.3 Tool Calling —— 函数 / 工具调用</h3>
+    <p>把普通 Java 方法注册为工具，ChatClient 自动生成 JSON Schema 并在模型需要时回调执行。可注解式 <code>@Tool</code>，也可用 <code>Function</code> Bean。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">Java</span><span class="file">WeatherTools.java — @Tool 注解式</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-kw">public class</span> <span class="tok-type">WeatherTools</span> {
+
+    <span class="tok-anno">@Tool</span>(description = <span class="tok-str">"查询指定城市的实时天气"</span>)
+    <span class="tok-kw">public</span> <span class="tok-type">WeatherResponse</span> <span class="tok-fn">getWeather</span>(<span class="tok-type">String</span> city) {
+        <span class="tok-kw">return</span> weatherService.<span class="tok-fn">query</span>(city);
+    }
+}
+
+<span class="tok-com">// 在 ChatClient 调用时传入工具</span>
+<span class="tok-type">String</span> answer = chatClient.prompt()
+        .<span class="tok-fn">user</span>(<span class="tok-str">"北京今天天气怎么样？"</span>)
+        .<span class="tok-fn">tools</span>(<span class="tok-kw">new</span> <span class="tok-type">WeatherTools</span>())
+        .<span class="tok-fn">call</span>()
+        .<span class="tok-fn">content</span>();</code></pre>
+    </div>
+
+    <!-- MCP -->
+    <h3>3.4 MCP —— Model Context Protocol</h3>
+    <p>MCP 是 Anthropic 提出的"工具协议标准"。Spring AI 提供 Client / Server 两端 Boot Starter，自动发现并聚合 MCP Server 暴露的工具为 <code>SyncMcpToolCallbackProvider</code> Bean，实现跨进程工具复用。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">YAML</span><span class="file">application.yml — MCP Client 配置</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-ykey">spring</span>:
+  <span class="tok-ykey">ai</span>:
+    <span class="tok-ykey">mcp</span>:
+      <span class="tok-ykey">client</span>:
+        <span class="tok-ykey">sse</span>:
+          <span class="tok-ykey">connections</span>:
+            <span class="tok-ykey">weather-server</span>:
+              <span class="tok-ykey">url</span>: <span class="tok-yval">http://localhost:8081</span>
+        <span class="tok-ykey">stdio</span>:
+          <span class="tok-ykey">servers-configuration</span>: <span class="tok-yval">classpath:mcp-servers.json</span>
+    <span class="tok-com"># 自动装配后，所有 MCP 工具聚合为 SyncMcpToolCallbackProvider Bean</span>
+    <span class="tok-com"># 注意：MCP 工具不会自动注册到 ChatClient，需手动 .tools(mcpProvider) 注入</span></code></pre>
+    </div>
+
+    <!-- Micrometer -->
+    <h3>3.5 Micrometer 可观测性 —— 原生指标 + 链路追踪</h3>
+    <p>这是 Spring AI 对 LangChain4j 的<b>最大优势</b>。接入 <code>spring-boot-starter-actuator</code> 即自动获得：Token 用量、响应耗时、错误率等指标，以及跨 HTTP→DB→模型 API 的分布式追踪。无需写一行监控代码。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">YAML</span><span class="file">application.yml — 可观测性配置</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-ykey">spring</span>:
+  <span class="tok-ykey">ai</span>:
+    <span class="tok-ykey">chat</span>:
+      <span class="tok-ykey">client</span>:
+        <span class="tok-ykey">observations</span>:
+          <span class="tok-ykey">log-prompt</span>: <span class="tok-yval">true</span>      <span class="tok-com"># 记录 prompt 内容（注意脱敏）</span>
+          <span class="tok-ykey">log-completion</span>: <span class="tok-yval">true</span> <span class="tok-com"># 记录模型返回内容</span>
+    <span class="tok-ykey">chat</span>:
+      <span class="tok-ykey">observations</span>:
+        <span class="tok-ykey">log-prompt</span>: <span class="tok-yval">true</span>
+<span class="tok-com"># 自动产出指标：gen_ai.client.token.usage（输入/输出 token）、</span>
+<span class="tok-com"># gen_ai.client.operation（模型调用耗时）、spring.ai.advisor（Advisor 链路 span）</span></code></pre>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Span / 指标名</th><th>含义</th><th>关键属性</th></tr></thead>
+        <tbody>
+          <tr><td><code>spring.ai.chat.client</code></td><td>ChatClient 调用（call/stream）</td><td>是否流式、Advisor 列表、会话 ID</td></tr>
+          <tr><td><code>spring.ai.advisor</code></td><td>Advisor 链路每一步</td><td>Advisor 名称、执行顺序</td></tr>
+          <tr><td><code>gen_ai.client.operation</code></td><td>模型 Provider 执行</td><td>模型名、耗时、finish_reason</td></tr>
+          <tr><td><code>gen_ai.client.token.usage</code></td><td>Token 用量</td><td>input_tokens / output_tokens / total</td></tr>
+          <tr><td><code>spring.ai.tool</code></td><td>工具调用执行</td><td>工具名、参数、结果</td></tr>
+          <tr><td><code>db.vector.client.operation</code></td><td>向量库查询</td><td>top_k、相似度阈值、返回文档数</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ LangChain4j 核心模块 ============ -->
+  <section id="langchain4j">
+    <h2><span class="ico" style="background:var(--lc4j-soft);color:var(--lc4j)">04</span>LangChain4j 核心模块速览</h2>
+    <p class="lead">四大核心：AI Services、Chat Memory、RAG Module、Agentic。以"声明式接口 + 注解"为核心编程模型，5 行代码即可跑通。</p>
+
+    <!-- AI Services -->
+    <h3>4.1 AI Services —— 声明式接口（招牌特性）</h3>
+    <p>定义一个接口 + 注解，LangChain4j 用动态代理生成实现，类似 Spring Data JPA / Feign。自动处理 prompt 模板、历史管理、输出解析。这是它"上手快"的根源。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">Java</span><span class="file">Assistant.java — 最简 AI Service</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-kw">interface</span> <span class="tok-type">Assistant</span> {
+    <span class="tok-anno">@SystemMessage</span>(<span class="tok-str">"你是 Java 技术专家，回答简洁专业。"</span>)
+    <span class="tok-type">String</span> <span class="tok-fn">chat</span>(<span class="tok-anno">@UserMessage</span> <span class="tok-type">String</span> userMessage);
+}
+
+<span class="tok-com">// 创建：一行代码</span>
+<span class="tok-type">ChatModel</span> model = <span class="tok-type">OpenAiChatModel</span>.<span class="tok-fn">builder</span>()
+        .<span class="tok-fn">apiKey</span>(<span class="tok-type">System</span>.<span class="tok-fn">getenv</span>(<span class="tok-str">"OPENAI_API_KEY"</span>))
+        .<span class="tok-fn">modelName</span>(<span class="tok-str">"gpt-4o-mini"</span>)
+        .<span class="tok-fn">build</span>();
+
+<span class="tok-type">Assistant</span> assistant = <span class="tok-type">AiServices</span>.<span class="tok-fn">create</span>(<span class="tok-type">Assistant</span>.<span class="tok-kw">class</span>, model);
+<span class="tok-type">String</span> answer = assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"解释一下 record 关键字"</span>);</code></pre>
+    </div>
+    <div class="note">Spring Boot / Quarkus 环境下可自动装配 Assistant Bean，无需手动 <code>AiServices.create()</code>，直接注入即可。</div>
+
+    <!-- Chat Memory -->
+    <h3>4.2 Chat Memory —— 会话记忆</h3>
+    <p>大模型本身无状态，需显式传入历史。LangChain4j 用 <code>ChatMemory</code> 自动管理；<code>MessageWindowChatMemory</code> 滑动窗口控制上下文长度；<code>@MemoryId</code> + <code>ChatMemoryProvider</code> 支持多用户隔离。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">Java</span><span class="file">MultiUserAssistant.java — 多用户记忆</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-kw">interface</span> <span class="tok-type">MultiUserAssistant</span> {
+    <span class="tok-type">String</span> <span class="tok-fn">chat</span>(<span class="tok-anno">@MemoryId</span> <span class="tok-type">String</span> userId, <span class="tok-anno">@UserMessage</span> <span class="tok-type">String</span> message);
+}
+
+<span class="tok-type">MultiUserAssistant</span> assistant = <span class="tok-type">AiServices</span>.<span class="tok-fn">builder</span>(<span class="tok-type">MultiUserAssistant</span>.<span class="tok-kw">class</span>)
+        .<span class="tok-fn">chatModel</span>(model)
+        .<span class="tok-fn">chatMemoryProvider</span>(userId -&gt;
+            <span class="tok-type">MessageWindowChatMemory</span>.<span class="tok-fn">withMaxMessages</span>(<span class="tok-num">10</span>))
+        .<span class="tok-fn">build</span>();
+
+<span class="tok-com">// 每个 userId 拥有独立记忆窗口</span>
+assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"user-001"</span>, <span class="tok-str">"我叫张三"</span>);
+assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"user-001"</span>, <span class="tok-str">"我叫什么？"</span>); <span class="tok-com">// 记得：张三</span></code></pre>
+    </div>
+
+    <!-- RAG -->
+    <h3>4.3 RAG Module —— Easy RAG 与可定制管道</h3>
+    <p>"Easy RAG"是亮点：指向文档即可自动完成 embedding、切分、入库、检索，零配置上手。需要定制时再降级到 <code>ContentRetriever</code> + <code>EmbeddingStoreIngestor</code>。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">Java</span><span class="file">EasyRag.java — 零配置 RAG</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-com">// Easy RAG：一行加载文档，自动切分 + embedding + 入库</span>
+<span class="tok-type">List&lt;Document&gt;</span> docs = <span class="tok-type">FileSystemDocumentLoader</span>.<span class="tok-fn">loadDocuments</span>(
+        <span class="tok-str">"docs/handbook.pdf"</span>, <span class="tok-kw">new</span> <span class="tok-type">TextDocumentParser</span>());
+
+<span class="tok-com">// 自动选择 embedding 模型 + 内存向量库（开箱即用）</span>
+<span class="tok-type">EmbeddingStoreIngestor</span>.<span class="tok-fn">builder</span>()
+        .<span class="tok-fn">embeddingStore</span>(embeddingStore)
+        .<span class="tok-fn">embeddingModel</span>(embeddingModel)
+        .<span class="tok-fn">build</span>()
+        .<span class="tok-fn">ingest</span>(docs);
+
+<span class="tok-com">// 注入 ContentRetriever 到 AI Service</span>
+<span class="tok-type">Assistant</span> assistant = <span class="tok-type">AiServices</span>.<span class="tok-fn">builder</span>(<span class="tok-type">Assistant</span>.<span class="tok-kw">class</span>)
+        .<span class="tok-fn">chatModel</span>(model)
+        .<span class="tok-fn">contentRetriever</span>(<span class="tok-type">EmbeddingStoreContentRetriever</span>.<span class="tok-fn">builder</span>()
+                .<span class="tok-fn">embeddingStore</span>(embeddingStore)
+                .<span class="tok-fn">embeddingModel</span>(embeddingModel)
+                .<span class="tok-fn">maxResults</span>(<span class="tok-num">5</span>)
+                .<span class="tok-fn">build</span>())
+        .<span class="tok-fn">build</span>();</code></pre>
+    </div>
+
+    <!-- Agentic -->
+    <h3>4.4 Agentic —— 工具编排与多步推理</h3>
+    <p>LangChain4j 的 Agentic 能力体现在：工具自动调用循环、结构化输出、以及 <code>GoalOrientedPlanner</code> 等规划器驱动的多步推理工作流。适合构建"目标驱动"的 Agent。</p>
+    <div class="code-card">
+      <div class="code-head"><span class="lang">Java</span><span class="file">AgenticAssistant.java — 工具 + 多步推理</span><span class="copy">复制</span></div>
+<pre><code><span class="tok-kw">interface</span> <span class="tok-type">ResearchAgent</span> {
+    <span class="tok-anno">@SystemMessage</span>(<span class="tok-str">"你是一个研究助手，可调用工具收集信息并汇总。"</span>)
+    <span class="tok-type">String</span> <span class="tok-fn">research</span>(<span class="tok-anno">@UserMessage</span> <span class="tok-type">String</span> topic);
+}
+
+<span class="tok-type">ResearchAgent</span> agent = <span class="tok-type">AiServices</span>.<span class="tok-fn">builder</span>(<span class="tok-type">ResearchAgent</span>.<span class="tok-kw">class</span>)
+        .<span class="tok-fn">chatModel</span>(model)
+        .<span class="tok-fn">tools</span>(searchTool, calculatorTool, fileWriterTool)
+        <span class="tok-com">// 模型自主决定调用哪个工具、调用几次，直至完成任务</span>
+        .<span class="tok-fn">build</span>();
+
+<span class="tok-com">// 进阶：GoalOrientedPlanner 驱动的多阶段工作流</span>
+<span class="tok-com">// planner 拆解目标 → 分步执行 → 循环修正 → 汇总输出</span>
+<span class="tok-type">String</span> result = agent.<span class="tok-fn">research</span>(<span class="tok-str">"对比 2025 年主流向量数据库的延迟与成本"</span>);</code></pre>
+    </div>
+  </section>
+
+  <!-- ============ 核心 API 对照 ============ -->
+  <section id="api-map">
+    <h2><span class="ico" style="background:var(--primary-soft);color:#9cc0ff">05</span>核心 API 一对一对照</h2>
+    <p class="lead">同一件事，两个框架各怎么做？这张对照表是面试"现场写代码"和"概念解释"的速查卡。</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:20%">能力</th><th class="t-spring" style="width:40%">Spring AI 写法</th><th class="t-lc4j" style="width:40%">LangChain4j 写法</th></tr></thead>
+        <tbody>
+          <tr><td><b>发起对话</b></td><td><code>chatClient.prompt().user(msg).call().content()</code></td><td><code>assistant.chat(msg)</code>（接口代理）</td></tr>
+          <tr><td><b>系统提示</b></td><td><code>.system("...")</code> 链式方法</td><td><code>@SystemMessage("...")</code> 注解</td></tr>
+          <tr><td><b>RAG 检索</b></td><td><code>QuestionAnswerAdvisor</code>（Advisor 链）</td><td><code>.contentRetriever(...)</code>（Builder 配置）</td></tr>
+          <tr><td><b>会话记忆</b></td><td><code>MessageChatMemoryAdvisor</code> + <code>ChatMemory</code></td><td><code>.chatMemory(MessageWindowChatMemory...)</code> + <code>@MemoryId</code></td></tr>
+          <tr><td><b>工具调用</b></td><td><code>.tools(new WeatherTools())</code> 或 Function Bean</td><td><code>@Tool</code> 注解方法 + <code>.tools(...)</code></td></tr>
+          <tr><td><b>流式输出</b></td><td><code>.stream().content()</code> 返回 <code>Flux&lt;String&gt;</code></td><td>返回 <code>TokenStream</code>，回调 <code>.onPartialResponse()</code></td></tr>
+          <tr><td><b>结构化输出</b></td><td><code>.entity(MyRecord.class)</code></td><td>接口返回类型直接声明为 POJO / Record</td></tr>
+          <tr><td><b>模型切换</b></td><td>改 <code>application.yml</code> 依赖与配置，代码零改动</td><td>Builder 换 <code>ChatModel</code> 实现，或用 Spring Boot starter</td></tr>
+          <tr><td><b>可观测性</b></td><td>加 actuator 依赖，自动产出指标/追踪</td><td>实现 <code>ChatModelListener</code> 手动埋点</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 选型决策树 ============ -->
+  <section id="decision">
+    <h2><span class="ico" style="background:var(--lc4j-soft);color:var(--lc4j)">06</span>选型决策树</h2>
+    <p class="lead">面试中被问"你们项目怎么选的"，沿着这棵树走一遍即可。核心逻辑：<b>先看团队站哪、再看模型策略、最后看编排复杂度</b>。</p>
+    <div class="tree">
+<span class="q">开始</span>
+<span class="arrow">│</span>
+<span class="arrow">├─</span> 项目已使用 Spring Boot？
+<span class="arrow">│</span>  <span class="arrow">├─</span> <span class="yes">是</span> → 主用通义千问且需多智能体 / Graph 编排？
+<span class="arrow">│</span>  <span class="arrow">│</span>   <span class="arrow">├─</span> <span class="yes">是</span> → <span class="pick">✦ Spring AI Alibaba</span>（DashScope 官方集成 + Graph 工作流）
+<span class="arrow">│</span>  <span class="arrow">│</span>   <span class="arrow">└─</span> <span class="no">否</span> → 需要 Spring 配置体系（多环境 / 配置中心）？
+<span class="arrow">│</span>  <span class="arrow">│</span>        <span class="arrow">├─</span> <span class="yes">是</span> → <span class="pick">✦ Spring AI</span>（配置驱动，治理友好）
+<span class="arrow">│</span>  <span class="arrow">│</span>        <span class="arrow">└─</span> <span class="no">否</span> → 需要框架灵活性（AI 层独立演进）？
+<span class="arrow">│</span>  <span class="arrow">│</span>             <span class="arrow">├─</span> <span class="yes">是</span> → <span class="pick">✦ LangChain4j</span>（低耦合，可替换）
+<span class="arrow">│</span>  <span class="arrow">│</span>             <span class="arrow">└─</span> <span class="no">否</span> → <span class="pick">✦ Spring AI</span>（生态一致性优先）
+<span class="arrow">│</span>  <span class="arrow">└─</span> <span class="no">否</span> → 使用 Quarkus / Micronaut？
+<span class="arrow">│</span>     <span class="arrow">├─</span> <span class="yes">是</span> → <span class="pick">✦ LangChain4j</span>（官方 Quarkus 扩展）
+<span class="arrow">│</span>     <span class="arrow">└─</span> <span class="no">否</span> → 纯 Java / Serverless？
+<span class="arrow">│</span>          <span class="arrow">└─</span> <span class="yes">是</span> → <span class="pick">✦ LangChain4j</span>（无框架依赖，启动快）
+<span class="arrow">│</span>
+<span class="arrow">└─</span> <span class="q">特殊场景</span>
+   <span class="arrow">├─</span> 需要 Spring Cloud / Micrometer 原生监控 → <span class="pick">✦ Spring AI</span>
+   <span class="arrow">├─</span> 需要 MCP Server 能力 → <span class="pick">✦ Spring AI 或 LangChain4j</span>（均支持）
+   <span class="arrow">├─</span> 需要跨 Quarkus / Micronaut 兼容 → <span class="pick">✦ LangChain4j</span>
+   <span class="arrow">├─</span> 复杂文档解析（旧 .doc / Notion 等）→ <span class="pick">✦ LangChain4j</span>（加载器更全）
+   <span class="arrow">├─</span> 从 Python LangChain 原型迁移 → <span class="pick">✦ LangChain4j</span>（概念对齐）
+   <span class="arrow">└─</span> 快速 PoC / 5 行代码验证 → <span class="pick">✦ LangChain4j</span>（无容器启动）
+    </div>
+    <p class="note">口述要点：强调"不要把框架选择变成单选题"。大型组织可混用——核心业务服务用 Spring AI 管治理，独立 Agent / PoC 服务用 LangChain4j 保灵活，关键是统一对外 API、日志与评测标准。</p>
+  </section>
+
+  <!-- ============ 选型五维度 ============ -->
+  <section id="dims">
+    <h2><span class="ico" style="background:var(--primary-soft);color:#9cc0ff">07</span>选型五维度详解</h2>
+    <p class="lead">这是 Phase 0 验收明确要求掌握的五个维度。每个维度给出两框架的倾向与口述话术。</p>
+    <div class="dims">
+      <div class="dim">
+        <div class="n">维度 01</div>
+        <h4>生态成熟度</h4>
+        <p>Spring AI 背靠 Spring 整套生态（Boot / Cloud / Security / Data），API 稳定性与向后兼容有官方保证；LangChain4j 功能覆盖更广（20+ LLM、30+ 向量库），但小版本偶有 breaking change。</p>
+        <div class="vs"><span class="s">Spring AI：稳定成熟</span><span class="l">LC4j：广度领先</span></div>
+      </div>
+      <div class="dim">
+        <div class="n">维度 02</div>
+        <h4>企业级支持</h4>
+        <p>Spring AI 由 VMware / Broadcom 商业背书，可观测性（Micrometer）、安全（Spring Security）、配置治理原生集成；LangChain4j 企业级能力需自行补齐监控、限流、审计。</p>
+        <div class="vs"><span class="s">Spring AI：原生强</span><span class="l">LC4j：需自建</span></div>
+      </div>
+      <div class="dim">
+        <div class="n">维度 03</div>
+        <h4>社区活跃度</h4>
+        <p>LangChain4j 社区驱动、迭代极快，新模型功能常领先数天上线，GitHub 活跃度高；Spring AI 更新节奏稳健、谨慎，文档与发布更规范。</p>
+        <div class="vs"><span class="s">Spring AI：稳健</span><span class="l">LC4j：迭代快</span></div>
+      </div>
+      <div class="dim">
+        <div class="n">维度 04</div>
+        <h4>学习曲线</h4>
+        <p>会 Spring Boot 的人看十分钟文档即可上手 Spring AI；LangChain4j 的 AI Services 声明式接口对任何 Java 开发者都友好，但 Agent / Memory / Tool 等概念需额外理解。</p>
+        <div class="vs"><span class="s">Spring 团队低</span><span class="l">Java 通用低</span></div>
+      </div>
+      <div class="dim">
+        <div class="n">维度 05</div>
+        <h4>与 Spring 生态集成度</h4>
+        <p>这是 Spring AI 的主场：配置中心、Actuator、Micrometer、Security 全部原生。LangChain4j 虽有社区 starter，但 ImageModel 等组件未提供自动装配，集成度较浅。</p>
+        <div class="vs"><span class="s">Spring AI：原生深</span><span class="l">LC4j：社区浅</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 面试口述要点 ============ -->
+  <section id="interview">
+    <h2><span class="ico" style="background:var(--lc4j-soft);color:var(--lc4j)">08</span>面试口述要点与脚本</h2>
+    <p class="lead">Phase 0 验收的核心就是"能口述"。下面给出高频题与参考口述脚本，建议对着镜子 / 录音练 3 遍，控制在 2-3 分钟内讲完。</p>
+
+    <div class="qa-grid">
+      <div class="script-card">
+        <div class="q"><span class="marker">Q1</span>一句话讲清 Spring AI 和 LangChain4j 的区别？</div>
+        <div class="a">
+          <strong>定调句：</strong>Spring AI 是"企业集成基础设施层"，LangChain4j 是"灵活 LLM 工具箱"，两者分层互补。<br><br>
+          Spring AI 由 Spring 官方出品，走<strong>约定优于配置</strong>路线，把 AI 能力做成 Spring 一等公民，核心是 ChatClient + Advisor 链，强在可观测性、配置治理和 Spring 生态深度集成；LangChain4j 是社区驱动的 Java 原生库，走<strong>声明式接口</strong>路线，核心是 AI Services，强在功能广度、跨框架和快速上手。两者不是二选一，企业里可以混用。
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="q"><span class="marker">Q2</span>Spring AI 的核心 API 有哪些？</div>
+        <div class="a">
+          五大核心：<br>
+          <strong>① ChatClient</strong> —— Fluent API 入口，<code>.prompt().system().user().call()</code>。<br>
+          <strong>② Advisors</strong> —— 拦截器链，QuestionAnswerAdvisor 做 RAG、MessageChatMemoryAdvisor 做记忆。<br>
+          <strong>③ Tool Calling</strong> —— <code>@Tool</code> 注解注册方法，模型自主回调。<br>
+          <strong>④ MCP</strong> —— Model Context Protocol，跨进程工具复用，Client/Server Boot Starter。<br>
+          <strong>⑤ Micrometer 可观测性</strong> —— 原生 Token 用量、耗时指标 + 分布式追踪，这是相对 LangChain4j 的最大优势。
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="q"><span class="marker">Q3</span>LangChain4j 的核心模块有哪些？</div>
+        <div class="a">
+          四大核心：<br>
+          <strong>① AI Services</strong> —— 招牌特性，接口 + 注解动态代理，类似 Spring Data JPA，5 行代码跑通。<br>
+          <strong>② Chat Memory</strong> —— MessageWindowChatMemory 滑动窗口，@MemoryId 多用户隔离。<br>
+          <strong>③ RAG Module</strong> —— Easy RAG 零配置上手，ContentRetriever 可定制管道。<br>
+          <strong>④ Agentic</strong> —— 工具自动调用循环 + GoalOrientedPlanner 多步推理工作流，适合目标驱动 Agent。
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="q"><span class="marker">Q4</span>什么场景选 Spring AI？什么场景选 LangChain4j？</div>
+        <div class="a">
+          <strong>选 Spring AI：</strong>已有 Spring Boot 微服务体系、需要配置中心/Actuator/Micrometer/Security、长期维护的企业应用、金融医疗等高合规行业。<br><br>
+          <strong>选 LangChain4j：</strong>非 Spring 项目（Quarkus/Micronaut/纯 Java）、快速 PoC 原型、复杂文档解析、从 Python LangChain 迁移、Serverless 追求启动速度。<br><br>
+          <strong>混用：</strong>核心服务用 Spring AI 管治理，独立 Agent 用 LangChain4j 保灵活。
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="q"><span class="marker">Q5</span>两者在可观测性上的差距具体在哪？</div>
+        <div class="a">
+          Spring AI 接入 <code>spring-boot-starter-actuator</code> 就自动获得：Token 用量指标（gen_ai.client.token.usage）、模型调用耗时、Advisor 链路 span、向量库查询 span，还能接入 Zipkin/Grafana Tempo 做全链路追踪，HTTP→DB→模型 API 一条 trace 看全。<br><br>
+          LangChain4j 虽然加了 ChatModelListener 扩展点，但更像"附加层"，要拿到同等洞察需自己写包装器。生产高合规场景，Spring AI 更稳。
+        </div>
+      </div>
+
+      <div class="script-card">
+        <div class="q"><span class="marker">Q6</span>选型时最重要的判断逻辑是什么？</div>
+        <div class="a">
+          不要问"哪个框架最好"，而要问<strong>"哪个让团队少造轮子、少迁移、少背治理债"</strong>。<br><br>
+          三步走：<strong>第一</strong>看团队和系统已站在哪（Spring 体系 → Spring AI）；<strong>第二</strong>看模型策略（多厂商中立两者都行，通义千问优先考虑 Spring AI Alibaba）；<strong>第三</strong>看编排复杂度（简单调用别过度设计，复杂多 Agent 才上工作流引擎）。生产治理比 Demo 体验更重要。
+        </div>
+      </div>
+    </div>
+
+    <h3>30 秒电梯版口述（背诵模板）</h3>
+    <div class="script-card">
+      <div class="a">
+        "Spring AI 和 LangChain4j 是 Java 生态两个主流 AI 框架，<strong>分层互补不是二选一</strong>。Spring AI 是 Spring 官方的企业集成基础设施层，强在配置治理、Micrometer 可观测性和 Spring 生态深度集成，适合已有 Spring 体系的长期企业项目；LangChain4j 是社区驱动的灵活 LLM 工具箱，核心是声明式 AI Services，上手快、跨框架、功能广，适合快速原型和非 Spring 项目。选型先看团队技术栈——Spring 体系选 Spring AI，非 Spring 或追求灵活选 LangChain4j，大型组织可混用，核心服务管治理、独立服务保灵活。"
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 自测清单 ============ -->
+  <section id="selftest">
+    <h2><span class="ico" style="background:var(--spring-soft);color:var(--spring)">09</span>Phase 0 验收自测清单</h2>
+    <p class="lead">逐项打勾，全部能自信说出即通过 Phase 0 验收。点击方框可标记完成。</p>
+    <ul class="checklist" id="checklist">
+      <li><span class="box"></span>能一句话讲清"基础设施层 vs 工具箱"的定位差异，并说出"分层互补"结论</li>
+      <li><span class="box"></span>能列出 Spring AI 五大核心 API：ChatClient / Advisors / Tool Calling / MCP / Micrometer</li>
+      <li><span class="box"></span>能说出至少 2 个 Spring AI Advisor 的用途（如 QuestionAnswerAdvisor、MessageChatMemoryAdvisor）</li>
+      <li><span class="box"></span>能列出 LangChain4j 四大核心模块：AI Services / Chat Memory / RAG Module / Agentic</li>
+      <li><span class="box"></span>能解释 AI Services 的声明式接口机制（类似 Spring Data JPA 的动态代理）</li>
+      <li><span class="box"></span>能口述选型五维度：生态成熟度 / 企业级支持 / 社区活跃度 / 学习曲线 / 与 Spring 生态集成度</li>
+      <li><span class="box"></span>能沿决策树走一遍：Spring 体系→配置治理→Spring AI；非 Spring→LangChain4j</li>
+      <li><span class="box"></span>能说出 Spring AI 可观测性相对 LangChain4j 的具体优势（原生指标 + 全链路追踪）</li>
+      <li><span class="box"></span>能给出"混用"方案：核心服务 Spring AI + 独立 Agent LangChain4j</li>
+      <li><span class="box"></span>能在 2-3 分钟内完整口述一遍，逻辑清晰、不卡壳</li>
+    </ul>
+  </section>
+
+  <!-- ============ 来源 ============ -->
+  <section id="sources" class="sources">
+    <h2><span class="ico" style="background:var(--card-2);color:var(--text-dim)">10</span>教程来源</h2>
+    <p class="lead">以下来源涵盖互联网检索文章与路线图推荐项目，地位平等，共同构成本教程的素材基础。</p>
+    <ol>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://springdevpro.com/spring-ai/spring-ai-vs-langchain4j-java-framework-comparison/" target="_blank" rel="noopener">Spring AI vs LangChain4j: Which Java AI Framework to Choose? — SpringDevPro</a></div>
+          <div class="src-desc">路线图推荐。生产环境双框架部署经验，含 API 设计、厂商锁定、RAG、可观测性、函数调用六维对比与决策矩阵。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://juejin.cn/post/7652548074997530660" target="_blank" rel="noopener">Java AI 框架怎么选：Spring AI、Spring AI Alibaba 与 LangChain4j 实战对比 — 掘金</a></div>
+          <div class="src-desc">含技术栈对比矩阵、性能资源开销量级参考、选型决策树、混合架构方案与生产上线检查清单，决策树素材主要来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://docs.spring.io/spring-ai/reference/1.1/observability/index.html" target="_blank" rel="noopener">Spring AI 官方文档 — Observability（可观测性）</a></div>
+          <div class="src-desc">ChatClient / Advisor / ChatModel / Tool Calling / VectorStore 的指标与 span 属性权威定义，可观测性章节素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://github.com/langchain4j/langchain4j/blob/main/docs/docs/tutorials/ai-services.md" target="_blank" rel="noopener">LangChain4j 官方教程 — AI Services</a></div>
+          <div class="src-desc">AI Services 声明式接口、@SystemMessage / @UserMessage / @MemoryId、ChatMemory、Tools、RAG 官方权威说明与代码示例。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://github.com/langchain4j/langchain4j/blob/main/docs/docs/tutorials/rag.md" target="_blank" rel="noopener">LangChain4j 官方教程 — RAG (Retrieval-Augmented Generation)</a></div>
+          <div class="src-desc">Easy RAG 零配置上手与可定制 ContentRetriever 管道的官方说明，RAG Module 章节素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://spring.io/blog/2026/06/15/spring-ai-composable-tool-calling/" target="_blank" rel="noopener">Tool Calling in Spring AI 2.0: A Composable, Agentic Architecture — Spring 官方博客</a></div>
+          <div class="src-desc">Spring AI 2.0 可组合工具调用架构、MCP 自动发现与 SyncMcpToolCallbackProvider 机制说明。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://docs.spring.io/spring-ai/reference/api/tools.html" target="_blank" rel="noopener">Spring AI 官方文档 — Tool Calling</a></div>
+          <div class="src-desc">@Tool 注解、ToolCallingAdvisor 自动执行与用户控制执行模式的官方 API 参考。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://dzone.com/articles/spring-ai-advisors" target="_blank" rel="noopener">Spring AI Advisors: Chat Memory, Token Tracking, and Message Logging — DZone</a></div>
+          <div class="src-desc">Advisor 链实战：MessageChatMemoryAdvisor、TokenUsageAdvisor、MessageLoggerAdvisor 自定义示例。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://spring-ai-community.github.io/spring-ai-playground/observability-architecture/" target="_blank" rel="noopener">AI Agent Observability — Spring AI Community Playground</a></div>
+          <div class="src-desc">Advisor span、向量库查询 span 的属性与含义对照，可观测性表格素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://blog.csdn.net/jsntghf/article/details/148671821" target="_blank" rel="noopener">Java 大模型开发框架深度对决：Spring AI 与 LangChain4j 的技术选型指南 — CSDN</a></div>
+          <div class="src-desc">开发团队、设计理念、主要优势三维对比表，框架定位差异素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://blog.csdn.net/HHX_01/article/details/159805358" target="_blank" rel="noopener">2026 Java AI 框架选型：Spring AI / LangChain4j 企业级对比 — CSDN</a></div>
+          <div class="src-desc">企业级选型场景判断：闭眼选 Spring AI 与闭眼选 LangChain4j 的典型情况，面试口述素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://juejin.cn/post/7660053470331371570" target="_blank" rel="noopener">Spring AI 还是 LangChain4j？技术面试里真正值钱的是 6 个工程边界 — 掘金</a></div>
+          <div class="src-desc">面试视角的工程边界分析：团队技术栈、运行环境、模型策略、编排复杂度、生产治理，面试口述脚本素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://cloud.tencent.com/developer/article/2518323" target="_blank" rel="noopener">LangChain4j 比 Spring AI 强在哪？一文读懂 — 腾讯云开发者社区</a></div>
+          <div class="src-desc">Spring 生态支持性差异、自动装配覆盖度对比，集成度维度素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://github.com/spring-projects/spring-ai" target="_blank" rel="noopener">Spring AI 官方仓库 — GitHub</a></div>
+          <div class="src-desc">路线图推荐项目。Spring 官方 AI 框架源码、示例与 Release，版本基准与 API 演进参考。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://github.com/langchain4j/langchain4j" target="_blank" rel="noopener">LangChain4j 官方仓库 — GitHub</a></div>
+          <div class="src-desc">路线图推荐项目。LangChain4j 源码、文档教程与 20+ LLM / 30+ 向量库集成参考。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://github.com/alibaba/spring-ai-alibaba" target="_blank" rel="noopener">Spring AI Alibaba 官方仓库 — GitHub</a></div>
+          <div class="src-desc">路线图推荐项目。阿里在 Spring AI 之上的国产模型（DashScope / 通义千问）、Graph 工作流与多智能体编排增强。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://github.com/springaialibaba/spring-ai-alibaba-examples" target="_blank" rel="noopener">spring-ai-alibaba-playground 示例仓库 — GitHub</a></div>
+          <div class="src-desc">路线图推荐项目。Spring AI Alibaba 官方示例与 Playground，实战代码参考。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://www.javapedia.net/LangChain4j-interview-questions" target="_blank" rel="noopener">Javapedia — LangChain4j 面试题</a></div>
+          <div class="src-desc">路线图推荐。LangChain4j 面试高频题集合，面试口述要点素材来源。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://blog.csdn.net/wjianwei666/article/details/159617268" target="_blank" rel="noopener">CSDN — Java AI 面试</a></div>
+          <div class="src-desc">路线图推荐。Java AI 方向面试题与知识点梳理，口述练习参考。</div>
+        </div>
+      </li>
+      <li>
+        <div>
+          <div class="src-title"><a href="https://notes.kamacoder.com/interview/llm/agent_interview.html" target="_blank" rel="noopener">卡码笔记 — Agent 面试题</a></div>
+          <div class="src-desc">路线图推荐。LLM / Agent 面试高频题，Agentic 模块与 Agent 选型口述参考。</div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>本教程为 Phase 0 验收项「Spring AI vs LangChain4j 选型对比笔记与口述练习」专属融合教程，自包含单 HTML 文件，无外部依赖。代码示例基于 Spring AI 2.0 / LangChain4j 1.x / Java 21，版本迭代较快，落地前请核对官方 BOM 与 Release Notes。</p>
+    <p>主线语言 Java（Spring AI + LangChain4j 双路径），Python 仅作概念迁移辅助参考。建议配合上方自测清单完成口述练习后再进入下一 Phase。</p>
+    <div class="tag-line">
+      <span>Phase 0</span><span>第 1-14 天</span><span>双框架地基</span><span>面试高频题</span><span>Java 21</span><span>Spring AI 2.0</span><span>LangChain4j 1.x</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+/* ---------- 轻量语法高亮（自包含，无外部依赖） ---------- */
+(function(){
+  // 代码块复制
+  document.querySelectorAll('.code-head .copy').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var code=btn.closest('.code-card').querySelector('pre').innerText;
+      if(navigator.clipboard){navigator.clipboard.writeText(code).then(function(){btn.textContent='已复制';setTimeout(function(){btn.textContent='复制'},1500)})}
+      else{var t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);btn.textContent='已复制';setTimeout(function(){btn.textContent='复制'},1500)}
+    });
+  });
+
+  // 阅读进度
+  var prog=document.getElementById('prog');
+  window.addEventListener('scroll',function(){
+    var h=document.documentElement;
+    var sc=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;
+    prog.style.width=sc+'%';
+  });
+
+  // 自测清单打勾
+  document.querySelectorAll('#checklist li').forEach(function(li){
+    li.addEventListener('click',function(){
+      var box=li.querySelector('.box');
+      box.classList.toggle('done');
+      li.classList.toggle('done');
+    });
+  });
+
+  // 语法高亮：对未处理的 pre>code 做按语言着色
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  // 占位符保护：先抽出注释和字符串，着色其余，再还原
+  function highlight(code,lang){
+    var stash=[];
+    function ph(html,cls){var i=stash.length;stash.push('<span class="'+cls+'">'+html+'</span>');return '\u0000'+i+'\u0000'}
+    var src=code;
+    // 注释
+    if(/^(java|xml|yaml|bash|properties|js)$/.test(lang)||lang===''){
+      src=src.replace(/(\/\/[^\n]*)/g,function(m){return ph(esc(m),'tok-com')});
+      src=src.replace(/(\/\*[\s\S]*?\*\/)/g,function(m){return ph(esc(m),'tok-com')});
+      src=src.replace(/(^|\n)(\s*#[^\n]*)/g,function(m,p1,p2){return /yaml|bash|properties|/.test(lang)||lang===''?p1+ph(esc(p2),'tok-com'):m});
+    }
+    // 字符串
+    src=src.replace(/("(?:[^"\\]|\\.)*")/g,function(m){return ph(esc(m),'tok-str')});
+    src=src.replace(/('(?:[^'\\]|\\.)*')/g,function(m){return ph(esc(m),'tok-str')});
+    // 转义剩余 HTML
+    src=esc(src).replace(/\u0000(\d+)\u0000/g,function(m,i){return stash[parseInt(i,10)]});
+    stash=[];
+    // 还原后再做关键词等着色（基于已转义文本）
+    if(lang==='java'||lang===''){
+      var kw='abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|var|record|sealed|permits|yield';
+      src=src.replace(new RegExp('\\b('+kw+')\\b','g'),'<span class="tok-kw">$1</span>');
+      src=src.replace(/(@[A-Za-z][A-Za-z0-9_]*)/g,'<span class="tok-anno">$1</span>');
+      src=src.replace(/\b([A-Z][A-Za-z0-9_]*)\b/g,'<span class="tok-type">$1</span>');
+      src=src.replace(/\b(\d+(?:\.\d+)?[fLdD]?)\b/g,'<span class="tok-num">$1</span>');
+    }else if(lang==='yaml'){
+      src=src.replace(/^(\s*)([A-Za-z0-9_.\-:]+)(\s*:)/gm,'$1<span class="tok-ykey">$2</span>$3');
+    }else if(lang==='xml'){
+      src=src.replace(/(&lt;\/?)([A-Za-z0-9_\-:.]+)/g,'$1<span class="tok-xmltag">$2</span>');
+      src=src.replace(/([A-Za-z0-9_\-:]+)(=)(&quot;|")/g,'<span class="tok-xmlattr">$1</span>$2$3');
+    }
+    return src;
+  }
+  document.querySelectorAll('pre code').forEach(function(el){
+    var card=el.closest('.code-card');
+    var lang=card?card.querySelector('.code-head .lang').textContent.trim().toLowerCase():'';
+    el.innerHTML=highlight(el.textContent,lang);
+  });
+})();
+</script>
+</body>
+</html>
