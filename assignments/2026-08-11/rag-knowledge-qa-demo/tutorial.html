@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG 知识库问答 demo 搭建 — 融合教程</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #21262d;
+    --ink: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #f78166;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --rule: #30363d;
+    --code-bg: #1c2128;
+    --code-border: #30363d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans CJK SC', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+    border-bottom: 1px solid var(--rule);
+    padding: 48px 0 40px;
+  }
+  .hero .phase-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+  .hero h1 {
+    font-size: 28px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .hero .meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .hero .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .hero .meta-item .icon { font-size: 18px; }
+  .hero .meta-item strong { color: var(--accent2); }
+
+  /* Sections */
+  section {
+    padding: 36px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  section h2 {
+    font-size: 22px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--rule);
+  }
+  section h3 {
+    font-size: 17px;
+    color: var(--ink);
+    margin: 24px 0 12px;
+  }
+  section p { margin-bottom: 12px; color: var(--ink); }
+  section ul, section ol { margin: 12px 0 12px 24px; }
+  section li { margin-bottom: 6px; }
+  .callout {
+    background: var(--bg2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    border-radius: 0 6px 6px 0;
+    margin: 16px 0;
+  }
+  .callout.warn { border-left-color: var(--yellow); }
+  .callout.tip { border-left-color: var(--green); }
+  .callout strong { color: var(--accent); }
+  .callout.warn strong { color: var(--yellow); }
+  .callout.tip strong { color: var(--green); }
+
+  /* Code */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+  pre code { color: var(--ink); }
+  p code, li code {
+    background: var(--bg3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+    color: var(--accent2);
+  }
+  .kw { color: #ff7b72; }
+  .str { color: #a5d6ff; }
+  .cmt { color: #8b949e; font-style: italic; }
+  .cls { color: #ffa657; }
+  .fn { color: #d2a8ff; }
+  .num { color: #79c0ff; }
+  .anno { color: #7ee787; }
+
+  /* Diagram */
+  .diagram {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .pipeline {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+    margin: 16px 0;
+  }
+  .pipeline .step {
+    background: var(--bg3);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--ink);
+    text-align: center;
+    min-width: 100px;
+  }
+  .pipeline .step.highlight {
+    border-color: var(--accent);
+    background: rgba(88, 166, 255, 0.1);
+  }
+  .pipeline .arrow {
+    color: var(--muted);
+    font-size: 18px;
+  }
+  .pipeline .step .step-title { font-weight: 700; color: var(--accent); display: block; }
+  .pipeline .step .step-desc { font-size: 11px; color: var(--muted); }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--rule);
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th { background: var(--bg2); color: var(--accent); font-weight: 600; }
+  td { color: var(--ink); }
+  tr:nth-child(even) { background: var(--bg2); }
+
+  /* Time badge */
+  .time-badge {
+    display: inline-block;
+    background: rgba(63, 185, 80, 0.15);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+
+  /* Tabs */
+  .tabs { margin: 16px 0; }
+  .tab-headers { display: flex; gap: 0; border-bottom: 2px solid var(--rule); }
+  .tab-header {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+  .tab-header.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Interview */
+  .interview-q {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 12px 0;
+  }
+  .interview-q .q-label {
+    color: var(--yellow);
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .interview-q .q-answer {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  /* Sources */
+  .sources ol { margin: 12px 0 12px 24px; }
+  .sources li { margin-bottom: 8px; font-size: 14px; }
+  .sources a { color: var(--accent); text-decoration: none; word-break: break-all; }
+  .sources a:hover { text-decoration: underline; }
+
+  /* Footer */
+  footer {
+    padding: 32px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="container">
+    <span class="phase-badge">Phase 0 · 基础筑基</span>
+    <h1>RAG 知识库问答 demo 搭建<br>使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路</h1>
+    <div class="meta">
+      <div class="meta-item"><span class="icon">⏱</span> 总预估时长：<strong>约 55 分钟</strong></div>
+      <div class="meta-item"><span class="icon">🔧</span> 主线语言：<strong>Java</strong>（Spring AI + LangChain4j 双路径）</div>
+      <div class="meta-item"><span class="icon">📦</span> Python 仅辅助（SDK 检索测试）</div>
+      <div class="meta-item"><span class="icon">🎯</span> 验收项：<strong>Phase 0 验收标准</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 1. RAG 全链路概览 ===== -->
+<section>
+  <div class="container">
+    <h2>1. RAG 全链路概览（10min）</h2>
+    <p>RAG（Retrieval-Augmented Generation，检索增强生成）是让 LLM 基于<strong>你的私有文档</strong>回答问题的核心技术。它通过在生成回答前先检索相关文档片段，将检索到的上下文注入到 Prompt 中，从而减少幻觉、提升事实准确性。</p>
+
+    <div class="diagram">
+      <p style="color: var(--accent); font-weight: 600; margin-bottom: 12px;">RAG 全链路架构图</p>
+      <div class="pipeline">
+        <div class="step highlight"><span class="step-title">DocumentLoader</span><span class="step-desc">文档加载</span></div>
+        <span class="arrow">→</span>
+        <div class="step highlight"><span class="step-title">Splitter</span><span class="step-desc">分块 Chunking</span></div>
+        <span class="arrow">→</span>
+        <div class="step highlight"><span class="step-title">Embedding</span><span class="step-desc">向量化</span></div>
+        <span class="arrow">→</span>
+        <div class="step highlight"><span class="step-title">VectorStore</span><span class="step-desc">存储向量</span></div>
+      </div>
+      <div class="pipeline" style="margin-top: 8px;">
+        <div class="step"><span class="step-title">User Query</span><span class="step-desc">用户提问</span></div>
+        <span class="arrow">→</span>
+        <div class="step highlight"><span class="step-title">Retriever</span><span class="step-desc">向量检索</span></div>
+        <span class="arrow">→</span>
+        <div class="step highlight"><span class="step-title">Prompt 模板</span><span class="step-desc">上下文注入</span></div>
+        <span class="arrow">→</span>
+        <div class="step highlight"><span class="step-title">LLM</span><span class="step-desc">生成回答</span></div>
+      </div>
+      <p style="color: var(--muted); font-size: 12px; margin-top: 12px;">上半部分为<strong>离线索引阶段</strong>（Indexing），下半部分为<strong>在线检索阶段</strong>（Retrieval）</p>
+    </div>
+
+    <div class="callout">
+      <strong>核心概念速记</strong>
+      <ul style="margin-top: 8px;">
+        <li><strong>Indexing（索引）</strong>：离线预处理文档 → 分块 → Embedding → 存入向量数据库</li>
+        <li><strong>Retrieval（检索）</strong>：在线将用户提问向量化 → 相似度搜索 → 注入上下文 → LLM 生成</li>
+        <li><strong>为什么需要分块？</strong>：LLM 上下文窗口有限，且小片段检索精度更高</li>
+        <li><strong>为什么需要 Embedding？</strong>：将文本转为数学向量，支持语义相似度计算</li>
+      </ul>
+    </div>
+
+    <h3>Spring AI vs LangChain4j RAG 架构对比</h3>
+    <table>
+      <thead>
+        <tr><th>维度</th><th>Spring AI</th><th>LangChain4j</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>核心 API</td><td><code>QuestionAnswerAdvisor</code> / <code>RetrievalAugmentationAdvisor</code></td><td><code>ContentRetriever</code> + <code>AiServices</code></td></tr>
+        <tr><td>文档加载</td><td><code>DocumentReader</code>（PDF/Text/Markdown）</td><td><code>FileSystemDocumentLoader</code> + <code>DocumentParser</code></td></tr>
+        <tr><td>分块策略</td><td><code>TokenTextSplitter</code> / <code>TokenSplitter</code></td><td><code>DocumentSplitter</code>（按 token/字符）</td></tr>
+        <tr><td>向量存储</td><td><code>VectorStore</code>（PgVector/Qdrant/Redis）</td><td><code>EmbeddingStore</code>（PgVector/Qdrant/InMemory）</td></tr>
+        <tr><td>高级 RAG</td><td>模块化：QueryTransformer / DocumentRetriever / QueryAugmenter</td><td>模块化：QueryTransformer / ContentRetriever / ContentAggregator</td></tr>
+        <tr><td>上手难度</td><td>中（需理解 Advisor 链）</td><td>低（Easy RAG 一行代码）</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 2. 项目搭建 ===== -->
+<section>
+  <div class="container">
+    <h2>2. 项目搭建与依赖配置（10min）</h2>
+
+    <div class="tabs">
+      <div class="tab-headers">
+        <div class="tab-header active" onclick="switchTab(this, 'spring-ai-setup')">Spring AI 路径</div>
+        <div class="tab-header" onclick="switchTab(this, 'langchain4j-setup')">LangChain4j 路径</div>
+      </div>
+
+      <div class="tab-content active" id="spring-ai-setup">
+        <h3>Spring AI 项目结构</h3>
+        <pre><code><span class="cmt">&lt;!-- pom.xml 核心依赖 --&gt;</span>
+&lt;dependencies&gt;
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>org.springframework.boot<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="kw">&lt;/artifactId&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- Spring AI OpenAI --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>spring-ai-starter-model-openai<span class="kw">&lt;/artifactId&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- Spring AI RAG 模块 --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>spring-ai-rag<span class="kw">&lt;/artifactId&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- Spring AI 向量存储（PgVector） --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>spring-ai-starter-vector-store-pgvector<span class="kw">&lt;/artifactId&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- 文档读取（PDF） --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>spring-ai-pdf-document-reader<span class="kw">&lt;/artifactId&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+&lt;/dependencies&gt;</code></pre>
+
+        <h3>application.yml 配置</h3>
+        <pre><code><span class="cls">spring:</span>
+  <span class="cls">ai:</span>
+    <span class="cls">openai:</span>
+      <span class="cls">api-key:</span> <span class="str">${OPENAI_API_KEY}</span>
+      <span class="cls">chat:</span>
+        <span class="cls">options:</span>
+          <span class="cls">model:</span> <span class="str">gpt-4o-mini</span>
+          <span class="cls">temperature:</span> <span class="num">0.3</span>
+      <span class="cls">embedding:</span>
+        <span class="cls">options:</span>
+          <span class="cls">model:</span> <span class="str">text-embedding-ada-002</span>
+    <span class="cls">vectorstore:</span>
+      <span class="cls">pgvector:</span>
+        <span class="cls">dimensions:</span> <span class="num">1536</span>
+        <span class="cls">distance-type:</span> cosine_distance
+        <span class="cls">index-type:</span> hnsw</code></pre>
+      </div>
+
+      <div class="tab-content" id="langchain4j-setup">
+        <h3>LangChain4j 项目结构</h3>
+        <pre><code><span class="cmt">&lt;!-- pom.xml 核心依赖 --&gt;</span>
+&lt;dependencies&gt;
+    <span class="cmt">&lt;!-- LangChain4j 核心 --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>langchain4j<span class="kw">&lt;/artifactId&gt;</span>
+        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- LangChain4j OpenAI 集成 --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>langchain4j-open-ai<span class="kw">&lt;/artifactId&gt;</span>
+        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- Easy RAG（内含 Tika 解析器 + 本地 Embedding） --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>langchain4j-easy-rag<span class="kw">&lt;/artifactId&gt;</span>
+        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- PgVector 向量存储 --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>langchain4j-pgvector<span class="kw">&lt;/artifactId&gt;</span>
+        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+
+    <span class="cmt">&lt;!-- Spring Boot --&gt;</span>
+    <span class="kw">&lt;dependency&gt;</span>
+        <span class="kw">&lt;groupId&gt;</span>org.springframework.boot<span class="kw">&lt;/groupId&gt;</span>
+        <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="kw">&lt;/artifactId&gt;</span>
+    <span class="kw">&lt;/dependency&gt;</span>
+&lt;/dependencies&gt;</code></pre>
+
+        <div class="callout tip">
+          <strong>Easy RAG 优势</strong>：LangChain4j 的 <code>langchain4j-easy-rag</code> 自带 Apache Tika 文档解析器和本地 Embedding 模型（bge-small-en-v1.5，仅 24MB），无需额外配置即可完成文档加载和向量化，非常适合快速搭建 demo。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3. 文档加载与分块 ===== -->
+<section>
+  <div class="container">
+    <h2>3. 文档加载与分块 Chunking（12min）</h2>
+    <p>文档加载和分块是 RAG 的第一步，直接影响检索质量。分块太大导致检索精度下降，太小则丢失上下文。</p>
+
+    <div class="tabs">
+      <div class="tab-headers">
+        <div class="tab-header active" onclick="switchTab(this, 'spring-ai-chunk')">Spring AI</div>
+        <div class="tab-header" onclick="switchTab(this, 'langchain4j-chunk')">LangChain4j</div>
+      </div>
+
+      <div class="tab-content active" id="spring-ai-chunk">
+        <pre><code><span class="kw">import</span> org.springframework.ai.document.Document;
+<span class="kw">import</span> org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+<span class="kw">import</span> org.springframework.ai.reader.tika.TikaDocumentReader;
+<span class="kw">import</span> org.springframework.ai.transformer.splitter.TokenTextSplitter;
+<span class="kw">import</span> org.springframework.ai.vectorstore.VectorStore;
+
+<span class="anno">@Service</span>
+<span class="kw">public class</span> <span class="cls">RagIngestionService</span> {
+
+    <span class="kw">private final</span> VectorStore vectorStore;
+
+    <span class="kw">public</span> <span class="cls">RagIngestionService</span>(VectorStore vectorStore) {
+        <span class="kw">this</span>.vectorStore = vectorStore;
+    }
+
+    <span class="kw">public void</span> <span class="fn">ingestDocuments</span>(String filePath) {
+        <span class="cmt">// 1. 文档加载（支持 PDF/TXT/DOCX，Tika 自动识别格式）</span>
+        <span class="cls">TikaDocumentReader</span> reader = <span class="kw">new</span> <span class="cls">TikaDocumentReader</span>(filePath);
+        <span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; documents = reader.get();
+
+        <span class="cmt">// 2. 分块（Chunking）— 按 token 分割</span>
+        <span class="cls">TokenTextSplitter</span> splitter = <span class="kw">new</span> <span class="cls">TokenTextSplitter</span>(
+            <span class="num">800</span>,   <span class="cmt">// 每块最大 800 token</span>
+            <span class="num">200</span>,   <span class="cmt">// 每块最小 200 token</span>
+            <span class="num">100</span>,   <span class="cmt">// 重叠 100 token（保留上下文连续性）</span>
+            <span class="num">10000</span>, <span class="cmt">// 单文档最大 token</span>
+            <span class="kw">true</span>    <span class="cmt">// 是否保留分隔符</span>
+        );
+        <span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; chunks = splitter.apply(documents);
+
+        <span class="cmt">// 3. 存入向量数据库（自动 Embedding + 存储）</span>
+        vectorStore.add(chunks);
+
+        <span class="cls">System</span>.out.println(<span class="str">"已入库 "</span> + chunks.size() + <span class="str">" 个文档片段"</span>);
+    }
+}</code></pre>
+      </div>
+
+      <div class="tab-content" id="langchain4j-chunk">
+        <pre><code><span class="kw">import</span> dev.langchain4j.data.document.Document;
+<span class="kw">import</span> dev.langchain4j.data.document.DocumentSplitter;
+<span class="kw">import</span> dev.langchain4j.data.document.DocumentParser;
+<span class="kw">import</span> dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
+<span class="kw">import</span> dev.langchain4j.data.document.parser.TextDocumentParser;
+<span class="kw">import</span> dev.langchain4j.data.document.splitter.DocumentSplitters;
+<span class="kw">import</span> dev.langchain4j.data.segment.TextSegment;
+<span class="kw">import</span> dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+
+<span class="anno">@Service</span>
+<span class="kw">public class</span> <span class="cls">RagIngestionService</span> {
+
+    <span class="kw">public void</span> <span class="fn">ingestDocuments</span>(String dirPath) {
+        <span class="cmt">// 1. 加载目录下所有文档（Tika 自动解析 PDF/DOCX/TXT）</span>
+        <span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; documents =
+            <span class="cls">FileSystemDocumentLoader</span>.loadDocuments(dirPath);
+
+        <span class="cmt">// 2. 配置分块策略</span>
+        <span class="cls">DocumentSplitter</span> splitter = <span class="cls">DocumentSplitters</span>.recursive(
+            <span class="num">800</span>,   <span class="cmt">// 每块最大 800 token</span>
+            <span class="num">100</span>,   <span class="cmt">// 重叠 100 token</span>
+            <span class="kw">new</span> <span class="cls">HuggingFaceTokenizer</span>() <span class="cmt">// token 计算器</span>
+        );
+
+        <span class="cmt">// 3. 创建 Ingestor（自动 Embedding + 存储）</span>
+        <span class="cls">EmbeddingStoreIngestor</span> ingestor = <span class="cls">EmbeddingStoreIngestor</span>.builder()
+            .documentSplitter(splitter)
+            .embeddingModel(embeddingModel)
+            .embeddingStore(embeddingStore)
+            .build();
+
+        <span class="cmt">// 4. 执行入库</span>
+        ingestor.ingest(documents);
+
+        <span class="cls">System</span>.out.println(<span class="str">"文档入库完成"</span>);
+    }
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <strong>Chunking 策略选择（面试高频）</strong>
+      <table style="margin-top: 8px;">
+        <thead><tr><th>策略</th><th>适用场景</th><th>优缺点</th></tr></thead>
+        <tbody>
+          <tr><td>固定大小分块（按 token）</td><td>通用场景、快速 demo</td><td>简单高效，但可能截断语义</td></tr>
+          <tr><td>递归分块（按段落→句子→词）</td><td>结构化文档（Markdown/HTML）</td><td>语义完整性好，推荐首选</td></tr>
+          <tr><td>滑动窗口 + 重叠</td><td>长文连续性要求高</td><td>上下文连续，但存储增大</td></tr>
+          <tr><td>语义分块（按 Embedding 相似度）</td><td>高精度检索</td><td>质量最高，但计算成本大</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>推荐分块参数</h3>
+    <ul>
+      <li><strong>块大小</strong>：500-800 token（约 375-600 个中文字），兼顾检索精度和上下文完整性</li>
+      <li><strong>重叠</strong>：10-15% 的块大小（如 800 token 块设 80-120 重叠），避免边界信息丢失</li>
+      <li><strong>分离器</strong>：优先按段落（\n\n）→ 句号（。）→ 逗号分割</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 4. 向量检索与 RAG 问答 ===== -->
+<section>
+  <div class="container">
+    <h2>4. 向量检索与 RAG 问答链路（15min）</h2>
+    <p>文档入库后，用户提问时需要：将问题向量化 → 在向量数据库中检索相似片段 → 将检索结果注入 Prompt → 发送给 LLM 生成回答。</p>
+
+    <div class="tabs">
+      <div class="tab-headers">
+        <div class="tab-header active" onclick="switchTab(this, 'spring-ai-rag')">Spring AI 路径</div>
+        <div class="tab-header" onclick="switchTab(this, 'langchain4j-rag')">LangChain4j 路径</div>
+      </div>
+
+      <div class="tab-content active" id="spring-ai-rag">
+        <h3>方案 A：QuestionAnswerAdvisor（简单 RAG）</h3>
+        <pre><code><span class="anno">@Service</span>
+<span class="kw">public class</span> <span class="cls">RagQaService</span> {
+
+    <span class="kw">private final</span> ChatClient chatClient;
+    <span class="kw">private final</span> VectorStore vectorStore;
+
+    <span class="kw">public</span> <span class="cls">RagQaService</span>(ChatClient.Builder builder, VectorStore vectorStore) {
+        <span class="kw">this</span>.vectorStore = vectorStore;
+        <span class="kw">this</span>.chatClient = builder.build();
+    }
+
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">ask</span>(<span class="cls">String</span> question) {
+        <span class="cmt">// 一行代码实现 RAG：Advisor 自动检索 + 注入上下文</span>
+        <span class="kw">return</span> chatClient.prompt()
+            .user(question)
+            .advisors(<span class="cls">QuestionAnswerAdvisor</span>.builder(vectorStore)
+                .searchRequest(<span class="cls">SearchRequest</span>.builder()
+                    .similarityThreshold(<span class="num">0.70</span>)  <span class="cmt">// 相似度阈值</span>
+                    .topK(<span class="num">5</span>)                  <span class="cmt">// 取 top 5 相关片段</span>
+                    .build())
+                .build())
+            .call()
+            .content();
+    }
+}</code></pre>
+
+        <h3>方案 B：RetrievalAugmentationAdvisor（高级 RAG）</h3>
+        <pre><code><span class="kw">public</span> <span class="cls">String</span> <span class="fn">advancedAsk</span>(<span class="cls">String</span> question) {
+    <span class="cmt">// 模块化 RAG：查询改写 + 检索 + 上下文增强</span>
+    <span class="cls">Advisor</span> ragAdvisor = <span class="cls">RetrievalAugmentationAdvisor</span>.builder()
+        <span class="cmt">// Pre-Retrieval：查询改写（提高检索质量）</span>
+        .queryTransformers(<span class="cls">RewriteQueryTransformer</span>.builder()
+            .chatClientBuilder(chatClient.mutate())
+            .build())
+        <span class="cmt">// Retrieval：向量检索</span>
+        .documentRetriever(<span class="cls">VectorStoreDocumentRetriever</span>.builder()
+            .vectorStore(vectorStore)
+            .similarityThreshold(<span class="num">0.50</span>)
+            .topK(<span class="num">5</span>)
+            .build())
+        <span class="cmt">// Post-Retrieval：上下文增强</span>
+        .queryAugmenter(<span class="cls">ContextualQueryAugmenter</span>.builder()
+            .allowEmptyContext(<span class="kw">false</span>)  <span class="cmt">// 无检索结果时拒答（防幻觉）</span>
+            .build())
+        .build();
+
+    <span class="kw">return</span> chatClient.prompt()
+        .user(question)
+        .advisors(ragAdvisor)
+        .call()
+        .content();
+}</code></pre>
+      </div>
+
+      <div class="tab-content" id="langchain4j-rag">
+        <h3>方案 A：Easy RAG（最快上手）</h3>
+        <pre><code><span class="cmt">// 1. 加载并入库文档（3 行代码）</span>
+<span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; docs = <span class="cls">FileSystemDocumentLoader</span>.loadDocuments(<span class="str">"docs/"</span>);
+<span class="cls">InMemoryEmbeddingStore</span>&lt;<span class="cls">TextSegment</span>&gt; store = <span class="kw">new</span> <span class="cls">InMemoryEmbeddingStore</span>&lt;&gt;();
+<span class="cls">EmbeddingStoreIngestor</span>.ingest(docs, store);
+
+<span class="cmt">// 2. 定义 AI Service 接口</span>
+<span class="kw">interface</span> <span class="cls">Assistant</span> {
+    <span class="cls">String</span> <span class="fn">chat</span>(<span class="cls">String</span> userMessage);
+}
+
+<span class="cmt">// 3. 构建 RAG 增强的 Assistant</span>
+<span class="cls">Assistant</span> assistant = <span class="cls">AiServices</span>.builder(<span class="cls">Assistant</span>.class)
+    .chatModel(chatModel)
+    .contentRetriever(<span class="cls">EmbeddingStoreContentRetriever</span>.from(store))
+    .build();
+
+<span class="cmt">// 4. 提问！</span>
+<span class="cls">String</span> answer = assistant.chat(<span class="str">"Spring AI 的核心组件有哪些？"</span>);</code></pre>
+
+        <h3>方案 B：自定义 ContentRetriever（高级 RAG）</h3>
+        <pre><code><span class="cmt">// 自定义检索器：控制 topK、相似度阈值</span>
+<span class="cls">ContentRetriever</span> retriever = <span class="cls">EmbeddingStoreContentRetriever</span>.builder()
+    .embeddingStore(embeddingStore)
+    .embeddingModel(embeddingModel)
+    .maxResults(<span class="num">5</span>)
+    .minScore(<span class="num">0.7</span>)
+    .build();
+
+<span class="cmt">// 带查询改写的高级 RAG</span>
+<span class="cls">Assistant</span> assistant = <span class="cls">AiServices</span>.builder(<span class="cls">Assistant</span>.class)
+    .chatModel(chatModel)
+    .contentRetriever(retriever)
+    <span class="cmt">// 查询改写器：将复杂问题分解为子查询</span>
+    .queryTransformer(<span class="cls">CompressingQueryTransformer</span>.builder()
+        .chatModel(chatModel)
+        .build())
+    <span class="cmt">// 检索后处理器：去重 + 重排序</span>
+    .contentAggregator(<span class="cls">DefaultContentAggregator</span>.builder()
+        .build())
+    .build();</code></pre>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <strong>防幻觉技巧</strong>：在 Prompt 模板中明确要求"如果上下文中没有相关信息，请回答'我不知道'"，这是生产环境 RAG 的标配。Spring AI 的 <code>ContextualQueryAugmenter.allowEmptyContext(false)</code> 和 LangChain4j 的 <code>minScore</code> 都能从机制上防止无依据回答。
+    </div>
+  </div>
+</section>
+
+<!-- ===== 5. Python 辅助验证 ===== -->
+<section>
+  <div class="container">
+    <h2>5. Python 辅助：向量检索验证（5min）</h2>
+    <p>Python 仅用于快速验证向量数据库的检索效果，不作为主线。用 Qdrant 或 PgVector 的 Python SDK 直接查询，确认 Java 端写入的向量能被正确检索。</p>
+
+    <pre><code><span class="cmt"># verify_retrieval.py — 验证向量检索质量</span>
+<span class="kw">from</span> qdrant_client <span class="kw">import</span> QdrantClient
+<span class="kw">from</span> qdrant_client.models <span class="kw">import</span> Distance, VectorParams
+
+<span class="cmt"># 连接 Qdrant（Java 端已写入数据）</span>
+client = QdrantClient(host=<span class="str">"localhost"</span>, port=6333)
+
+<span class="cmt"># 验证检索</span>
+results = client.search(
+    collection_name=<span class="str">"knowledge_base"</span>,
+    query_vector=[<span class="num">0.1</span>, <span class="num">0.2</span>, ...],  <span class="cmt"># 用 Embedding 模型生成</span>
+    limit=<span class="num">5</span>
+)
+
+<span class="kw">for</span> hit <span class="kw">in</span> results:
+    print(<span class="str">f"Score: </span>{hit.score}<span class="str"> | Text: </span>{hit.payload[<span class="str">'text'</span>][:<span class="num">100</span>]}<span class="str">"</span>)</code></pre>
+
+    <div class="callout">
+      <strong>Python 的角色定位</strong>：在本教程中 Python 仅用于辅助验证向量数据写入和检索的正确性。RAG 全链路的主线实现完全使用 Java（Spring AI 或 LangChain4j），这与实际 JD 要求一致——Java 是硬性技能，Python 是加分项。
+    </div>
+  </div>
+</section>
+
+<!-- ===== 6. 面试题精讲 ===== -->
+<section>
+  <div class="container">
+    <h2>6. 面试题精讲（3min）</h2>
+
+    <div class="interview-q">
+      <div class="q-label">Q1（第一梯队）：请口述 RAG 完整链路及每个环节的 why</div>
+      <div class="q-answer">
+        <strong>答题框架</strong>：RAG 分为离线索引和在线检索两个阶段。<br>
+        <strong>索引阶段</strong>：DocumentLoader 加载文档 → Splitter 分块（why：LLM 上下文有限，小片段检索精度高）→ Embedding 向量化（why：将语义转为数学向量支持相似度计算）→ VectorStore 存储（why：支持高效近似最近邻搜索）。<br>
+        <strong>检索阶段</strong>：用户提问向量化 → VectorStore 相似度检索 topK → 将检索结果注入 Prompt 模板 → LLM 基于上下文生成回答（why：减少幻觉，回答有据可查）。<br>
+        <strong>Chunking 策略</strong>：推荐 recursive 分块（按段落→句子→词递归分割），块大小 500-800 token，重叠 10-15%。太大会降低检索精度，太小会丢失上下文。
+      </div>
+    </div>
+
+    <div class="interview-q">
+      <div class="q-label">Q2（第一梯队）：混合检索 + Rerank 原理</div>
+      <div class="q-answer">
+        <strong>混合检索</strong>：结合向量检索（语义相似）和关键词检索（BM25/TF-IDF），两者互补。向量检索擅长理解同义词和语义，关键词检索擅长精确匹配专有名词和代码。<br>
+        <strong>融合方法</strong>：RRF（Reciprocal Rank Fusion）是常用融合算法，公式 <code>score = Σ 1/(k + rank_i)</code>，k 通常取 60。<br>
+        <strong>Rerank</strong>：检索后用 Cross-Encoder 模型对 topK 候选重新打分排序。与 Bi-Encoder（Embedding 模型）不同，Cross-Encoder 同时编码 query 和 document，精度更高但速度慢。典型流程：向量检索召回 50 条 → Rerank 精排取 top 5。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 7. 完整 demo 运行 ===== -->
+<section>
+  <div class="container">
+    <h2>7. 完整 demo 运行与验收（5min）</h2>
+
+    <h3>验收清单</h3>
+    <ol>
+      <li><input type="checkbox" checked> 能加载本地 PDF/TXT 文档</li>
+      <li><input type="checkbox" checked> 文档被正确分块并 Embedding</li>
+      <li><input type="checkbox" checked> 向量数据存入向量数据库（PgVector / Qdrant）</li>
+      <li><input type="checkbox" checked> 用户提问后能检索相关文档片段</li>
+      <li><input type="checkbox" checked> LLM 基于检索结果生成有依据的回答</li>
+      <li><input type="checkbox" checked> 能口述 RAG 完整链路及每个环节的 why</li>
+    </ol>
+
+    <h3>REST API 示例</h3>
+    <pre><code><span class="anno">@RestController</span>
+<span class="anno">@RequestMapping</span>(<span class="str">"/api/rag"</span>)
+<span class="kw">public class</span> <span class="cls">RagController</span> {
+
+    <span class="kw">private final</span> RagQaService ragQaService;
+    <span class="kw">private final</span> RagIngestionService ingestionService;
+
+    <span class="anno">@PostMapping</span>(<span class="str">"/ingest"</span>)
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">ingest</span>(<span class="anno">@RequestParam</span> <span class="cls">String</span> filePath) {
+        ingestionService.ingestDocuments(filePath);
+        <span class="kw">return</span> <span class="str">"文档入库成功"</span>;
+    }
+
+    <span class="anno">@PostMapping</span>(<span class="str">"/ask"</span>)
+    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">ask</span>(<span class="anno">@RequestParam</span> <span class="cls">String</span> question) {
+        <span class="kw">return</span> ragQaService.ask(question);
+    }
+}
+
+<span class="cmt">// 测试：curl -X POST "http://localhost:8080/api/rag/ask?question=Spring AI的核心组件有哪些"</span></code></pre>
+
+    <div class="callout tip">
+      <strong>Phase 0 验收呼应</strong>：本任务对应 Phase 0 验收标准——"能加载本地文档、分块、Embedding 后存入向量数据库；用户提问后能检索相关文档片段并生成回答"。完成后你已具备 RAG 全链路的实操能力，面试中被问到"你做过的 RAG 项目"时可以完整口述从文档加载到回答生成的每个环节。
+    </div>
+  </div>
+</section>
+
+<!-- ===== Sources ===== -->
+<section class="sources">
+  <div class="container">
+    <h2>教程来源</h2>
+    <ol>
+      <li><a href="https://docs.spring.io/spring-ai/reference/2.0/api/retrieval-augmented-generation.html" target="_blank" rel="noopener">Spring AI 官方文档 — Retrieval Augmented Generation (RAG)</a></li>
+      <li><a href="https://docs.langchain4j.dev/tutorials/rag" target="_blank" rel="noopener">LangChain4j 官方教程 — RAG (Retrieval-Augmented Generation)</a></li>
+      <li><a href="https://blog.csdn.net/HHX_01/article/details/158888122" target="_blank" rel="noopener">CSDN — Spring AI 2.0 实战：Java 零代码接入大模型 + RAG 知识库</a></li>
+      <li><a href="https://blog.csdn.net/qq_23625847/article/details/159546940" target="_blank" rel="noopener">CSDN — Java + RAG 从零搭建：用 LangChain4j 实现企业知识库问答</a></li>
+      <li><a href="https://juejin.cn/post/7620064920299487275" target="_blank" rel="noopener">掘金 — Spring AI 与 LangChain4j 从入门到精通：Java 后端开发者的 AI 实战手册</a></li>
+      <li><a href="https://github.com/gdunhao/rag-spring-ai" target="_blank" rel="noopener">GitHub — RAG with Spring AI & Ollama 综合示例项目</a></li>
+      <li><a href="https://github.com/cloud-skunkworks/LangChain4j-for-Beginners/blob/main/03-rag/README.md" target="_blank" rel="noopener">GitHub — LangChain4j for Beginners: Module 03 RAG</a></li>
+      <li><a href="https://github.com/tucanoo/springboot-ai-rag-tutorial" target="_blank" rel="noopener">路线图推荐 — springboot-ai-rag-tutorial（Spring Boot + Spring AI + PGVector 完整 RAG 应用）</a></li>
+      <li><a href="https://github.com/however-yir/knowledgeops-agent" target="_blank" rel="noopener">路线图推荐 — knowledgeops-agent（生产级多 Agent 平台，多租户/RBAC/可观测）</a></li>
+      <li><a href="https://github.com/yuquanquan/spring-al-alibaba-customer" target="_blank" rel="noopener">路线图推荐 — spring-al-alibaba-customer（企业级智能客服，混合检索 + 自适应 rerank）</a></li>
+      <li><a href="https://github.com/lhw300/Java-LLM-integration" target="_blank" rel="noopener">路线图推荐 — Java-LLM-integration LCallAI（两阶段检索：粗排 + LLM rerank）</a></li>
+      <li><a href="https://docs.spring.io/spring-ai/reference/api/etl.html" target="_blank" rel="noopener">Spring AI ETL 文档 — DocumentReader/Transformer/Writer</a></li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Phase 0 · 基础筑基 | RAG 知识库问答 demo 搭建 | 生成日期：2026-08-11</p>
+  </div>
+</footer>
+
+<script>
+function switchTab(header, contentId) {
+  var tabs = header.parentElement;
+  var contents = tabs.parentElement.querySelectorAll('.tab-content');
+  tabs.querySelectorAll('.tab-header').forEach(function(h) { h.classList.remove('active'); });
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  header.classList.add('active');
+  document.getElementById(contentId).classList.add('active');
+}
+</script>
+</body>
+</html>

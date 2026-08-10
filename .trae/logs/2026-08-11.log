@@ -1,0 +1,118 @@
+===== 每日维护日志 2026-08-11（北京时间）=====
+
+【步骤1】git clone 仓库
+  状态：成功
+  仓库：cnddb-2024/java-ai-agent-roadmap
+
+【步骤2】创建日志目录
+  状态：成功
+  路径：.trae/logs/
+
+【步骤3】飞书token状态检查
+  状态：成功（飞书可用）
+  lark-cli auth status 不支持 --as 参数，凭证外部提供，lark-cli task 命令直接可用
+  tasklist_guid: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+  清单名：Java AI Agent 转型学习计划
+
+【步骤4】更新反馈层（HTML + charts.js）
+  4a: TODAY=2026-08-11, 起始日=2026-07-29, 第14天, Phase 0（第1-14天）
+  4b: today-marker 更新为 "当前：Phase 0 · 第 14/168 天"（原为第13天）
+  4c: __RADAR_GAP__.me 更新 [61, 41, 22, 34, 50, 15, 27] → [61, 41, 22, 34, 50, 18, 27]
+      Python维度 +3（任务a5931ab7 "Python 面向对象编程实战" 新完成）
+      维度: RAG全链路/Agent编排/Spring AI/分布式中间件/工程化/Python/面试原理深度
+  4d: __RADAR_DAILY__ 更新 [60, 45, 60, 50, 45, 25] → [55, 50, 65, 55, 50, 30]
+      维度: 计划完成率/学习时长/知识输入/实战输出/复习覆盖/连续打卡
+      （最近7天：8/6×2, 8/7×3, 8/8×3, 8/10×1，共9个作业/教程）
+      （计划完成率6/11=55%；学习时长+5因新增作业；知识输入+5因新知识面）
+
+【步骤5】采集飞书任务状态 + 扫描作业
+  5a: tasklist_guid = 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+  5b: 飞书共17个任务（10个已完成，7个未完成）
+  5c: assignments/ 目录扫描完成
+      - 2026-07-31: 2个作业（java-web-to-ai-agent-mindmap, langchain4j-quickstart）
+      - 2026-08-01: 2个作业（python-quickstart, spring-ai-quickstart）
+      - 2026-08-06: 2个作业（rag-core-concepts, spring-ai-streaming-chat）
+      - 2026-08-07: 3个作业（python-data-structures, qdrant-deploy, week1-notes）
+      - 2026-08-08: 3个教程（function-calling-tool-use, python-oop-practice, spring-ai-vs-langchain4j-comparison）
+      - 2026-08-10: 1个作业（python-oop-practice/summary.md）
+      - 2026-08-11: 1个教程（rag-knowledge-qa-demo/tutorial.html，本次新生成）
+  5d: diff分析结果
+      - NEW_DONE（新完成）：1个
+        · a5931ab7 - "Python 面向对象编程实战：类/继承/多态/异常处理"（旧snapshot completed=false，飞书completed_at=1786370114000）
+      - VANISHED（消失任务）：空列表
+      - NEW_APPEARED（新出现任务）：空列表
+      C = 1
+  5e: 学习指引检查
+      所有7个未完成任务的 description 均已填充，无需补写
+
+【步骤6】滑动窗口任务规划
+  C=1（今天有1个新完成任务），执行步骤6c-6d
+  汇总未完成任务：7个（飞书7个 + backlog 0个），不足9个
+
+  按snapshot中created_at排序（从旧到新）及due分配：
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │ # │ 任务GUID(前8位) │ 任务摘要                           │ created_at       │ due分配     │
+  ├─────────────────────────────────────────────────────────────────────────────────┤
+  │ 1 │ b92b1e0d        │ Spring AI vs LangChain4j 选型对比  │ 1785537370288    │ 2026-08-11  │
+  │ 2 │ a0c5dd2a        │ Function Calling 与 Tool Use       │ 1785590400000    │ 2026-08-11  │
+  │ 3 │ 40ae67ff        │ RAG 知识库问答 demo                │ 1785590500000    │ 2026-08-11  │
+  │ 4 │ 3091bd59        │ Python 模块与包管理                │ 1785796638172    │ 2026-08-12  │
+  │ 5 │ ff91fc34        │ Spring AI Advisors 机制实战        │ 1785796639254    │ 2026-08-12  │
+  │ 6 │ ee7c02ae        │ Spring AI Tool Calling 实战        │ 1785796640191    │ 2026-08-12  │
+  │ 7 │ 004da9dc        │ 目标 JD 收集与刚需能力提取表       │ 1785796641257    │ 2026-08-13  │
+  └─────────────────────────────────────────────────────────────────────────────────┘
+
+  Patch操作（5个due更新）：
+    1. b92b1e0d: due 2026-08-10 → 2026-08-11（今天） ✓
+    2. a0c5dd2a: due 2026-08-10 → 2026-08-11（今天） ✓
+    3. 3091bd59: due 2026-08-11 → 2026-08-12（明天） ✓
+    4. ff91fc34: due 2026-08-11 → 2026-08-12（明天） ✓
+    5. 004da9dc: due 2026-08-12 → 2026-08-13（后天） ✓
+  无需Patch（2个，due已正确）：
+    - 40ae67ff: due 已是 2026-08-11
+    - ee7c02ae: due 已是 2026-08-12
+
+  6g: backlog.json 无变更（无任务从飞书删除，无任务从backlog创建）
+  6h: snapshot.json 已保存（17个任务，10已完成/7未完成，snapshot_date=2026-08-11）
+
+  新增任务：无
+  删除任务：无
+  顺延任务：5个（due日期更新）
+    - b92b1e0d: 8/10→8/11, a0c5dd2a: 8/10→8/11
+    - 3091bd59: 8/11→8/12, ff91fc34: 8/11→8/12
+    - 004da9dc: 8/12→8/13
+
+【步骤7】融合教程生成
+  7a: 待处理任务列表（3个，均为今天due）
+    1. b92b1e0d - Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）
+    2. a0c5dd2a - Function Calling 与 Tool Use 原理实战
+    3. 40ae67ff - RAG 知识库问答 demo 搭建
+
+  7b: 幂等检查结果
+    1. spring-ai-vs-langchain4j-comparison → 已有教程 (assignments/2026-08-08/) → 跳过
+    2. function-calling-tool-use → 已有教程 (assignments/2026-08-08/) → 跳过
+    3. rag-knowledge-qa-demo → 无教程 → 需生成
+
+  7c: 为 40ae67ff 生成融合教程
+    - 获取飞书任务详情（summary + description）✓
+    - 解析路线图 HTML 确定 Phase 0，提取 RAG 相关推荐项目和面试题 ✓
+    - 搜索互联网教程（7+来源）：Spring AI 官方文档、LangChain4j 官方教程、CSDN×2、掘金、GitHub×2 ✓
+    - 提取路线图推荐项目：springboot-ai-rag-tutorial、knowledgeops-agent、spring-al-alibaba-customer、Java-LLM-integration 等 ✓
+    - 生成 tutorial.html（自包含，Java主线+Python辅助，标注Phase 0，预估55分钟）✓
+    - 存入 assignments/2026-08-11/rag-knowledge-qa-demo/tutorial.html ✓
+
+  7e: 飞书评论写入
+    - 任务 40ae67ff (task_id: t100026, guid: 40ae67ff-da61-4d73-b826-b49b8c06ef75)
+    - 评论内容："📚 专属融合教程已生成：https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-11/rag-knowledge-qa-demo/tutorial.html"
+    - 评论ID: 7672536769182567396 ✓
+
+  教程生成情况汇总：
+    生成：1个（rag-knowledge-qa-demo）
+    跳过：2个（已有教程）
+    失败：0个
+
+【步骤8】写回与兜底
+  8a: 日志写入 .trae/logs/2026-08-11.log
+  8b: git add + commit + push
+
+===== 运行结束 =====
