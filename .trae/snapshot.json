@@ -120,6 +120,20 @@
       "created_at": "1785796641257",
       "completed": false,
       "due": "2026-08-13"
+    },
+    {
+      "guid": "2544e132-c0d0-418d-ad15-76ed68a04237",
+      "summary": "Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪",
+      "created_at": "1786419277834",
+      "completed": false,
+      "due": "2026-08-13"
+    },
+    {
+      "guid": "ca4b1438-5ae1-4f98-bb31-d09f61068c0c",
+      "summary": "本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理",
+      "created_at": "1786419278414",
+      "completed": false,
+      "due": "2026-08-13"
     }
   ]
 }
