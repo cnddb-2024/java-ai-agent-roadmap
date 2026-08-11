@@ -369,21 +369,21 @@
     <p>ChatClient 是 Spring AI 的中枢入口，风格类似 WebClient / JdbcTemplate：<code>.prompt().system().user().call().content()</code> 一步步链式表达，显式且可读。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">Java</span><span class="file">ChatService.java</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-anno">@Service</span>
-<span class="tok-kw">public class</span> <span class="tok-type">ChatService</span> {
+<pre><code>@Service
+public class ChatService {
 
-    <span class="tok-kw">private final</span> <span class="tok-type">ChatClient</span> chatClient;
+    private final ChatClient chatClient;
 
-    <span class="tok-kw">public</span> <span class="tok-type">ChatService</span>(<span class="tok-type">ChatClient.Builder</span> builder) {
-        <span class="tok-kw">this</span>.chatClient = builder.build();
+    public ChatService(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
     }
 
-    <span class="tok-kw">public</span> <span class="tok-type">String</span> <span class="tok-fn">chat</span>(<span class="tok-type">String</span> userMessage) {
-        <span class="tok-kw">return</span> chatClient.prompt()
-                .<span class="tok-fn">system</span>(<span class="tok-str">"你是企业 AI 助手，回答专业、简洁。"</span>)
-                .<span class="tok-fn">user</span>(userMessage)
-                .<span class="tok-fn">call</span>()
-                .<span class="tok-fn">content</span>();
+    public String chat(String userMessage) {
+        return chatClient.prompt()
+                .system("你是企业 AI 助手，回答专业、简洁。")
+                .user(userMessage)
+                .call()
+                .content();
     }
 }</code></pre>
     </div>
@@ -393,27 +393,27 @@
     <p>Advisor 是 Spring AI 的"灵魂"：以链式拦截器方式在请求前后插入逻辑（RAG 检索、记忆注入、Token 追踪、日志等）。内置 <code>QuestionAnswerAdvisor</code>（RAG）、<code>MessageChatMemoryAdvisor</code>（记忆）、<code>ToolCallingAdvisor</code>（工具）等。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">Java</span><span class="file">RagService.java — QuestionAnswerAdvisor 实现 RAG</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-anno">@Service</span>
-<span class="tok-kw">public class</span> <span class="tok-type">RagService</span> {
+<pre><code>@Service
+public class RagService {
 
-    <span class="tok-kw">private final</span> <span class="tok-type">ChatClient</span> chatClient;
-    <span class="tok-kw">private final</span> <span class="tok-type">VectorStore</span> vectorStore;
+    private final ChatClient chatClient;
+    private final VectorStore vectorStore;
 
-    <span class="tok-kw">public</span> <span class="tok-type">RagService</span>(<span class="tok-type">ChatClient.Builder</span> builder, <span class="tok-type">VectorStore</span> vectorStore) {
-        <span class="tok-kw">this</span>.vectorStore = vectorStore;
-        <span class="tok-kw">this</span>.chatClient = builder
-                .<span class="tok-fn">defaultAdvisors</span>(
-                    <span class="tok-type">QuestionAnswerAdvisor</span>.<span class="tok-fn">builder</span>(vectorStore)
-                        .<span class="tok-fn">searchRequest</span>(<span class="tok-type">SearchRequest</span>.<span class="tok-fn">builder</span>()
-                            .<span class="tok-fn">topK</span>(<span class="tok-num">5</span>)
-                            .<span class="tok-fn">similarityThreshold</span>(<span class="tok-num">0.7</span>)
-                            .<span class="tok-fn">build</span>())
-                        .<span class="tok-fn">build</span>())
-                .<span class="tok-fn">build</span>();
+    public RagService(ChatClient.Builder builder, VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+        this.chatClient = builder
+                .defaultAdvisors(
+                    QuestionAnswerAdvisor.builder(vectorStore)
+                        .searchRequest(SearchRequest.builder()
+                            .topK(5)
+                            .similarityThreshold(0.7)
+                            .build())
+                        .build())
+                .build();
     }
 
-    <span class="tok-kw">public</span> <span class="tok-type">String</span> <span class="tok-fn">ask</span>(<span class="tok-type">String</span> question) {
-        <span class="tok-kw">return</span> chatClient.prompt().<span class="tok-fn">user</span>(question).<span class="tok-fn">call</span>().<span class="tok-fn">content</span>();
+    public String ask(String question) {
+        return chatClient.prompt().user(question).call().content();
     }
 }</code></pre>
     </div>
@@ -423,20 +423,20 @@
     <p>把普通 Java 方法注册为工具，ChatClient 自动生成 JSON Schema 并在模型需要时回调执行。可注解式 <code>@Tool</code>，也可用 <code>Function</code> Bean。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">Java</span><span class="file">WeatherTools.java — @Tool 注解式</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-kw">public class</span> <span class="tok-type">WeatherTools</span> {
+<pre><code>public class WeatherTools {
 
-    <span class="tok-anno">@Tool</span>(description = <span class="tok-str">"查询指定城市的实时天气"</span>)
-    <span class="tok-kw">public</span> <span class="tok-type">WeatherResponse</span> <span class="tok-fn">getWeather</span>(<span class="tok-type">String</span> city) {
-        <span class="tok-kw">return</span> weatherService.<span class="tok-fn">query</span>(city);
+    @Tool(description = "查询指定城市的实时天气")
+    public WeatherResponse getWeather(String city) {
+        return weatherService.query(city);
     }
 }
 
-<span class="tok-com">// 在 ChatClient 调用时传入工具</span>
-<span class="tok-type">String</span> answer = chatClient.prompt()
-        .<span class="tok-fn">user</span>(<span class="tok-str">"北京今天天气怎么样？"</span>)
-        .<span class="tok-fn">tools</span>(<span class="tok-kw">new</span> <span class="tok-type">WeatherTools</span>())
-        .<span class="tok-fn">call</span>()
-        .<span class="tok-fn">content</span>();</code></pre>
+// 在 ChatClient 调用时传入工具
+String answer = chatClient.prompt()
+        .user("北京今天天气怎么样？")
+        .tools(new WeatherTools())
+        .call()
+        .content();</code></pre>
     </div>
 
     <!-- MCP -->
@@ -444,18 +444,18 @@
     <p>MCP 是 Anthropic 提出的"工具协议标准"。Spring AI 提供 Client / Server 两端 Boot Starter，自动发现并聚合 MCP Server 暴露的工具为 <code>SyncMcpToolCallbackProvider</code> Bean，实现跨进程工具复用。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">YAML</span><span class="file">application.yml — MCP Client 配置</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-ykey">spring</span>:
-  <span class="tok-ykey">ai</span>:
-    <span class="tok-ykey">mcp</span>:
-      <span class="tok-ykey">client</span>:
-        <span class="tok-ykey">sse</span>:
-          <span class="tok-ykey">connections</span>:
-            <span class="tok-ykey">weather-server</span>:
-              <span class="tok-ykey">url</span>: <span class="tok-yval">http://localhost:8081</span>
-        <span class="tok-ykey">stdio</span>:
-          <span class="tok-ykey">servers-configuration</span>: <span class="tok-yval">classpath:mcp-servers.json</span>
-    <span class="tok-com"># 自动装配后，所有 MCP 工具聚合为 SyncMcpToolCallbackProvider Bean</span>
-    <span class="tok-com"># 注意：MCP 工具不会自动注册到 ChatClient，需手动 .tools(mcpProvider) 注入</span></code></pre>
+<pre><code>spring:
+  ai:
+    mcp:
+      client:
+        sse:
+          connections:
+            weather-server:
+              url: http://localhost:8081
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
+    # 自动装配后，所有 MCP 工具聚合为 SyncMcpToolCallbackProvider Bean
+    # 注意：MCP 工具不会自动注册到 ChatClient，需手动 .tools(mcpProvider) 注入</code></pre>
     </div>
 
     <!-- Micrometer -->
@@ -463,18 +463,18 @@
     <p>这是 Spring AI 对 LangChain4j 的<b>最大优势</b>。接入 <code>spring-boot-starter-actuator</code> 即自动获得：Token 用量、响应耗时、错误率等指标，以及跨 HTTP→DB→模型 API 的分布式追踪。无需写一行监控代码。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">YAML</span><span class="file">application.yml — 可观测性配置</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-ykey">spring</span>:
-  <span class="tok-ykey">ai</span>:
-    <span class="tok-ykey">chat</span>:
-      <span class="tok-ykey">client</span>:
-        <span class="tok-ykey">observations</span>:
-          <span class="tok-ykey">log-prompt</span>: <span class="tok-yval">true</span>      <span class="tok-com"># 记录 prompt 内容（注意脱敏）</span>
-          <span class="tok-ykey">log-completion</span>: <span class="tok-yval">true</span> <span class="tok-com"># 记录模型返回内容</span>
-    <span class="tok-ykey">chat</span>:
-      <span class="tok-ykey">observations</span>:
-        <span class="tok-ykey">log-prompt</span>: <span class="tok-yval">true</span>
-<span class="tok-com"># 自动产出指标：gen_ai.client.token.usage（输入/输出 token）、</span>
-<span class="tok-com"># gen_ai.client.operation（模型调用耗时）、spring.ai.advisor（Advisor 链路 span）</span></code></pre>
+<pre><code>spring:
+  ai:
+    chat:
+      client:
+        observations:
+          log-prompt: true      # 记录 prompt 内容（注意脱敏）
+          log-completion: true # 记录模型返回内容
+    chat:
+      observations:
+        log-prompt: true
+# 自动产出指标：gen_ai.client.token.usage（输入/输出 token）、
+# gen_ai.client.operation（模型调用耗时）、spring.ai.advisor（Advisor 链路 span）</code></pre>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -501,19 +501,19 @@
     <p>定义一个接口 + 注解，LangChain4j 用动态代理生成实现，类似 Spring Data JPA / Feign。自动处理 prompt 模板、历史管理、输出解析。这是它"上手快"的根源。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">Java</span><span class="file">Assistant.java — 最简 AI Service</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-kw">interface</span> <span class="tok-type">Assistant</span> {
-    <span class="tok-anno">@SystemMessage</span>(<span class="tok-str">"你是 Java 技术专家，回答简洁专业。"</span>)
-    <span class="tok-type">String</span> <span class="tok-fn">chat</span>(<span class="tok-anno">@UserMessage</span> <span class="tok-type">String</span> userMessage);
+<pre><code>interface Assistant {
+    @SystemMessage("你是 Java 技术专家，回答简洁专业。")
+    String chat(@UserMessage String userMessage);
 }
 
-<span class="tok-com">// 创建：一行代码</span>
-<span class="tok-type">ChatModel</span> model = <span class="tok-type">OpenAiChatModel</span>.<span class="tok-fn">builder</span>()
-        .<span class="tok-fn">apiKey</span>(<span class="tok-type">System</span>.<span class="tok-fn">getenv</span>(<span class="tok-str">"OPENAI_API_KEY"</span>))
-        .<span class="tok-fn">modelName</span>(<span class="tok-str">"gpt-4o-mini"</span>)
-        .<span class="tok-fn">build</span>();
+// 创建：一行代码
+ChatModel model = OpenAiChatModel.builder()
+        .apiKey(System.getenv("OPENAI_API_KEY"))
+        .modelName("gpt-4o-mini")
+        .build();
 
-<span class="tok-type">Assistant</span> assistant = <span class="tok-type">AiServices</span>.<span class="tok-fn">create</span>(<span class="tok-type">Assistant</span>.<span class="tok-kw">class</span>, model);
-<span class="tok-type">String</span> answer = assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"解释一下 record 关键字"</span>);</code></pre>
+Assistant assistant = AiServices.create(Assistant.class, model);
+String answer = assistant.chat("解释一下 record 关键字");</code></pre>
     </div>
     <div class="note">Spring Boot / Quarkus 环境下可自动装配 Assistant Bean，无需手动 <code>AiServices.create()</code>，直接注入即可。</div>
 
@@ -522,19 +522,19 @@
     <p>大模型本身无状态，需显式传入历史。LangChain4j 用 <code>ChatMemory</code> 自动管理；<code>MessageWindowChatMemory</code> 滑动窗口控制上下文长度；<code>@MemoryId</code> + <code>ChatMemoryProvider</code> 支持多用户隔离。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">Java</span><span class="file">MultiUserAssistant.java — 多用户记忆</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-kw">interface</span> <span class="tok-type">MultiUserAssistant</span> {
-    <span class="tok-type">String</span> <span class="tok-fn">chat</span>(<span class="tok-anno">@MemoryId</span> <span class="tok-type">String</span> userId, <span class="tok-anno">@UserMessage</span> <span class="tok-type">String</span> message);
+<pre><code>interface MultiUserAssistant {
+    String chat(@MemoryId String userId, @UserMessage String message);
 }
 
-<span class="tok-type">MultiUserAssistant</span> assistant = <span class="tok-type">AiServices</span>.<span class="tok-fn">builder</span>(<span class="tok-type">MultiUserAssistant</span>.<span class="tok-kw">class</span>)
-        .<span class="tok-fn">chatModel</span>(model)
-        .<span class="tok-fn">chatMemoryProvider</span>(userId -&gt;
-            <span class="tok-type">MessageWindowChatMemory</span>.<span class="tok-fn">withMaxMessages</span>(<span class="tok-num">10</span>))
-        .<span class="tok-fn">build</span>();
+MultiUserAssistant assistant = AiServices.builder(MultiUserAssistant.class)
+        .chatModel(model)
+        .chatMemoryProvider(userId -&gt;
+            MessageWindowChatMemory.withMaxMessages(10))
+        .build();
 
-<span class="tok-com">// 每个 userId 拥有独立记忆窗口</span>
-assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"user-001"</span>, <span class="tok-str">"我叫张三"</span>);
-assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"user-001"</span>, <span class="tok-str">"我叫什么？"</span>); <span class="tok-com">// 记得：张三</span></code></pre>
+// 每个 userId 拥有独立记忆窗口
+assistant.chat("user-001", "我叫张三");
+assistant.chat("user-001", "我叫什么？"); // 记得：张三</code></pre>
     </div>
 
     <!-- RAG -->
@@ -542,26 +542,26 @@ assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"user-001"</spa
     <p>"Easy RAG"是亮点：指向文档即可自动完成 embedding、切分、入库、检索，零配置上手。需要定制时再降级到 <code>ContentRetriever</code> + <code>EmbeddingStoreIngestor</code>。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">Java</span><span class="file">EasyRag.java — 零配置 RAG</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-com">// Easy RAG：一行加载文档，自动切分 + embedding + 入库</span>
-<span class="tok-type">List&lt;Document&gt;</span> docs = <span class="tok-type">FileSystemDocumentLoader</span>.<span class="tok-fn">loadDocuments</span>(
-        <span class="tok-str">"docs/handbook.pdf"</span>, <span class="tok-kw">new</span> <span class="tok-type">TextDocumentParser</span>());
+<pre><code>// Easy RAG：一行加载文档，自动切分 + embedding + 入库
+List&lt;Document&gt; docs = FileSystemDocumentLoader.loadDocuments(
+        "docs/handbook.pdf", new TextDocumentParser());
 
-<span class="tok-com">// 自动选择 embedding 模型 + 内存向量库（开箱即用）</span>
-<span class="tok-type">EmbeddingStoreIngestor</span>.<span class="tok-fn">builder</span>()
-        .<span class="tok-fn">embeddingStore</span>(embeddingStore)
-        .<span class="tok-fn">embeddingModel</span>(embeddingModel)
-        .<span class="tok-fn">build</span>()
-        .<span class="tok-fn">ingest</span>(docs);
+// 自动选择 embedding 模型 + 内存向量库（开箱即用）
+EmbeddingStoreIngestor.builder()
+        .embeddingStore(embeddingStore)
+        .embeddingModel(embeddingModel)
+        .build()
+        .ingest(docs);
 
-<span class="tok-com">// 注入 ContentRetriever 到 AI Service</span>
-<span class="tok-type">Assistant</span> assistant = <span class="tok-type">AiServices</span>.<span class="tok-fn">builder</span>(<span class="tok-type">Assistant</span>.<span class="tok-kw">class</span>)
-        .<span class="tok-fn">chatModel</span>(model)
-        .<span class="tok-fn">contentRetriever</span>(<span class="tok-type">EmbeddingStoreContentRetriever</span>.<span class="tok-fn">builder</span>()
-                .<span class="tok-fn">embeddingStore</span>(embeddingStore)
-                .<span class="tok-fn">embeddingModel</span>(embeddingModel)
-                .<span class="tok-fn">maxResults</span>(<span class="tok-num">5</span>)
-                .<span class="tok-fn">build</span>())
-        .<span class="tok-fn">build</span>();</code></pre>
+// 注入 ContentRetriever 到 AI Service
+Assistant assistant = AiServices.builder(Assistant.class)
+        .chatModel(model)
+        .contentRetriever(EmbeddingStoreContentRetriever.builder()
+                .embeddingStore(embeddingStore)
+                .embeddingModel(embeddingModel)
+                .maxResults(5)
+                .build())
+        .build();</code></pre>
     </div>
 
     <!-- Agentic -->
@@ -569,20 +569,20 @@ assistant.<span class="tok-fn">chat</span>(<span class="tok-str">"user-001"</spa
     <p>LangChain4j 的 Agentic 能力体现在：工具自动调用循环、结构化输出、以及 <code>GoalOrientedPlanner</code> 等规划器驱动的多步推理工作流。适合构建"目标驱动"的 Agent。</p>
     <div class="code-card">
       <div class="code-head"><span class="lang">Java</span><span class="file">AgenticAssistant.java — 工具 + 多步推理</span><span class="copy">复制</span></div>
-<pre><code><span class="tok-kw">interface</span> <span class="tok-type">ResearchAgent</span> {
-    <span class="tok-anno">@SystemMessage</span>(<span class="tok-str">"你是一个研究助手，可调用工具收集信息并汇总。"</span>)
-    <span class="tok-type">String</span> <span class="tok-fn">research</span>(<span class="tok-anno">@UserMessage</span> <span class="tok-type">String</span> topic);
+<pre><code>interface ResearchAgent {
+    @SystemMessage("你是一个研究助手，可调用工具收集信息并汇总。")
+    String research(@UserMessage String topic);
 }
 
-<span class="tok-type">ResearchAgent</span> agent = <span class="tok-type">AiServices</span>.<span class="tok-fn">builder</span>(<span class="tok-type">ResearchAgent</span>.<span class="tok-kw">class</span>)
-        .<span class="tok-fn">chatModel</span>(model)
-        .<span class="tok-fn">tools</span>(searchTool, calculatorTool, fileWriterTool)
-        <span class="tok-com">// 模型自主决定调用哪个工具、调用几次，直至完成任务</span>
-        .<span class="tok-fn">build</span>();
+ResearchAgent agent = AiServices.builder(ResearchAgent.class)
+        .chatModel(model)
+        .tools(searchTool, calculatorTool, fileWriterTool)
+        // 模型自主决定调用哪个工具、调用几次，直至完成任务
+        .build();
 
-<span class="tok-com">// 进阶：GoalOrientedPlanner 驱动的多阶段工作流</span>
-<span class="tok-com">// planner 拆解目标 → 分步执行 → 循环修正 → 汇总输出</span>
-<span class="tok-type">String</span> result = agent.<span class="tok-fn">research</span>(<span class="tok-str">"对比 2025 年主流向量数据库的延迟与成本"</span>);</code></pre>
+// 进阶：GoalOrientedPlanner 驱动的多阶段工作流
+// planner 拆解目标 → 分步执行 → 循环修正 → 汇总输出
+String result = agent.research("对比 2025 年主流向量数据库的延迟与成本");</code></pre>
     </div>
   </section>
 

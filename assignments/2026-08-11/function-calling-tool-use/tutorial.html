@@ -266,49 +266,49 @@
     </table>
 
     <h3>2.3 一次真实的 wire 交互（节选）</h3>
-    <pre><code><span class="cm">// ① 上行：声明工具</span>
+    <pre><code>// ① 上行：声明工具
 {
-  <span class="str">"model"</span>: <span class="str">"gpt-4o-mini"</span>,
-  <span class="str">"messages"</span>: [{<span class="str">"role"</span>:<span class="str">"user"</span>, <span class="str">"content"</span>:<span class="str">"北京今天天气怎么样？"</span>}],
-  <span class="str">"tools"</span>: [{
-    <span class="str">"type"</span>: <span class="str">"function"</span>,
-    <span class="str">"function"</span>: {
-      <span class="str">"name"</span>: <span class="str">"getWeather"</span>,
-      <span class="str">"description"</span>: <span class="str">"查询指定城市的实时天气"</span>,
-      <span class="str">"parameters"</span>: {
-        <span class="str">"type"</span>: <span class="str">"object"</span>,
-        <span class="str">"properties"</span>: {
-          <span class="str">"city"</span>: {<span class="str">"type"</span>:<span class="str">"string"</span>, <span class="str">"description"</span>:<span class="str">"城市名，如 Beijing"</span>}
+  "model": "gpt-4o-mini",
+  "messages": [{"role":"user", "content":"北京今天天气怎么样？"}],
+  "tools": [{
+    "type": "function",
+    "function": {
+      "name": "getWeather",
+      "description": "查询指定城市的实时天气",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "city": {"type":"string", "description":"城市名，如 Beijing"}
         },
-        <span class="str">"required"</span>: [<span class="str">"city"</span>]
+        "required": ["city"]
       }
     }
   }],
-  <span class="str">"tool_choice"</span>: <span class="str">"auto"</span>
+  "tool_choice": "auto"
 }
 
-<span class="cm">// ② 下行：模型决定调用</span>
+// ② 下行：模型决定调用
 {
-  <span class="str">"finish_reason"</span>: <span class="str">"tool_calls"</span>,
-  <span class="str">"message"</span>: {
-    <span class="str">"role"</span>: <span class="str">"assistant"</span>,
-    <span class="str">"tool_calls"</span>: [{
-      <span class="str">"id"</span>: <span class="str">"call_abc123"</span>,
-      <span class="str">"type"</span>: <span class="str">"function"</span>,
-      <span class="str">"function"</span>: {<span class="str">"name"</span>:<span class="str">"getWeather"</span>, <span class="str">"arguments"</span>:<span class="str">"{\"city\":\"Beijing\"}"</span>}
+  "finish_reason": "tool_calls",
+  "message": {
+    "role": "assistant",
+    "tool_calls": [{
+      "id": "call_abc123",
+      "type": "function",
+      "function": {"name":"getWeather", "arguments":"{\"city\":\"Beijing\"}"}
     }]
   }
 }
 
-<span class="cm">// ③ 上行：回传结果（Java 侧执行后）</span>
+// ③ 上行：回传结果（Java 侧执行后）
 {
-  <span class="str">"role"</span>: <span class="str">"tool"</span>,
-  <span class="str">"tool_call_id"</span>: <span class="str">"call_abc123"</span>,
-  <span class="str">"content"</span>: <span class="str">"{\"temp\":27,\"condition\":\"晴\"}"</span>
+  "role": "tool",
+  "tool_call_id": "call_abc123",
+  "content": "{\"temp\":27,\"condition\":\"晴\"}"
 }
 
-<span class="cm">// ④ 下行：最终回答</span>
-{ <span class="str">"role"</span>:<span class="str">"assistant"</span>, <span class="str">"content"</span>:<span class="str">"北京今天晴，气温约 27℃，适合外出。"</span> }</code></pre>
+// ④ 下行：最终回答
+{ "role":"assistant", "content":"北京今天晴，气温约 27℃，适合外出。" }</code></pre>
 
     <div class="callout success">
       <p><strong>关键点：</strong>模型本身不联网、不执行代码。它只负责"决定调用 + 填参数"以及"看见结果后组织语言"。
@@ -359,20 +359,20 @@
     </table>
 
     <h3>在框架里怎么写</h3>
-    <pre><code><span class="cm">// Spring AI（1.0 M+/GA）</span>
+    <pre><code>// Spring AI（1.0 M+/GA）
 ChatResponse resp = chatClient.prompt()
-    .user(<span class="str">"北京天气？"</span>)
+    .user("北京天气？")
     .tools(weatherTools)
     .options(OpenAiChatOptions.builder()
-        .toolChoice(ToolChoice.AUTO)   <span class="cm">// NONE / REQUIRED / FUNCTION</span>
+        .toolChoice(ToolChoice.AUTO)   // NONE / REQUIRED / FUNCTION
         .build())
     .call()
     .chatResponse();
 
-<span class="cm">// LangChain4j</span>
+// LangChain4j
 OpenAiChatModel model = OpenAiChatModel.builder()
-    .apiKey(System.getenv(<span class="str">"OPENAI_API_KEY"</span>))
-    .toolChoice(ToolChoice.AUTO)  <span class="cm">// 也可在 @Tool 级或 AiService 级覆盖</span>
+    .apiKey(System.getenv("OPENAI_API_KEY"))
+    .toolChoice(ToolChoice.AUTO)  // 也可在 @Tool 级或 AiService 级覆盖
     .build();</code></pre>
     <div class="callout warn">
       <p><strong>注意：</strong><code>required</code> 只保证"至少调一次工具"，并不保证调用正确的工具。
@@ -400,40 +400,40 @@ OpenAiChatModel model = OpenAiChatModel.builder()
     <h3>4.2 手工写一份：天气 + 时间</h3>
     <pre><code>[
   {
-    <span class="str">"type"</span>: <span class="str">"function"</span>,
-    <span class="str">"function"</span>: {
-      <span class="str">"name"</span>: <span class="str">"get_weather"</span>,
-      <span class="str">"description"</span>: <span class="str">"查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。"</span>,
-      <span class="str">"parameters"</span>: {
-        <span class="str">"type"</span>: <span class="str">"object"</span>,
-        <span class="str">"properties"</span>: {
-          <span class="str">"city"</span>: {
-            <span class="str">"type"</span>: <span class="str">"string"</span>,
-            <span class="str">"description"</span>: <span class="str">"城市中文名或英文名，例如 'Beijing'、'上海'"</span>
+    "type": "function",
+    "function": {
+      "name": "get_weather",
+      "description": "查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "城市中文名或英文名，例如 'Beijing'、'上海'"
           },
-          <span class="str">"unit"</span>: {
-            <span class="str">"type"</span>: <span class="str">"string"</span>,
-            <span class="str">"enum"</span>: [<span class="str">"celsius"</span>, <span class="str">"fahrenheit"</span>],
-            <span class="str">"default"</span>: <span class="str">"celsius"</span>,
-            <span class="str">"description"</span>: <span class="str">"温度单位"</span>
+          "unit": {
+            "type": "string",
+            "enum": ["celsius", "fahrenheit"],
+            "default": "celsius",
+            "description": "温度单位"
           }
         },
-        <span class="str">"required"</span>: [<span class="str">"city"</span>]
+        "required": ["city"]
       }
     }
   },
   {
-    <span class="str">"type"</span>: <span class="str">"function"</span>,
-    <span class="str">"function"</span>: {
-      <span class="str">"name"</span>: <span class="str">"current_time"</span>,
-      <span class="str">"description"</span>: <span class="str">"返回指定时区的当前日期与时间。当用户问'现在几点/今天几号'时使用。"</span>,
-      <span class="str">"parameters"</span>: {
-        <span class="str">"type"</span>: <span class="str">"object"</span>,
-        <span class="str">"properties"</span>: {
-          <span class="str">"timezone"</span>: {
-            <span class="str">"type"</span>: <span class="str">"string"</span>,
-            <span class="str">"description"</span>: <span class="str">"IANA 时区，例如 Asia/Shanghai、UTC"</span>,
-            <span class="str">"default"</span>: <span class="str">"Asia/Shanghai"</span>
+    "type": "function",
+    "function": {
+      "name": "current_time",
+      "description": "返回指定时区的当前日期与时间。当用户问'现在几点/今天几号'时使用。",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "timezone": {
+            "type": "string",
+            "description": "IANA 时区，例如 Asia/Shanghai、UTC",
+            "default": "Asia/Shanghai"
           }
         }
       }
@@ -462,74 +462,74 @@ OpenAiChatModel model = OpenAiChatModel.builder()
     </p>
 
     <h3>5.1 依赖（Maven）</h3>
-    <pre><code><span class="kw">&lt;dependency&gt;</span>
-  <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
-  <span class="kw">&lt;artifactId&gt;</span>spring-ai-starter-model-openai<span class="kw">&lt;/artifactId&gt;</span>
-<span class="kw">&lt;/dependency&gt;</span></code></pre>
+    <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-ai-starter-model-openai&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
 
     <h3>5.2 方式一：<code>@Tool</code> 注解声明式</h3>
-    <pre><code><span class="kw">package</span> com.example.agent.tools;
+    <pre><code>package com.example.agent.tools;
 
-<span class="kw">import</span> org.springframework.ai.tool.annotation.Tool;
-<span class="kw">import</span> org.springframework.ai.tool.annotation.ToolParam;
-<span class="kw">import</span> org.springframework.stereotype.Component;
-<span class="kw">import</span> java.time.*;
-<span class="kw">import</span> java.util.Map;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.stereotype.Component;
+import java.time.*;
+import java.util.Map;
 
-<span class="ann">@Component</span>
-<span class="kw">public class</span> <span class="typ">WeatherTools</span> {
+@Component
+public class WeatherTools {
 
-    <span class="ann">@Tool(</span>name = <span class="str">"get_weather"</span>,
-          description = <span class="str">"查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。"</span><span class="ann">)</span>
-    <span class="kw">public</span> <span class="typ">Map</span>&lt;<span class="typ">String</span>, <span class="typ">Object</span>&gt; getWeather(
-            <span class="ann">@ToolParam(</span>description = <span class="str">"城市名，例如 Beijing 或 上海"</span><span class="ann">)</span> <span class="typ">String</span> city,
-            <span class="ann">@ToolParam(</span>description = <span class="str">"温度单位：celsius 或 fahrenheit"</span>, required = <span class="kw">false</span><span class="ann">)</span> <span class="typ">String</span> unit) {
+    @Tool(name = "get_weather",
+          description = "查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。")
+    public Map&lt;String, Object&gt; getWeather(
+            @ToolParam(description = "城市名，例如 Beijing 或 上海") String city,
+            @ToolParam(description = "温度单位：celsius 或 fahrenheit", required = false) String unit) {
 
-        <span class="typ">String</span> u = (unit == <span class="kw">null</span>) ? <span class="str">"celsius"</span> : unit;
-        <span class="cm">// 真实项目里这里替换成 RestClient/WebClient 调用气象 API</span>
-        <span class="kw">return</span> <span class="typ">Map</span>.of(
-            <span class="str">"city"</span>, city,
-            <span class="str">"temperature"</span>, <span class="str">"celsius"</span>.equals(u) ? <span class="num">27</span> : <span class="num">80</span>,
-            <span class="str">"unit"</span>, u,
-            <span class="str">"condition"</span>, <span class="str">"晴"</span>
+        String u = (unit == null) ? "celsius" : unit;
+        // 真实项目里这里替换成 RestClient/WebClient 调用气象 API
+        return Map.of(
+            "city", city,
+            "temperature", "celsius".equals(u) ? 27 : 80,
+            "unit", u,
+            "condition", "晴"
         );
     }
 
-    <span class="ann">@Tool(</span>name = <span class="str">"current_time"</span>,
-          description = <span class="str">"返回指定时区的当前日期与时间；当用户问'现在几点/今天几号'时使用。"</span><span class="ann">)</span>
-    <span class="kw">public</span> <span class="typ">String</span> currentTime(
-            <span class="ann">@ToolParam(</span>description = <span class="str">"IANA 时区，例如 Asia/Shanghai"</span>, required = <span class="false">false</span><span class="ann">)</span> <span class="typ">String</span> timezone) {
-        <span class="typ">ZoneId</span> zone = (timezone == <span class="kw">null</span>)
-            ? <span class="typ">ZoneId</span>.of(<span class="str">"Asia/Shanghai"</span>)
-            : <span class="typ">ZoneId</span>.of(timezone);
-        <span class="kw">return</span> <span class="typ">ZonedDateTime</span>.now(zone).toString();
+    @Tool(name = "current_time",
+          description = "返回指定时区的当前日期与时间；当用户问'现在几点/今天几号'时使用。")
+    public String currentTime(
+            @ToolParam(description = "IANA 时区，例如 Asia/Shanghai", required = false) String timezone) {
+        ZoneId zone = (timezone == null)
+            ? ZoneId.of("Asia/Shanghai")
+            : ZoneId.of(timezone);
+        return ZonedDateTime.now(zone).toString();
     }
 }</code></pre>
 
     <h4>在 ChatClient 中挂载工具</h4>
-    <pre><code><span class="kw">package</span> com.example.agent;
+    <pre><code>package com.example.agent;
 
-<span class="kw">import</span> org.springframework.ai.chat.client.ChatClient;
-<span class="kw">import</span> org.springframework.ai.openai.OpenAiChatOptions;
-<span class="kw">import</span> org.springframework.ai.openai.api.tool.*;
-<span class="kw">import</span> org.springframework.ai.tool.ToolCallback;
-<span class="kw">import</span> org.springframework.stereotype.Service;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.tool.*;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.stereotype.Service;
 
-<span class="ann">@Service</span>
-<span class="kw">public class</span> <span class="typ">AgentService</span> {
+@Service
+public class AgentService {
 
-    <span class="kw">private final</span> <span class="typ">ChatClient</span> chatClient;
-    <span class="kw">private final</span> <span class="typ">WeatherTools</span> weatherTools;
+    private final ChatClient chatClient;
+    private final WeatherTools weatherTools;
 
-    <span class="kw">public</span> <span class="fn">AgentService</span>(<span class="typ">ChatClient</span>.Builder builder, <span class="typ">WeatherTools</span> weatherTools) {
-        <span class="kw">this</span>.chatClient = builder.build();
-        <span class="kw">this</span>.weatherTools = weatherTools;
+    public AgentService(ChatClient.Builder builder, WeatherTools weatherTools) {
+        this.chatClient = builder.build();
+        this.weatherTools = weatherTools;
     }
 
-    <span class="kw">public</span> <span class="typ">String</span> <span class="fn">chat</span>(<span class="typ">String</span> userInput) {
-        <span class="kw">return</span> chatClient.prompt()
+    public String chat(String userInput) {
+        return chatClient.prompt()
                 .user(userInput)
-                .tools(weatherTools)               <span class="cm">// ← 关键：注册 @Tool 方法</span>
+                .tools(weatherTools)               // ← 关键：注册 @Tool 方法
                 .call()
                 .content();
     }
@@ -545,78 +545,78 @@ OpenAiChatModel model = OpenAiChatModel.builder()
       当工具定义需要在运行时动态生成（比如从数据库读取可用函数列表），
       或者你需要完全掌控参数解析与结果序列化，可以使用 <code>FunctionCallback</code>。
     </p>
-    <pre><code><span class="kw">package</span> com.example.agent.tools;
+    <pre><code>package com.example.agent.tools;
 
-<span class="kw">import</span> com.fasterxml.jackson.databind.JsonNode;
-<span class="kw">import</span> com.fasterxml.jackson.databind.ObjectMapper;
-<span class="kw">import</span> org.springframework.ai.tool.function.FunctionToolCallback;
-<span class="kw">import</span> org.springframework.context.annotation.Bean;
-<span class="kw">import</span> org.springframework.context.annotation.Configuration;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-<span class="kw">import</span> java.time.*;
-<span class="kw">import</span> java.util.Map;
+import java.time.*;
+import java.util.Map;
 
-<span class="ann">@Configuration</span>
-<span class="kw">public class</span> <span class="typ">ToolConfig</span> {
+@Configuration
+public class ToolConfig {
 
-    <span class="kw">private final</span> <span class="typ">ObjectMapper</span> json = <span class="kw">new</span> <span class="typ">ObjectMapper</span>();
+    private final ObjectMapper json = new ObjectMapper();
 
-    <span class="ann">@Bean</span>
-    <span class="kw">public</span> <span class="typ">FunctionToolCallback</span> <span class="fn">weatherCallback</span>() {
-        <span class="kw">return</span> <span class="typ">FunctionToolCallback</span>.builder(<span class="str">"get_weather"</span>, <span class="kw">this</span>::invokeWeather)
-                .description(<span class="str">"查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。"</span>)
-                .inputSchema(<span class="str">"""</span>
+    @Bean
+    public FunctionToolCallback weatherCallback() {
+        return FunctionToolCallback.builder("get_weather", this::invokeWeather)
+                .description("查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。")
+                .inputSchema("""
                     {
-                      <span class="str">"type"</span>:<span class="str">"object"</span>,
-                      <span class="str">"properties"</span>:{
-                        <span class="str">"city"</span>:{<span class="str">"type"</span>:<span class="str">"string"</span>,<span class="str">"description"</span>:<span class="str">"城市名，如 Beijing"</span>},
-                        <span class="str">"unit"</span>:{<span class="str">"type"</span>:<span class="str">"string"</span>,<span class="str">"enum"</span>:[<span class="str">"celsius"</span>,<span class="str">"fahrenheit"</span>]}
+                      "type":"object",
+                      "properties":{
+                        "city":{"type":"string","description":"城市名，如 Beijing"},
+                        "unit":{"type":"string","enum":["celsius","fahrenheit"]}
                       },
-                      <span class="str">"required"</span>:[<span class="str">"city"</span>]
+                      "required":["city"]
                     }
-                    <span class="str">"""</span>)
+                    """)
                 .build();
     }
 
-    <span class="kw">private</span> <span class="typ">String</span> <span class="fn">invokeWeather</span>(<span class="typ">String</span> jsonInput) {
-        <span class="kw">try</span> {
-            <span class="typ">JsonNode</span> node = json.readTree(jsonInput);
-            <span class="typ">String</span> city = node.path(<span class="str">"city"</span>).asText(<span class="str">"Beijing"</span>);
-            <span class="typ">String</span> unit = node.path(<span class="str">"unit"</span>).asText(<span class="str">"celsius"</span>);
-            <span class="typ">Map</span>&lt;<span class="typ">String</span>, <span class="typ">Object</span>&gt; result = <span class="typ">Map</span>.of(
-                <span class="str">"city"</span>, city,
-                <span class="str">"temperature"</span>, <span class="str">"celsius"</span>.equals(unit) ? <span class="num">27</span> : <span class="num">80</span>,
-                <span class="str">"condition"</span>, <span class="str">"晴"</span>
+    private String invokeWeather(String jsonInput) {
+        try {
+            JsonNode node = json.readTree(jsonInput);
+            String city = node.path("city").asText("Beijing");
+            String unit = node.path("unit").asText("celsius");
+            Map&lt;String, Object&gt; result = Map.of(
+                "city", city,
+                "temperature", "celsius".equals(unit) ? 27 : 80,
+                "condition", "晴"
             );
-            <span class="kw">return</span> json.writeValueAsString(result);
-        } <span class="kw">catch</span> (<span class="typ">Exception</span> e) {
-            <span class="kw">return</span> <span class="str">"{\"error\":\""</span> + e.getMessage() + <span class="str">"\"}"</span>;
+            return json.writeValueAsString(result);
+        } catch (Exception e) {
+            return "{\"error\":\"" + e.getMessage() + "\"}";
         }
     }
 
-    <span class="ann">@Bean</span>
-    <span class="kw">public</span> <span class="typ">FunctionToolCallback</span> <span class="fn">timeCallback</span>() {
-        <span class="kw">return</span> <span class="typ">FunctionToolCallback</span>.builder(<span class="str">"current_time"</span>, input -&gt;
-                <span class="typ">ZonedDateTime</span>.now(<span class="typ">ZoneId</span>.of(<span class="str">"Asia/Shanghai"</span>)).toString())
-            .description(<span class="str">"返回 Asia/Shanghai 当前时间；当用户问'现在几点'时使用。"</span>)
-            .inputType(<span class="typ">String</span>.class) <span class="cm">// 无参也可声明</span>
+    @Bean
+    public FunctionToolCallback timeCallback() {
+        return FunctionToolCallback.builder("current_time", input -&gt;
+                ZonedDateTime.now(ZoneId.of("Asia/Shanghai")).toString())
+            .description("返回 Asia/Shanghai 当前时间；当用户问'现在几点'时使用。")
+            .inputType(String.class) // 无参也可声明
             .build();
     }
 }</code></pre>
 
     <h4>挂载编程式回调</h4>
-    <pre><code><span class="kw">public</span> <span class="typ">String</span> <span class="fn">chatWithCallbacks</span>(<span class="typ">String</span> input) {
-    <span class="kw">return</span> chatClient.prompt()
+    <pre><code>public String chatWithCallbacks(String input) {
+    return chatClient.prompt()
         .user(input)
-        .toolCallbacks(weatherCallback, timeCallback)  <span class="cm">// ← FunctionCallback 路径</span>
+        .toolCallbacks(weatherCallback, timeCallback)  // ← FunctionCallback 路径
         .call()
         .content();
 }</code></pre>
 
     <h3>5.4 运行验证</h3>
-    <pre><code><span class="typ">String</span> a = agentService.chat(<span class="str">"北京现在天气怎么样？顺便告诉我现在几点。"</span>);
-<span class="cm">// 模型会连续调用 get_weather(city=Beijing) 和 current_time(timezone=Asia/Shanghai)，</span>
-<span class="cm">// 然后把两个结果合并为一段中文回答。</span>
+    <pre><code>String a = agentService.chat("北京现在天气怎么样？顺便告诉我现在几点。");
+// 模型会连续调用 get_weather(city=Beijing) 和 current_time(timezone=Asia/Shanghai)，
+// 然后把两个结果合并为一段中文回答。
 System.out.println(a);</code></pre>
 
     <div class="callout success">
@@ -634,87 +634,87 @@ System.out.println(a);</code></pre>
     </p>
 
     <h3>6.1 依赖（Maven）</h3>
-    <pre><code><span class="kw">&lt;dependency&gt;</span>
-  <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
-  <span class="kw">&lt;artifactId&gt;</span>langchain4j-open-ai<span class="kw">&lt;/artifactId&gt;</span>
-  <span class="kw">&lt;version&gt;</span>1.0.0-beta1<span class="kw">&lt;/version&gt;</span>   <span class="cm">&lt;!-- 以最新版为准 --&gt;</span>
-<span class="kw">&lt;/dependency&gt;</span></code></pre>
+    <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+  &lt;artifactId&gt;langchain4j-open-ai&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-beta1&lt;/version&gt;   &lt;!-- 以最新版为准 --&gt;
+&lt;/dependency&gt;</code></pre>
 
     <h3>6.2 用 @Tool 写工具类</h3>
-    <pre><code><span class="kw">package</span> com.example.l4j.tools;
+    <pre><code>package com.example.l4j.tools;
 
-<span class="kw">import</span> dev.langchain4j.agent.tool.Tool;
-<span class="kw">import</span> dev.langchain4j.agent.tool.P;
-<span class="kw">import</span> org.springframework.stereotype.Component;
+import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.agent.tool.P;
+import org.springframework.stereotype.Component;
 
-<span class="kw">import</span> java.time.*;
-<span class="kw">import</span> java.util.Map;
+import java.time.*;
+import java.util.Map;
 
-<span class="ann">@Component</span>
-<span class="kw">public class</span> <span class="typ">WeatherTools</span> {
+@Component
+public class WeatherTools {
 
-    <span class="ann">@Tool("查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。")</span>
-    <span class="kw">public</span> <span class="typ">Map</span>&lt;<span class="typ">String</span>, <span class="typ">Object</span>&gt; getWeather(
-            <span class="ann">@P("城市名，例如 Beijing 或 上海")</span> <span class="typ">String</span> city,
-            <span class="ann">@P("温度单位：celsius 或 fahrenheit，默认 celsius")</span> <span class="typ">String</span> unit) {
-        <span class="typ">String</span> u = (unit == <span class="kw">null</span>) ? <span class="str">"celsius"</span> : unit;
-        <span class="kw">return</span> <span class="typ">Map</span>.of(
-            <span class="str">"city"</span>, city,
-            <span class="str">"temperature"</span>, <span class="str">"celsius"</span>.equals(u) ? <span class="num">27</span> : <span class="num">80</span>,
-            <span class="str">"unit"</span>, u,
-            <span class="str">"condition"</span>, <span class="str">"晴"</span>
+    @Tool("查询给定城市的当前天气；当用户询问天气/气温/是否下雨时使用。")
+    public Map&lt;String, Object&gt; getWeather(
+            @P("城市名，例如 Beijing 或 上海") String city,
+            @P("温度单位：celsius 或 fahrenheit，默认 celsius") String unit) {
+        String u = (unit == null) ? "celsius" : unit;
+        return Map.of(
+            "city", city,
+            "temperature", "celsius".equals(u) ? 27 : 80,
+            "unit", u,
+            "condition", "晴"
         );
     }
 
-    <span class="ann">@Tool("返回指定时区的当前日期与时间；当用户问'现在几点/今天几号'时使用。")</span>
-    <span class="kw">public</span> <span class="typ">String</span> currentTime(
-            <span class="ann">@P("IANA 时区，例如 Asia/Shanghai，默认 Asia/Shanghai")</span> <span class="typ">String</span> timezone) {
-        <span class="typ">ZoneId</span> zone = (timezone == <span class="kw">null</span>)
-            ? <span class="typ">ZoneId</span>.of(<span class="str">"Asia/Shanghai"</span>)
-            : <span class="typ">ZoneId</span>.of(timezone);
-        <span class="kw">return</span> <span class="typ">ZonedDateTime</span>.now(zone).toString();
+    @Tool("返回指定时区的当前日期与时间；当用户问'现在几点/今天几号'时使用。")
+    public String currentTime(
+            @P("IANA 时区，例如 Asia/Shanghai，默认 Asia/Shanghai") String timezone) {
+        ZoneId zone = (timezone == null)
+            ? ZoneId.of("Asia/Shanghai")
+            : ZoneId.of(timezone);
+        return ZonedDateTime.now(zone).toString();
     }
 }</code></pre>
 
     <h3>6.3 定义 AiService 接口并装配工具</h3>
-    <pre><code><span class="kw">package</span> com.example.l4j;
+    <pre><code>package com.example.l4j;
 
-<span class="kw">import</span> dev.langchain4j.service.SystemMessage;
-<span class="kw">import</span> dev.langchain4j.service.UserMessage;
-<span class="kw">import</span> dev.langchain4j.service.spring.AiService;
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.spring.AiService;
 
-<span class="ann">@AiService</span>
-<span class="kw">interface</span> <span class="typ">Assistant</span> {
+@AiService
+interface Assistant {
 
-    <span class="ann">@SystemMessage("你是一个简洁的中文助手，需要时调用工具，不要编造数据。")</span>
-    <span class="typ">String</span> chat(<span class="ann">@UserMessage</span> <span class="typ">String</span> message);
+    @SystemMessage("你是一个简洁的中文助手，需要时调用工具，不要编造数据。")
+    String chat(@UserMessage String message);
 }</code></pre>
 
     <p>若不用 Spring Boot 自动装配，可以用原生 builder（也是题目要求的方式）：</p>
-    <pre><code><span class="kw">package</span> com.example.l4j;
+    <pre><code>package com.example.l4j;
 
-<span class="kw">import</span> dev.langchain4j.memory.chat.MessageWindowChatMemory;
-<span class="kw">import</span> dev.langchain4j.model.openai.OpenAiChatModel;
-<span class="kw">import</span> dev.langchain4j.service.AiServices;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.service.AiServices;
 
-<span class="kw">public class</span> <span class="typ">AssistantApp</span> {
+public class AssistantApp {
 
-    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="typ">String</span>[] args) {
-        <span class="typ">OpenAiChatModel</span> model = <span class="typ">OpenAiChatModel</span>.builder()
-            .apiKey(System.getenv(<span class="str">"OPENAI_API_KEY"</span>))
-            .modelName(<span class="str">"gpt-4o-mini"</span>)
-            .temperature(<span class="num">0.2</span>)
+    public static void main(String[] args) {
+        OpenAiChatModel model = OpenAiChatModel.builder()
+            .apiKey(System.getenv("OPENAI_API_KEY"))
+            .modelName("gpt-4o-mini")
+            .temperature(0.2)
             .build();
 
-        <span class="typ">WeatherTools</span> tools = <span class="kw">new</span> <span class="typ">WeatherTools</span>();
+        WeatherTools tools = new WeatherTools();
 
-        <span class="typ">Assistant</span> assistant = AiServices.builder(<span class="typ">Assistant</span>.class)
+        Assistant assistant = AiServices.builder(Assistant.class)
             .chatLanguageModel(model)
-            .tools(tools)                           <span class="cm">// ← 关键：把 @Tool 方法暴露给模型</span>
-            .chatMemory(MessageWindowChatMemory.withMaxMessages(<span class="num">20</span>))
+            .tools(tools)                           // ← 关键：把 @Tool 方法暴露给模型
+            .chatMemory(MessageWindowChatMemory.withMaxMessages(20))
             .build();
 
-        <span class="typ">String</span> answer = assistant.chat(<span class="str">"上海天气怎样？现在几点？"</span>);
+        String answer = assistant.chat("上海天气怎样？现在几点？");
         System.out.println(answer);
     }
 }</code></pre>
@@ -724,16 +724,16 @@ System.out.println(a);</code></pre>
       与 Spring AI 的 FunctionCallback 对应，LangChain4j 也可以用
       <code>ToolSpecification</code> + <code>ToolExecutor</code> 在运行时动态拼装工具，适合从数据库/配置中心加载工具清单。
     </p>
-    <pre><code><span class="kw">var</span> spec = dev.langchain4j.agent.tool.ToolSpecification.builder()
-    .name(<span class="str">"get_weather"</span>)
-    .description(<span class="str">"查询城市天气"</span>)
-    .parameters(JsonObjectUtils.from(<span class="str">"""</span>
-        {<span class="str">"type"</span>:<span class="str">"object"</span>,
-         <span class="str">"properties"</span>:{<span class="str">"city"</span>:{<span class="str">"type"</span>:<span class="str">"string"</span>}},
-         <span class="str">"required"</span>:[<span class="str">"city"</span>]}
-        <span class="str">"""</span>))
+    <pre><code>var spec = dev.langchain4j.agent.tool.ToolSpecification.builder()
+    .name("get_weather")
+    .description("查询城市天气")
+    .parameters(JsonObjectUtils.from("""
+        {"type":"object",
+         "properties":{"city":{"type":"string"}},
+         "required":["city"]}
+        """))
     .build();
-<span class="cm">// 然后在低层 ChatModel 层配合 ToolExecutor 使用；AiServices 路径下一般用不到。</span></code></pre>
+// 然后在低层 ChatModel 层配合 ToolExecutor 使用；AiServices 路径下一般用不到。</code></pre>
   </section>
 
   <!-- 7. 常见坑 -->

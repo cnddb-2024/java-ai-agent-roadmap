@@ -73,8 +73,70 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 - 文件名固定为 `tutorial.html`
 - 字体使用 canvas-fonts（如 InstrumentSans + JetBrainsMono）
 - 图表/图示用 Mermaid 或 ECharts
-- 代码块带语法高亮颜色标注
 - 底部含"教程来源"章节，使用 `<ol>` 有序列表
+
+### 8.1 代码块规范（极其重要 -- 防高亮标签泄漏）
+
+**问题背景**：此前生成的教程使用手动 `<span class="tok-xxx">` 标签包裹代码 token 实现语法高亮。这种方式存在严重缺陷：
+- LLM 生成时经常出错：span 标签未闭合、嵌套错误、属性泄漏到可见文本
+- 用户复制代码时 `class="tok-str">` 等 HTML 属性残留在代码中，导致代码无法编译
+- GitHub raw 视图下 span 标签暴露为可见文本
+
+**强制规则（禁止违反）**：
+
+1. **禁止在 `<pre><code>` 内部使用任何 `<span>` 标签做语法高亮**。代码块内容必须是纯文本，不含任何 HTML 标签（除 HTML 实体转义 `&lt;` `&gt;` `&amp;` 外）。
+
+2. **正确的代码块写法**：
+```html
+<pre><code>public class WeatherTools {
+
+    @Tool(description = "查询指定城市的实时天气")
+    public WeatherResponse getWeather(String city) {
+        return weatherService.query(city);
+    }
+}</code></pre>
+```
+注意：`<pre><code>` 内部是纯文本，`<` 用 `&lt;` 转义，`>` 用 `&gt;` 转义，`&` 用 `&amp;` 转义。不包裹任何 span。
+
+3. **语法高亮通过 CSS 样式整个代码块实现**，而非逐 token 着色：
+```css
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  background: #1c2128;
+  color: #e6edf3;
+  display: block;
+  padding: 16px;
+  border-radius: 8px;
+  white-space: pre;
+  overflow-x: auto;
+}
+```
+
+4. **行内代码** 使用 `<code>` 标签，同样不含 span：
+```html
+<p>使用 <code>@Tool</code> 注解定义工具方法。</p>
+```
+
+5. **禁止出现的模式**（生成后必须检查）：
+   - `<span class="tok-` -- 旧的高亮标签前缀
+   - `<span class="kw">` / `<span class="st">` / `<span class="fn">` / `<span class="ty">` / `<span class="cm">` / `<span class="an">` / `<span class="nu">` / `<span class="tag">` -- 任何手动 span 高亮
+   - `class="tok-` 出现在 `<pre><code>` 内部
+   - 任何未闭合的 `<span` 标签
+
+### 8.2 HTML 实体转义规则
+
+在 `<pre><code>` 块中，以下字符必须转义：
+- `<` -> `&lt;`
+- `>` -> `&gt;`
+- `&` -> `&amp;`
+
+示例 -- XML/POM 代码块：
+```html
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-ai-openai-spring-boot-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+```
 
 ### 9. 幂等性检查（防重复生成）
 
@@ -91,9 +153,85 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 
 - 当天 due 的任务：优先处理，存入 `assignments/<TODAY>/<slug>/tutorial.html`
 - 逾期任务（due < TODAY 且未完成）：检查原始 due 日期目录下是否已有教程
-  - 有 → 跳过
-  - 无 → 生成并存入 `assignments/<原始due日期>/<slug>/tutorial.html`
+  - 有 -> 跳过
+  - 无 -> 生成并存入 `assignments/<原始due日期>/<slug>/tutorial.html`
 - 已完成任务：跳过，不生成教程
+
+### 11. Agent 校验环节（生成后必须执行，禁止跳过）
+
+**原则**：每个 `tutorial.html` 生成后，在写入文件之前，必须经过校验。校验不通过则修复后重新校验，最多重试 2 次。仍不通过则记录错误日志，该教程标记为"生成失败"。
+
+**校验流程**（按顺序执行，任一项失败则整体不通过）：
+
+#### 11.1 代码块完整性校验
+
+对文件中所有 `<pre><code>...</code></pre>` 块执行以下检查：
+
+- **无 span 泄漏**：`<pre><code>` 内部不得出现 `<span` 标签。用正则 `<pre><code>[\s\S]*?<\/code><\/pre>` 提取每个代码块，检查内部是否含 `<span`。若含则不通过。
+- **无 class 属性泄漏**：代码块内不得出现 `class="tok-`、`class="kw"`、`class="st"`、`class="fn"`、`class="ty"`、`class="cm"`、`class="an"`、`class="nu"`、`class="tag"` 等模式。
+- **HTML 实体正确转义**：代码块内的 `<` 必须写作 `&lt;`，`>` 必须写作 `&gt;`（除 `</code></pre>` 闭合标签外）。检查是否存在裸露的 `<` 或 `>` 字符（如 `<dependency>` 应为 `&lt;dependency&gt;`）。
+- **标签闭合平衡**：`<pre>` 与 `</pre>` 数量相等，`<code>` 与 `</code>` 数量相等。
+
+#### 11.2 Java 代码语法校验
+
+对代码块中的 Java 代码执行基本语法检查：
+
+- 每个 `{` 都有对应的 `}`。
+- 每个 `(` 都有对应的 `)`。
+- 字符串引号成对出现（`"` 的数量为偶数）。
+- 注释格式正确（`//` 单行注释不跨越代码块边界）。
+- `@Annotation` 后跟合法的 Java 标识符或 `(`。
+
+#### 11.3 HTML 结构校验
+
+- `<!DOCTYPE html>` 存在于文件开头。
+- `<html>` 和 `</html>` 标签成对。
+- `<head>` 和 `</head>` 成对。
+- `<body>` 和 `</body>` 成对。
+- 所有 `<section>` 或 `<div>` 标签正确闭合。
+- CSS 中定义了 `pre code` 的样式（字体、背景色等）。
+
+#### 11.4 内容完整性校验
+
+- Hero 区包含 Phase 标注和任务全称。
+- Hero 区包含总预估时长。
+- 底部"教程来源"章节存在，且包含至少 5 个 `<li>` 条目。
+- 每个来源链接是完整的 URL（以 `http` 开头）。
+
+#### 11.5 校验执行方式
+
+校验通过脚本自动化执行。在生成 tutorial.html 后，运行以下检查命令：
+
+```bash
+# 检查 span 泄漏：在 pre/code 块内不应有 span 标签
+python3 -c "
+import re, sys
+html = open(sys.argv[1]).read()
+blocks = re.findall(r'<pre><code>([\s\S]*?)</code></pre>', html)
+issues = []
+for i, block in enumerate(blocks):
+    if '<span' in block:
+        issues.append(f'代码块{i+1}: 含有 <span> 标签')
+    if 'class=\"tok-' in block or 'class=\"kw\"' in block or 'class=\"st\"' in block:
+        issues.append(f'代码块{i+1}: 含有语法高亮 class 属性')
+    # 检查裸露的 < > (非实体转义)
+    stripped = block.replace('&lt;','').replace('&gt;','').replace('&amp;','')
+    if '<' in stripped or '>' in stripped:
+        issues.append(f'代码块{i+1}: 含有未转义的 < 或 >')
+if issues:
+    print('校验失败:')
+    for issue in issues:
+        print(f'  - {issue}')
+    sys.exit(1)
+else:
+    print('代码块校验通过')
+" <tutorial.html路径>
+```
+
+若校验失败，必须修复后重新校验。修复方式：
+- 将所有 `<span class="xxx">内容</span>` 替换为纯文本 `内容`。
+- 将代码块内的 `<` 替换为 `&lt;`，`>` 替换为 `&gt;`。
+- 确保 `pre code` 的 CSS 样式已定义。
 
 ## 执行步骤
 
@@ -105,10 +243,16 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 3. 解析路线图 HTML，确定当前 Phase，提取相关推荐项目和面试题
 4. 搜索互联网教程（至少 5 个来源）
 5. 融合生成 tutorial.html，按上述规范
-6. 存入 assignments/<due日期>/<slug>/tutorial.html（due日期≠当天时为逾期任务）
-7. git add + commit + push 到路线图仓库
-8. 获取 GitHub raw URL
-9. lark-cli task +comment 将 raw URL 写入飞书任务评论
+   - 代码块使用纯文本 <pre><code>，禁止 <span> 高亮标签
+   - HTML 实体正确转义（< -> &lt; 等）
+6. 【Agent 校验】对生成的 HTML 执行第 11 节校验流程
+   - 校验通过 -> 继续步骤 7
+   - 校验失败 -> 修复问题，重新校验（最多重试 2 次）
+   - 仍失败 -> 记录错误日志，标记"生成失败"，跳过该任务
+7. 存入 assignments/<due日期>/<slug>/tutorial.html（due日期≠当天时为逾期任务）
+8. git add + commit + push 到路线图仓库
+9. 获取 GitHub raw URL
+10. lark-cli task +comment 将 raw URL 写入飞书任务评论
 ```
 
 ## 输出

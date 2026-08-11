@@ -450,118 +450,118 @@
     <h3 style="color:var(--accent)">4.1 Spring AI</h3>
 
     <p class="code-label">// 依赖（pom.xml 关键 starter）</p>
-    <pre><code><span class="tag">&lt;dependency&gt;</span>
-  <span class="tag">&lt;groupId&gt;</span>org.springframework.ai<span class="tag">&lt;/groupId&gt;</span>
-  <span class="tag">&lt;artifactId&gt;</span>spring-ai-openai-spring-boot-starter<span class="tag">&lt;/artifactId&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+    <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-ai-openai-spring-boot-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
 
     <p class="code-label">// application.yml</p>
-    <pre><code><span class="kw">spring</span>:
-  <span class="kw">ai</span>:
-    <span class="kw">openai</span>:
-      <span class="kw">api-key</span>: <span class="st">${OPENAI_API_KEY}</span>
-      <span class="kw">chat</span>:
-        <span class="kw">options</span>:
-          <span class="kw">model</span>: <span class="st">gpt-4o-mini</span>
-          <span class="kw">temperature</span>: <span class="nu">0.3</span></code></pre>
+    <pre><code>spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.3</code></pre>
 
     <p class="code-label">// 简单 Chat</p>
-    <pre><code><span class="an">@RestController</span>
-<span class="kw">class</span> <span class="ty">ChatController</span> {
+    <pre><code>@RestController
+class ChatController {
 
-    <span class="kw">private final</span> <span class="ty">ChatClient</span> chatClient;
+    private final ChatClient chatClient;
 
-    <span class="fn">ChatController</span>(<span class="ty">ChatClient.Builder</span> builder) {
-        <span class="kw">this</span>.chatClient = builder.<span class="fn">build</span>();
+    ChatController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
     }
 
-    <span class="an">@GetMapping</span>(<span class="st">"/chat"</span>)
-    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">chat</span>(<span class="an">@RequestParam</span> <span class="ty">String</span> q) {
-        <span class="kw">return</span> chatClient.<span class="fn">prompt</span>()
-                .<span class="fn">user</span>(q)
-                .<span class="fn">call</span>()
-                .<span class="fn">content</span>();
+    @GetMapping("/chat")
+    public String chat(@RequestParam String q) {
+        return chatClient.prompt()
+                .user(q)
+                .call()
+                .content();
     }
 }</code></pre>
 
     <p class="code-label">// Tool Calling：用 @Tool 暴露一个查天气方法</p>
-    <pre><code><span class="an">@Component</span>
-<span class="kw">class</span> <span class="ty">WeatherTools</span> {
+    <pre><code>@Component
+class WeatherTools {
 
-    <span class="an">@Tool</span>(description = <span class="st">"根据城市名查询当前天气，返回温度和天气状况"</span>)
-    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getWeather</span>(<span class="st">String city</span>) {
-        <span class="cm">// 真实项目中调用第三方天气 API</span>
-        <span class="kw">return</span> <span class="st">"北京 · 晴 · 26°C"</span>;
+    @Tool(description = "根据城市名查询当前天气，返回温度和天气状况")
+    public String getWeather(String city) {
+        // 真实项目中调用第三方天气 API
+        return "北京 · 晴 · 26°C";
     }
 }
 
-<span class="an">@RestController</span>
-<span class="kw">class</span> <span class="ty">AgentController</span> {
+@RestController
+class AgentController {
 
-    <span class="kw">private final</span> <span class="ty">ChatClient</span> chatClient;
-    <span class="kw">private final</span> <span class="ty">WeatherTools</span> weatherTools;
+    private final ChatClient chatClient;
+    private final WeatherTools weatherTools;
 
-    <span class="cm">// 构造器注入 ...</span>
+    // 构造器注入 ...
 
-    <span class="an">@GetMapping</span>(<span class="st">"/ask"</span>)
-    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">ask</span>(<span class="an">@RequestParam</span> <span class="ty">String</span> q) {
-        <span class="kw">return</span> chatClient.<span class="fn">prompt</span>()
-                .<span class="fn">user</span>(q)
-                .<span class="fn">tools</span>(weatherTools)        <span class="cm">// 注册工具，框架自动处理调用循环</span>
-                .<span class="fn">call</span>()
-                .<span class="fn">content</span>();
+    @GetMapping("/ask")
+    public String ask(@RequestParam String q) {
+        return chatClient.prompt()
+                .user(q)
+                .tools(weatherTools)        // 注册工具，框架自动处理调用循环
+                .call()
+                .content();
     }
 }</code></pre>
 
     <h3 style="color:var(--accent2)">4.2 LangChain4j</h3>
 
     <p class="code-label">// 依赖（不依赖 Spring 也能用）</p>
-    <pre><code><span class="tag">&lt;dependency&gt;</span>
-  <span class="tag">&lt;groupId&gt;</span>dev.langchain4j<span class="tag">&lt;/groupId&gt;</span>
-  <span class="tag">&lt;artifactId&gt;</span>langchain4j-open-ai<span class="tag">&lt;/artifactId&gt;</span>
-  <span class="tag">&lt;version&gt;</span>1.0.0-beta1<span class="tag">&lt;/version&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
+    <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+  &lt;artifactId&gt;langchain4j-open-ai&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-beta1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
 
     <p class="code-label">// 简单 Chat（显式 Builder 拼装）</p>
-    <pre><code><span class="kw">public class</span> <span class="ty">SimpleChat</span> {
-    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
-        <span class="ty">ChatLanguageModel</span> model = OpenAiChatModel.<span class="fn">builder</span>()
-                .<span class="fn">apiKey</span>(<span class="ty">System</span>.<span class="fn">getenv</span>(<span class="st">"OPENAI_API_KEY"</span>))
-                .<span class="fn">modelName</span>(<span class="st">"gpt-4o-mini"</span>)
-                .<span class="fn">temperature</span>(<span class="nu">0.3</span>)
-                .<span class="fn">build</span>();
+    <pre><code>public class SimpleChat {
+    public static void main(String[] args) {
+        ChatLanguageModel model = OpenAiChatModel.builder()
+                .apiKey(System.getenv("OPENAI_API_KEY"))
+                .modelName("gpt-4o-mini")
+                .temperature(0.3)
+                .build();
 
-        <span class="ty">String</span> answer = model.<span class="fn">generate</span>(<span class="st">"用一句话解释什么是 RAG"</span>);
-        <span class="ty">System</span>.out.<span class="fn">println</span>(answer);
+        String answer = model.generate("用一句话解释什么是 RAG");
+        System.out.println(answer);
     }
 }</code></pre>
 
     <p class="code-label">// Tool Calling：@Tool + AiServices 声明式接口</p>
-    <pre><code><span class="kw">class</span> <span class="ty">WeatherTools</span> {
+    <pre><code>class WeatherTools {
 
-    <span class="an">@Tool</span>(<span class="st">"根据城市名查询当前天气"</span>)
-    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getWeather</span>(<span class="st">@P("城市名，如 北京、上海")</span> <span class="ty">String</span> city) {
-        <span class="kw">return</span> city + <span class="st">" · 晴 · 26°C"</span>;
+    @Tool("根据城市名查询当前天气")
+    public String getWeather(@P("城市名，如 北京、上海") String city) {
+        return city + " · 晴 · 26°C";
     }
 }
 
-<span class="kw">interface</span> <span class="ty">Assistant</span> {
-    <span class="ty">String</span> <span class="fn">chat</span>(<span class="ty">String</span> userMessage);
+interface Assistant {
+    String chat(String userMessage);
 }
 
-<span class="kw">public class</span> <span class="ty">AgentDemo</span> {
-    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
-        <span class="ty">ChatLanguageModel</span> model = OpenAiChatModel.<span class="fn">builder</span>()
-                .<span class="fn">apiKey</span>(<span class="ty">System</span>.<span class="fn">getenv</span>(<span class="st">"OPENAI_API_KEY"</span>))
-                .<span class="fn">modelName</span>(<span class="st">"gpt-4o-mini"</span>)
-                .<span class="fn">build</span>();
+public class AgentDemo {
+    public static void main(String[] args) {
+        ChatLanguageModel model = OpenAiChatModel.builder()
+                .apiKey(System.getenv("OPENAI_API_KEY"))
+                .modelName("gpt-4o-mini")
+                .build();
 
-        <span class="ty">Assistant</span> assistant = AiServices.<span class="fn">builder</span>(<span class="ty">Assistant</span>.class)
-                .<span class="fn">chatLanguageModel</span>(model)
-                .<span class="fn">tools</span>(<span class="kw">new</span> <span class="ty">WeatherTools</span>())   <span class="cm">// 注入工具</span>
-                .<span class="fn">build</span>();
+        Assistant assistant = AiServices.builder(Assistant.class)
+                .chatLanguageModel(model)
+                .tools(new WeatherTools())   // 注入工具
+                .build();
 
-        <span class="ty">System</span>.out.<span class="fn">println</span>(assistant.<span class="fn">chat</span>(<span class="st">"北京今天天气怎么样？适合穿什么？"</span>));
+        System.out.println(assistant.chat("北京今天天气怎么样？适合穿什么？"));
     }
 }</code></pre>
 

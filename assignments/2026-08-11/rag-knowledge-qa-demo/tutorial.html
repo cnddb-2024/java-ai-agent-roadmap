@@ -335,94 +335,94 @@
 
       <div class="tab-content active" id="spring-ai-setup">
         <h3>Spring AI 项目结构</h3>
-        <pre><code><span class="cmt">&lt;!-- pom.xml 核心依赖 --&gt;</span>
+        <pre><code>&lt;!-- pom.xml 核心依赖 --&gt;
 &lt;dependencies&gt;
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>org.springframework.boot<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="kw">&lt;/artifactId&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- Spring AI OpenAI --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>spring-ai-starter-model-openai<span class="kw">&lt;/artifactId&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- Spring AI OpenAI --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-ai-starter-model-openai&lt;/artifactId&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- Spring AI RAG 模块 --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>spring-ai-rag<span class="kw">&lt;/artifactId&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- Spring AI RAG 模块 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-ai-rag&lt;/artifactId&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- Spring AI 向量存储（PgVector） --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>spring-ai-starter-vector-store-pgvector<span class="kw">&lt;/artifactId&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- Spring AI 向量存储（PgVector） --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-ai-starter-vector-store-pgvector&lt;/artifactId&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- 文档读取（PDF） --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>org.springframework.ai<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>spring-ai-pdf-document-reader<span class="kw">&lt;/artifactId&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- 文档读取（PDF） --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-ai-pdf-document-reader&lt;/artifactId&gt;
+    &lt;/dependency&gt;
 &lt;/dependencies&gt;</code></pre>
 
         <h3>application.yml 配置</h3>
-        <pre><code><span class="cls">spring:</span>
-  <span class="cls">ai:</span>
-    <span class="cls">openai:</span>
-      <span class="cls">api-key:</span> <span class="str">${OPENAI_API_KEY}</span>
-      <span class="cls">chat:</span>
-        <span class="cls">options:</span>
-          <span class="cls">model:</span> <span class="str">gpt-4o-mini</span>
-          <span class="cls">temperature:</span> <span class="num">0.3</span>
-      <span class="cls">embedding:</span>
-        <span class="cls">options:</span>
-          <span class="cls">model:</span> <span class="str">text-embedding-ada-002</span>
-    <span class="cls">vectorstore:</span>
-      <span class="cls">pgvector:</span>
-        <span class="cls">dimensions:</span> <span class="num">1536</span>
-        <span class="cls">distance-type:</span> cosine_distance
-        <span class="cls">index-type:</span> hnsw</code></pre>
+        <pre><code>spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.3
+      embedding:
+        options:
+          model: text-embedding-ada-002
+    vectorstore:
+      pgvector:
+        dimensions: 1536
+        distance-type: cosine_distance
+        index-type: hnsw</code></pre>
       </div>
 
       <div class="tab-content" id="langchain4j-setup">
         <h3>LangChain4j 项目结构</h3>
-        <pre><code><span class="cmt">&lt;!-- pom.xml 核心依赖 --&gt;</span>
+        <pre><code>&lt;!-- pom.xml 核心依赖 --&gt;
 &lt;dependencies&gt;
-    <span class="cmt">&lt;!-- LangChain4j 核心 --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>langchain4j<span class="kw">&lt;/artifactId&gt;</span>
-        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- LangChain4j 核心 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+        &lt;artifactId&gt;langchain4j&lt;/artifactId&gt;
+        &lt;version&gt;1.0.1&lt;/version&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- LangChain4j OpenAI 集成 --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>langchain4j-open-ai<span class="kw">&lt;/artifactId&gt;</span>
-        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- LangChain4j OpenAI 集成 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+        &lt;artifactId&gt;langchain4j-open-ai&lt;/artifactId&gt;
+        &lt;version&gt;1.0.1&lt;/version&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- Easy RAG（内含 Tika 解析器 + 本地 Embedding） --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>langchain4j-easy-rag<span class="kw">&lt;/artifactId&gt;</span>
-        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- Easy RAG（内含 Tika 解析器 + 本地 Embedding） --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+        &lt;artifactId&gt;langchain4j-easy-rag&lt;/artifactId&gt;
+        &lt;version&gt;1.0.1&lt;/version&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- PgVector 向量存储 --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>dev.langchain4j<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>langchain4j-pgvector<span class="kw">&lt;/artifactId&gt;</span>
-        <span class="kw">&lt;version&gt;</span>1.0.1<span class="kw">&lt;/version&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- PgVector 向量存储 --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;dev.langchain4j&lt;/groupId&gt;
+        &lt;artifactId&gt;langchain4j-pgvector&lt;/artifactId&gt;
+        &lt;version&gt;1.0.1&lt;/version&gt;
+    &lt;/dependency&gt;
 
-    <span class="cmt">&lt;!-- Spring Boot --&gt;</span>
-    <span class="kw">&lt;dependency&gt;</span>
-        <span class="kw">&lt;groupId&gt;</span>org.springframework.boot<span class="kw">&lt;/groupId&gt;</span>
-        <span class="kw">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="kw">&lt;/artifactId&gt;</span>
-    <span class="kw">&lt;/dependency&gt;</span>
+    &lt;!-- Spring Boot --&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
 &lt;/dependencies&gt;</code></pre>
 
         <div class="callout tip">
@@ -446,80 +446,80 @@
       </div>
 
       <div class="tab-content active" id="spring-ai-chunk">
-        <pre><code><span class="kw">import</span> org.springframework.ai.document.Document;
-<span class="kw">import</span> org.springframework.ai.reader.pdf.PagePdfDocumentReader;
-<span class="kw">import</span> org.springframework.ai.reader.tika.TikaDocumentReader;
-<span class="kw">import</span> org.springframework.ai.transformer.splitter.TokenTextSplitter;
-<span class="kw">import</span> org.springframework.ai.vectorstore.VectorStore;
+        <pre><code>import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.reader.tika.TikaDocumentReader;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
 
-<span class="anno">@Service</span>
-<span class="kw">public class</span> <span class="cls">RagIngestionService</span> {
+@Service
+public class RagIngestionService {
 
-    <span class="kw">private final</span> VectorStore vectorStore;
+    private final VectorStore vectorStore;
 
-    <span class="kw">public</span> <span class="cls">RagIngestionService</span>(VectorStore vectorStore) {
-        <span class="kw">this</span>.vectorStore = vectorStore;
+    public RagIngestionService(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
     }
 
-    <span class="kw">public void</span> <span class="fn">ingestDocuments</span>(String filePath) {
-        <span class="cmt">// 1. 文档加载（支持 PDF/TXT/DOCX，Tika 自动识别格式）</span>
-        <span class="cls">TikaDocumentReader</span> reader = <span class="kw">new</span> <span class="cls">TikaDocumentReader</span>(filePath);
-        <span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; documents = reader.get();
+    public void ingestDocuments(String filePath) {
+        // 1. 文档加载（支持 PDF/TXT/DOCX，Tika 自动识别格式）
+        TikaDocumentReader reader = new TikaDocumentReader(filePath);
+        List&lt;Document&gt; documents = reader.get();
 
-        <span class="cmt">// 2. 分块（Chunking）— 按 token 分割</span>
-        <span class="cls">TokenTextSplitter</span> splitter = <span class="kw">new</span> <span class="cls">TokenTextSplitter</span>(
-            <span class="num">800</span>,   <span class="cmt">// 每块最大 800 token</span>
-            <span class="num">200</span>,   <span class="cmt">// 每块最小 200 token</span>
-            <span class="num">100</span>,   <span class="cmt">// 重叠 100 token（保留上下文连续性）</span>
-            <span class="num">10000</span>, <span class="cmt">// 单文档最大 token</span>
-            <span class="kw">true</span>    <span class="cmt">// 是否保留分隔符</span>
+        // 2. 分块（Chunking）— 按 token 分割
+        TokenTextSplitter splitter = new TokenTextSplitter(
+            800,   // 每块最大 800 token
+            200,   // 每块最小 200 token
+            100,   // 重叠 100 token（保留上下文连续性）
+            10000, // 单文档最大 token
+            true    // 是否保留分隔符
         );
-        <span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; chunks = splitter.apply(documents);
+        List&lt;Document&gt; chunks = splitter.apply(documents);
 
-        <span class="cmt">// 3. 存入向量数据库（自动 Embedding + 存储）</span>
+        // 3. 存入向量数据库（自动 Embedding + 存储）
         vectorStore.add(chunks);
 
-        <span class="cls">System</span>.out.println(<span class="str">"已入库 "</span> + chunks.size() + <span class="str">" 个文档片段"</span>);
+        System.out.println("已入库 " + chunks.size() + " 个文档片段");
     }
 }</code></pre>
       </div>
 
       <div class="tab-content" id="langchain4j-chunk">
-        <pre><code><span class="kw">import</span> dev.langchain4j.data.document.Document;
-<span class="kw">import</span> dev.langchain4j.data.document.DocumentSplitter;
-<span class="kw">import</span> dev.langchain4j.data.document.DocumentParser;
-<span class="kw">import</span> dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
-<span class="kw">import</span> dev.langchain4j.data.document.parser.TextDocumentParser;
-<span class="kw">import</span> dev.langchain4j.data.document.splitter.DocumentSplitters;
-<span class="kw">import</span> dev.langchain4j.data.segment.TextSegment;
-<span class="kw">import</span> dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+        <pre><code>import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.DocumentParser;
+import dev.langchain4j.data.document.loader.FileSystemDocumentLoader;
+import dev.langchain4j.data.document.parser.TextDocumentParser;
+import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 
-<span class="anno">@Service</span>
-<span class="kw">public class</span> <span class="cls">RagIngestionService</span> {
+@Service
+public class RagIngestionService {
 
-    <span class="kw">public void</span> <span class="fn">ingestDocuments</span>(String dirPath) {
-        <span class="cmt">// 1. 加载目录下所有文档（Tika 自动解析 PDF/DOCX/TXT）</span>
-        <span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; documents =
-            <span class="cls">FileSystemDocumentLoader</span>.loadDocuments(dirPath);
+    public void ingestDocuments(String dirPath) {
+        // 1. 加载目录下所有文档（Tika 自动解析 PDF/DOCX/TXT）
+        List&lt;Document&gt; documents =
+            FileSystemDocumentLoader.loadDocuments(dirPath);
 
-        <span class="cmt">// 2. 配置分块策略</span>
-        <span class="cls">DocumentSplitter</span> splitter = <span class="cls">DocumentSplitters</span>.recursive(
-            <span class="num">800</span>,   <span class="cmt">// 每块最大 800 token</span>
-            <span class="num">100</span>,   <span class="cmt">// 重叠 100 token</span>
-            <span class="kw">new</span> <span class="cls">HuggingFaceTokenizer</span>() <span class="cmt">// token 计算器</span>
+        // 2. 配置分块策略
+        DocumentSplitter splitter = DocumentSplitters.recursive(
+            800,   // 每块最大 800 token
+            100,   // 重叠 100 token
+            new HuggingFaceTokenizer() // token 计算器
         );
 
-        <span class="cmt">// 3. 创建 Ingestor（自动 Embedding + 存储）</span>
-        <span class="cls">EmbeddingStoreIngestor</span> ingestor = <span class="cls">EmbeddingStoreIngestor</span>.builder()
+        // 3. 创建 Ingestor（自动 Embedding + 存储）
+        EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
             .documentSplitter(splitter)
             .embeddingModel(embeddingModel)
             .embeddingStore(embeddingStore)
             .build();
 
-        <span class="cmt">// 4. 执行入库</span>
+        // 4. 执行入库
         ingestor.ingest(documents);
 
-        <span class="cls">System</span>.out.println(<span class="str">"文档入库完成"</span>);
+        System.out.println("文档入库完成");
     }
 }</code></pre>
       </div>
@@ -561,25 +561,25 @@
 
       <div class="tab-content active" id="spring-ai-rag">
         <h3>方案 A：QuestionAnswerAdvisor（简单 RAG）</h3>
-        <pre><code><span class="anno">@Service</span>
-<span class="kw">public class</span> <span class="cls">RagQaService</span> {
+        <pre><code>@Service
+public class RagQaService {
 
-    <span class="kw">private final</span> ChatClient chatClient;
-    <span class="kw">private final</span> VectorStore vectorStore;
+    private final ChatClient chatClient;
+    private final VectorStore vectorStore;
 
-    <span class="kw">public</span> <span class="cls">RagQaService</span>(ChatClient.Builder builder, VectorStore vectorStore) {
-        <span class="kw">this</span>.vectorStore = vectorStore;
-        <span class="kw">this</span>.chatClient = builder.build();
+    public RagQaService(ChatClient.Builder builder, VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+        this.chatClient = builder.build();
     }
 
-    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">ask</span>(<span class="cls">String</span> question) {
-        <span class="cmt">// 一行代码实现 RAG：Advisor 自动检索 + 注入上下文</span>
-        <span class="kw">return</span> chatClient.prompt()
+    public String ask(String question) {
+        // 一行代码实现 RAG：Advisor 自动检索 + 注入上下文
+        return chatClient.prompt()
             .user(question)
-            .advisors(<span class="cls">QuestionAnswerAdvisor</span>.builder(vectorStore)
-                .searchRequest(<span class="cls">SearchRequest</span>.builder()
-                    .similarityThreshold(<span class="num">0.70</span>)  <span class="cmt">// 相似度阈值</span>
-                    .topK(<span class="num">5</span>)                  <span class="cmt">// 取 top 5 相关片段</span>
+            .advisors(QuestionAnswerAdvisor.builder(vectorStore)
+                .searchRequest(SearchRequest.builder()
+                    .similarityThreshold(0.70)  // 相似度阈值
+                    .topK(5)                  // 取 top 5 相关片段
                     .build())
                 .build())
             .call()
@@ -588,26 +588,26 @@
 }</code></pre>
 
         <h3>方案 B：RetrievalAugmentationAdvisor（高级 RAG）</h3>
-        <pre><code><span class="kw">public</span> <span class="cls">String</span> <span class="fn">advancedAsk</span>(<span class="cls">String</span> question) {
-    <span class="cmt">// 模块化 RAG：查询改写 + 检索 + 上下文增强</span>
-    <span class="cls">Advisor</span> ragAdvisor = <span class="cls">RetrievalAugmentationAdvisor</span>.builder()
-        <span class="cmt">// Pre-Retrieval：查询改写（提高检索质量）</span>
-        .queryTransformers(<span class="cls">RewriteQueryTransformer</span>.builder()
+        <pre><code>public String advancedAsk(String question) {
+    // 模块化 RAG：查询改写 + 检索 + 上下文增强
+    Advisor ragAdvisor = RetrievalAugmentationAdvisor.builder()
+        // Pre-Retrieval：查询改写（提高检索质量）
+        .queryTransformers(RewriteQueryTransformer.builder()
             .chatClientBuilder(chatClient.mutate())
             .build())
-        <span class="cmt">// Retrieval：向量检索</span>
-        .documentRetriever(<span class="cls">VectorStoreDocumentRetriever</span>.builder()
+        // Retrieval：向量检索
+        .documentRetriever(VectorStoreDocumentRetriever.builder()
             .vectorStore(vectorStore)
-            .similarityThreshold(<span class="num">0.50</span>)
-            .topK(<span class="num">5</span>)
+            .similarityThreshold(0.50)
+            .topK(5)
             .build())
-        <span class="cmt">// Post-Retrieval：上下文增强</span>
-        .queryAugmenter(<span class="cls">ContextualQueryAugmenter</span>.builder()
-            .allowEmptyContext(<span class="kw">false</span>)  <span class="cmt">// 无检索结果时拒答（防幻觉）</span>
+        // Post-Retrieval：上下文增强
+        .queryAugmenter(ContextualQueryAugmenter.builder()
+            .allowEmptyContext(false)  // 无检索结果时拒答（防幻觉）
             .build())
         .build();
 
-    <span class="kw">return</span> chatClient.prompt()
+    return chatClient.prompt()
         .user(question)
         .advisors(ragAdvisor)
         .call()
@@ -617,44 +617,44 @@
 
       <div class="tab-content" id="langchain4j-rag">
         <h3>方案 A：Easy RAG（最快上手）</h3>
-        <pre><code><span class="cmt">// 1. 加载并入库文档（3 行代码）</span>
-<span class="cls">List</span>&lt;<span class="cls">Document</span>&gt; docs = <span class="cls">FileSystemDocumentLoader</span>.loadDocuments(<span class="str">"docs/"</span>);
-<span class="cls">InMemoryEmbeddingStore</span>&lt;<span class="cls">TextSegment</span>&gt; store = <span class="kw">new</span> <span class="cls">InMemoryEmbeddingStore</span>&lt;&gt;();
-<span class="cls">EmbeddingStoreIngestor</span>.ingest(docs, store);
+        <pre><code>// 1. 加载并入库文档（3 行代码）
+List&lt;Document&gt; docs = FileSystemDocumentLoader.loadDocuments("docs/");
+InMemoryEmbeddingStore&lt;TextSegment&gt; store = new InMemoryEmbeddingStore&lt;&gt;();
+EmbeddingStoreIngestor.ingest(docs, store);
 
-<span class="cmt">// 2. 定义 AI Service 接口</span>
-<span class="kw">interface</span> <span class="cls">Assistant</span> {
-    <span class="cls">String</span> <span class="fn">chat</span>(<span class="cls">String</span> userMessage);
+// 2. 定义 AI Service 接口
+interface Assistant {
+    String chat(String userMessage);
 }
 
-<span class="cmt">// 3. 构建 RAG 增强的 Assistant</span>
-<span class="cls">Assistant</span> assistant = <span class="cls">AiServices</span>.builder(<span class="cls">Assistant</span>.class)
+// 3. 构建 RAG 增强的 Assistant
+Assistant assistant = AiServices.builder(Assistant.class)
     .chatModel(chatModel)
-    .contentRetriever(<span class="cls">EmbeddingStoreContentRetriever</span>.from(store))
+    .contentRetriever(EmbeddingStoreContentRetriever.from(store))
     .build();
 
-<span class="cmt">// 4. 提问！</span>
-<span class="cls">String</span> answer = assistant.chat(<span class="str">"Spring AI 的核心组件有哪些？"</span>);</code></pre>
+// 4. 提问！
+String answer = assistant.chat("Spring AI 的核心组件有哪些？");</code></pre>
 
         <h3>方案 B：自定义 ContentRetriever（高级 RAG）</h3>
-        <pre><code><span class="cmt">// 自定义检索器：控制 topK、相似度阈值</span>
-<span class="cls">ContentRetriever</span> retriever = <span class="cls">EmbeddingStoreContentRetriever</span>.builder()
+        <pre><code>// 自定义检索器：控制 topK、相似度阈值
+ContentRetriever retriever = EmbeddingStoreContentRetriever.builder()
     .embeddingStore(embeddingStore)
     .embeddingModel(embeddingModel)
-    .maxResults(<span class="num">5</span>)
-    .minScore(<span class="num">0.7</span>)
+    .maxResults(5)
+    .minScore(0.7)
     .build();
 
-<span class="cmt">// 带查询改写的高级 RAG</span>
-<span class="cls">Assistant</span> assistant = <span class="cls">AiServices</span>.builder(<span class="cls">Assistant</span>.class)
+// 带查询改写的高级 RAG
+Assistant assistant = AiServices.builder(Assistant.class)
     .chatModel(chatModel)
     .contentRetriever(retriever)
-    <span class="cmt">// 查询改写器：将复杂问题分解为子查询</span>
-    .queryTransformer(<span class="cls">CompressingQueryTransformer</span>.builder()
+    // 查询改写器：将复杂问题分解为子查询
+    .queryTransformer(CompressingQueryTransformer.builder()
         .chatModel(chatModel)
         .build())
-    <span class="cmt">// 检索后处理器：去重 + 重排序</span>
-    .contentAggregator(<span class="cls">DefaultContentAggregator</span>.builder()
+    // 检索后处理器：去重 + 重排序
+    .contentAggregator(DefaultContentAggregator.builder()
         .build())
     .build();</code></pre>
       </div>
@@ -672,22 +672,22 @@
     <h2>5. Python 辅助：向量检索验证（5min）</h2>
     <p>Python 仅用于快速验证向量数据库的检索效果，不作为主线。用 Qdrant 或 PgVector 的 Python SDK 直接查询，确认 Java 端写入的向量能被正确检索。</p>
 
-    <pre><code><span class="cmt"># verify_retrieval.py — 验证向量检索质量</span>
-<span class="kw">from</span> qdrant_client <span class="kw">import</span> QdrantClient
-<span class="kw">from</span> qdrant_client.models <span class="kw">import</span> Distance, VectorParams
+    <pre><code># verify_retrieval.py — 验证向量检索质量
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
 
-<span class="cmt"># 连接 Qdrant（Java 端已写入数据）</span>
-client = QdrantClient(host=<span class="str">"localhost"</span>, port=6333)
+# 连接 Qdrant（Java 端已写入数据）
+client = QdrantClient(host="localhost", port=6333)
 
-<span class="cmt"># 验证检索</span>
+# 验证检索
 results = client.search(
-    collection_name=<span class="str">"knowledge_base"</span>,
-    query_vector=[<span class="num">0.1</span>, <span class="num">0.2</span>, ...],  <span class="cmt"># 用 Embedding 模型生成</span>
-    limit=<span class="num">5</span>
+    collection_name="knowledge_base",
+    query_vector=[0.1, 0.2, ...],  # 用 Embedding 模型生成
+    limit=5
 )
 
-<span class="kw">for</span> hit <span class="kw">in</span> results:
-    print(<span class="str">f"Score: </span>{hit.score}<span class="str"> | Text: </span>{hit.payload[<span class="str">'text'</span>][:<span class="num">100</span>]}<span class="str">"</span>)</code></pre>
+for hit in results:
+    print(f"Score: {hit.score} | Text: {hit.payload['text'][:100]}")</code></pre>
 
     <div class="callout">
       <strong>Python 的角色定位</strong>：在本教程中 Python 仅用于辅助验证向量数据写入和检索的正确性。RAG 全链路的主线实现完全使用 Java（Spring AI 或 LangChain4j），这与实际 JD 要求一致——Java 是硬性技能，Python 是加分项。
@@ -737,26 +737,26 @@ results = client.search(
     </ol>
 
     <h3>REST API 示例</h3>
-    <pre><code><span class="anno">@RestController</span>
-<span class="anno">@RequestMapping</span>(<span class="str">"/api/rag"</span>)
-<span class="kw">public class</span> <span class="cls">RagController</span> {
+    <pre><code>@RestController
+@RequestMapping("/api/rag")
+public class RagController {
 
-    <span class="kw">private final</span> RagQaService ragQaService;
-    <span class="kw">private final</span> RagIngestionService ingestionService;
+    private final RagQaService ragQaService;
+    private final RagIngestionService ingestionService;
 
-    <span class="anno">@PostMapping</span>(<span class="str">"/ingest"</span>)
-    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">ingest</span>(<span class="anno">@RequestParam</span> <span class="cls">String</span> filePath) {
+    @PostMapping("/ingest")
+    public String ingest(@RequestParam String filePath) {
         ingestionService.ingestDocuments(filePath);
-        <span class="kw">return</span> <span class="str">"文档入库成功"</span>;
+        return "文档入库成功";
     }
 
-    <span class="anno">@PostMapping</span>(<span class="str">"/ask"</span>)
-    <span class="kw">public</span> <span class="cls">String</span> <span class="fn">ask</span>(<span class="anno">@RequestParam</span> <span class="cls">String</span> question) {
-        <span class="kw">return</span> ragQaService.ask(question);
+    @PostMapping("/ask")
+    public String ask(@RequestParam String question) {
+        return ragQaService.ask(question);
     }
 }
 
-<span class="cmt">// 测试：curl -X POST "http://localhost:8080/api/rag/ask?question=Spring AI的核心组件有哪些"</span></code></pre>
+// 测试：curl -X POST "http://localhost:8080/api/rag/ask?question=Spring AI的核心组件有哪些"</code></pre>
 
     <div class="callout tip">
       <strong>Phase 0 验收呼应</strong>：本任务对应 Phase 0 验收标准——"能加载本地文档、分块、Embedding 后存入向量数据库；用户提问后能检索相关文档片段并生成回答"。完成后你已具备 RAG 全链路的实操能力，面试中被问到"你做过的 RAG 项目"时可以完整口述从文档加载到回答生成的每个环节。
