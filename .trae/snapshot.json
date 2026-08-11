@@ -3,53 +3,60 @@
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
     {
-      "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
-      "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
-      "created_at": "1785400453431",
-      "completed": true,
-      "due": "2026-08-02"
+      "guid": "ca4b1438-5ae1-4f98-bb31-d09f61068c0c",
+      "summary": "本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理",
+      "created_at": "1786419278414",
+      "completed": false,
+      "due": "2026-08-13"
     },
     {
-      "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
-      "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖",
-      "created_at": "1785400455301",
-      "completed": true,
-      "due": "2026-08-02"
+      "guid": "2544e132-c0d0-418d-ad15-76ed68a04237",
+      "summary": "Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪",
+      "created_at": "1786419277834",
+      "completed": false,
+      "due": "2026-08-13"
     },
     {
-      "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
-      "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记",
-      "created_at": "1785400457200",
-      "completed": true,
-      "due": "2026-08-06"
+      "guid": "004da9dc-6c2a-4dcd-b79e-1c1f4347d8db",
+      "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
+      "created_at": "1785796641257",
+      "completed": false,
+      "due": "2026-08-13"
     },
     {
-      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
-      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
-      "created_at": "1785400471330",
-      "completed": true,
-      "due": "2026-08-07"
+      "guid": "ee7c02ae-4537-4773-807f-7d6d7f3afbb4",
+      "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",
+      "created_at": "1785796640191",
+      "completed": false,
+      "due": "2026-08-12"
     },
     {
-      "guid": "922cb234-2017-4885-ac2d-9e17b0826aa8",
-      "summary": "LangChain4j 框架结构研读：克隆官方仓库并跑通 QuickStart 示例",
-      "created_at": "1785400472739",
-      "completed": true,
-      "due": "2026-07-31"
+      "guid": "ff91fc34-b270-448b-a963-72e9422bdc20",
+      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
+      "created_at": "1785796639254",
+      "completed": false,
+      "due": "2026-08-12"
     },
     {
-      "guid": "72a66dc2-1adc-4061-8139-abcddd47f09c",
-      "summary": "Java Web 转 AI Agent 知识体系思维导图输出（Phase0 验收项）",
-      "created_at": "1785400474470",
-      "completed": true,
-      "due": "2026-07-31"
+      "guid": "3091bd59-fc44-44fc-86d2-292633ef7c63",
+      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
+      "created_at": "1785796638172",
+      "completed": false,
+      "due": "2026-08-12"
     },
     {
-      "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
-      "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
-      "created_at": "1785400489687",
-      "completed": true,
-      "due": "2026-08-06"
+      "guid": "40ae67ff-da61-4d73-b826-b49b8c06ef75",
+      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
+      "created_at": "1785590500000",
+      "completed": false,
+      "due": "2026-08-11"
+    },
+    {
+      "guid": "a0c5dd2a-1de3-4d88-898a-680a1c7204a4",
+      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
+      "created_at": "1785590400000",
+      "completed": false,
+      "due": "2026-08-11"
     },
     {
       "guid": "3112e317-9976-4eb3-84e6-d0a3e7304cb3",
@@ -80,60 +87,53 @@
       "due": "2026-08-11"
     },
     {
-      "guid": "a0c5dd2a-1de3-4d88-898a-680a1c7204a4",
-      "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
-      "created_at": "1785590400000",
-      "completed": false,
-      "due": "2026-08-11"
+      "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
+      "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo",
+      "created_at": "1785400489687",
+      "completed": true,
+      "due": "2026-08-06"
     },
     {
-      "guid": "40ae67ff-da61-4d73-b826-b49b8c06ef75",
-      "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
-      "created_at": "1785590500000",
-      "completed": false,
-      "due": "2026-08-11"
+      "guid": "72a66dc2-1adc-4061-8139-abcddd47f09c",
+      "summary": "Java Web 转 AI Agent 知识体系思维导图输出（Phase0 验收项）",
+      "created_at": "1785400474470",
+      "completed": true,
+      "due": "2026-07-31"
     },
     {
-      "guid": "3091bd59-fc44-44fc-86d2-292633ef7c63",
-      "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览",
-      "created_at": "1785796638172",
-      "completed": false,
-      "due": "2026-08-12"
+      "guid": "922cb234-2017-4885-ac2d-9e17b0826aa8",
+      "summary": "LangChain4j 框架结构研读：克隆官方仓库并跑通 QuickStart 示例",
+      "created_at": "1785400472739",
+      "completed": true,
+      "due": "2026-07-31"
     },
     {
-      "guid": "ff91fc34-b270-448b-a963-72e9422bdc20",
-      "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截",
-      "created_at": "1785796639254",
-      "completed": false,
-      "due": "2026-08-12"
+      "guid": "b0342461-c918-42e9-85bf-105d616fe135",
+      "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）",
+      "created_at": "1785400471330",
+      "completed": true,
+      "due": "2026-08-07"
     },
     {
-      "guid": "ee7c02ae-4537-4773-807f-7d6d7f3afbb4",
-      "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo",
-      "created_at": "1785796640191",
-      "completed": false,
-      "due": "2026-08-12"
+      "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
+      "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记",
+      "created_at": "1785400457200",
+      "completed": true,
+      "due": "2026-08-06"
     },
     {
-      "guid": "004da9dc-6c2a-4dcd-b79e-1c1f4347d8db",
-      "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
-      "created_at": "1785796641257",
-      "completed": false,
-      "due": "2026-08-13"
+      "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
+      "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖",
+      "created_at": "1785400455301",
+      "completed": true,
+      "due": "2026-08-02"
     },
     {
-      "guid": "2544e132-c0d0-418d-ad15-76ed68a04237",
-      "summary": "Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪",
-      "created_at": "1786419277834",
-      "completed": false,
-      "due": "2026-08-13"
-    },
-    {
-      "guid": "ca4b1438-5ae1-4f98-bb31-d09f61068c0c",
-      "summary": "本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理",
-      "created_at": "1786419278414",
-      "completed": false,
-      "due": "2026-08-13"
+      "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
+      "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
+      "created_at": "1785400453431",
+      "completed": true,
+      "due": "2026-08-02"
     }
   ]
 }
