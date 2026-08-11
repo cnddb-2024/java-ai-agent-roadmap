@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring AI Tool Calling 实战教程</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #22d3ee;
+    --accent-2: #a78bfa;
+    --green: #34d399;
+    --border: #334155;
+    --code-bg: #0b1220;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px 60px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #0b1220 0%, #1e293b 60%, #312e81 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 20px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(34,211,238,0.25), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 980px; margin: 0 auto; position: relative; z-index: 1; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+  .badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: rgba(15, 23, 42, 0.6);
+  }
+  .badge.phase { color: var(--accent); border-color: rgba(34,211,238,0.5); }
+  .badge.time { color: var(--green); border-color: rgba(52,211,153,0.5); }
+  .badge.lang { color: var(--accent-2); border-color: rgba(167,139,250,0.5); }
+  .hero h1 {
+    font-size: 34px;
+    line-height: 1.3;
+    margin: 8px 0 14px;
+    background: linear-gradient(90deg, #e2e8f0, #22d3ee 60%, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.sub { color: var(--muted); font-size: 16px; max-width: 760px; margin: 0; }
+
+  /* TOC */
+  .toc {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 28px 0 10px;
+  }
+  .toc h3 { margin: 0 0 10px; font-size: 15px; color: var(--accent); letter-spacing: 1px; }
+  .toc ol { margin: 0; padding-left: 22px; }
+  .toc li { margin: 4px 0; color: var(--muted); }
+  .toc a { color: var(--text); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+
+  /* Sections */
+  section.phase {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 30px;
+    margin: 28px 0;
+  }
+  .phase-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+  }
+  .phase-tag {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0b1220;
+    background: var(--accent);
+    padding: 3px 10px;
+    border-radius: 6px;
+  }
+  .phase-tag.p2 { background: var(--accent-2); }
+  .phase-tag.p3 { background: #fbbf24; }
+  .phase-tag.p4 { background: var(--green); }
+  .phase-head h2 { margin: 0; font-size: 22px; }
+  .phase-head .dur { color: var(--muted); font-size: 14px; }
+  h3 { color: var(--accent); margin-top: 24px; font-size: 17px; }
+  p { margin: 10px 0; }
+  ul, ol { padding-left: 24px; }
+  li { margin: 6px 0; }
+  code.inline {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #fca5a5;
+  }
+
+  /* Code blocks - PURE pre code, no spans */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+  pre code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: #cbd5e1;
+    white-space: pre;
+    display: block;
+  }
+  pre.xml { border-left-color: #fbbf24; }
+  pre.json { border-left-color: var(--green); }
+
+  .callout {
+    background: rgba(34,211,238,0.08);
+    border: 1px solid rgba(34,211,238,0.35);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    color: #cffafe;
+  }
+  .callout.warn {
+    background: rgba(251,191,36,0.08);
+    border-color: rgba(251,191,36,0.4);
+    border-left-color: #fbbf24;
+    color: #fef3c7;
+  }
+  .callout.interview {
+    background: rgba(167,139,250,0.08);
+    border-color: rgba(167,139,250,0.4);
+    border-left-color: var(--accent-2);
+    color: #ede9fe;
+  }
+  .callout strong { color: #fff; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  th { background: var(--panel-2); color: var(--accent); }
+
+  .sources {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 30px;
+    margin-top: 36px;
+  }
+  .sources h2 { margin-top: 0; color: var(--accent); }
+  .sources ol { padding-left: 22px; }
+  .sources li { margin: 8px 0; word-break: break-all; }
+  .sources a { color: #7dd3fc; }
+  .sources a:visited { color: #c4b5fd; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="badge-row">
+      <b class="badge phase">Phase 0 · 定向与双框架地基</b>
+      <b class="badge lang">Java + Spring AI</b>
+      <b class="badge time">总预估时长 55min</b>
+    </div>
+    <h1>Spring AI Tool Calling 实战：@Tool 注解 / FunctionCallback / 工具注册与调用 demo</h1>
+    <p class="sub">
+      本教程从 Function Calling 底层协议出发，依次走完声明式 <code class="inline">@Tool</code> 注解、编程式
+      <code class="inline">FunctionToolCallback</code> / 旧版 <code class="inline">FunctionCallback</code>、
+      以及通过 <code class="inline">ChatClient.tools()</code> 与 <code class="inline">ToolCallbackProvider</code>
+      完成多工具注册与并行调用的完整路径，并呼应面试第一梯队考点：Function Call 底层协议、MCP vs Function Call。
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <nav class="toc">
+    <h3>本教程路线（总计 55 分钟）</h3>
+    <ol>
+      <li><a href="#p1">Phase 1 · Function Calling 原理（10min）</a></li>
+      <li><a href="#p2">Phase 2 · @Tool 注解定义工具（15min）</a></li>
+      <li><a href="#p3">Phase 3 · FunctionCallback 方式（15min）</a></li>
+      <li><a href="#p4">Phase 4 · 工具注册与多工具并行（15min）</a></li>
+      <li><a href="#sources">教程来源</a></li>
+    </ol>
+  </nav>
+
+  <!-- ==================== PHASE 1 ==================== -->
+  <section class="phase" id="p1">
+    <div class="phase-head">
+      <b class="phase-tag">Phase 1</b>
+      <h2>Function Calling 原理：LLM 不执行函数</h2>
+      <b class="dur">预计 10 min</b>
+    </div>
+
+    <p>
+      <strong>Tool Calling（也叫 Function Calling）</strong> 是大模型应用里最基础的"动手能力"：
+      模型本身只会输出文本，但通过在请求中携带一组"工具描述"，它就可以在需要时输出一段结构化的"我要调用哪个函数、参数是什么"的指令，
+      由<strong>客户端应用</strong>真正去执行函数，再把结果送回模型，模型据此给出最终答复。
+    </p>
+
+    <div class="callout warn">
+      <strong>关键认知：</strong>LLM 永远不会、也无法直接执行你写的 Java 方法。
+      它只是根据你提供的 JSON Schema，<em>决定</em>是否调用、调用哪个、传什么参数；真正的函数执行发生在你自己的进程里。
+      这也是为什么 Function Calling 是安全的——模型无法触达任何未被显式暴露的 API。
+    </div>
+
+    <h3>1. 一次完整的工具调用循环（Tool Calling Loop）</h3>
+    <ol>
+      <li>客户端在请求体里通过 <code class="inline">tools</code> 字段上报可用工具清单（名称、描述、参数 JSON Schema）。</li>
+      <li>模型判断需要使用工具时，在响应里返回 <code class="inline">tool_calls</code>（而不是最终文本），
+          其中包含 <code class="inline">id</code>、<code class="inline">function.name</code>、<code class="inline">function.arguments</code>（JSON 字符串）。</li>
+      <li>客户端根据 <code class="inline">name</code> 找到本地函数，解析参数并执行，得到结果。</li>
+      <li>客户端把结果以 <code class="inline">role=tool</code> 的消息（携带相同的 <code class="inline">tool_call_id</code>）追加进对话，再发一次请求。</li>
+      <li>模型结合工具结果输出最终自然语言答案；如果还需要再调工具，则循环 2-4 步。</li>
+    </ol>
+
+    <h3>2. 请求中携带 tools 参数（OpenAI 兼容协议示意）</h3>
+<pre class="json"><code>{
+  "model": "gpt-4o-mini",
+  "messages": [
+    { "role": "user", "content": "北京和东京现在天气怎么样？" }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "getCurrentWeather",
+        "description": "查询指定城市的当前天气",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": { "type": "string", "description": "城市名称，例如 Beijing" },
+            "unit": { "type": "string", "enum": ["C", "F"] }
+          },
+          "required": ["city"]
+        }
+      }
+    }
+  ],
+  "tool_choice": "auto"
+}</code></pre>
+
+    <h3>3. 模型返回 tool_calls（注意：它没有执行函数）</h3>
+<pre class="json"><code>{
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": null,
+        "tool_calls": [
+          {
+            "id": "call_abc123",
+            "type": "function",
+            "function": {
+              "name": "getCurrentWeather",
+              "arguments": "{\"city\":\"Beijing\",\"unit\":\"C\"}"
+            }
+          },
+          {
+            "id": "call_def456",
+            "type": "function",
+            "function": {
+              "name": "getCurrentWeather",
+              "arguments": "{\"city\":\"Tokyo\",\"unit\":\"C\"}"
+            }
+          }
+        ]
+      },
+      "finish_reason": "tool_calls"
+    }
+  ]
+}</code></pre>
+    <p>
+      上面这个响应是 Function Calling 最核心的"面试答案"：模型在<strong>一次响应里可以并行请求多个工具调用</strong>（parallel tool calls），
+      客户端可以并发执行，再把所有结果回传。Spring AI 内部就是围绕这个循环做了封装。
+    </p>
+
+    <div class="callout interview">
+      <strong>面试题呼应 · Function Call 底层（第一梯队）：</strong><br>
+      (1) 协议层：请求带 <code class="inline">tools</code> + JSON Schema，响应回 <code class="inline">tool_calls</code>，客户端回传 <code class="inline">role=tool</code> 消息；<br>
+      (2) 执行权：模型只"决策"不"执行"，函数运行在客户端进程；<br>
+      (3) 多轮：可循环调用，也支持一次响应里并行多个 tool_call；<br>
+      (4) 描述很关键：<code class="inline">description</code> 写不好，模型就不知道何时该调工具。
+    </div>
+  </section>
+
+  <!-- ==================== PHASE 2 ==================== -->
+  <section class="phase" id="p2">
+    <div class="phase-head">
+      <b class="phase-tag p2">Phase 2</b>
+      <h2>@Tool 注解定义工具：天气 / 时间 / 计算</h2>
+      <b class="dur">预计 15 min</b>
+    </div>
+
+    <p>
+      Spring AI 提供两种声明工具的方式。Phase 2 先讲最推荐的<strong>声明式</strong>写法：
+      直接在普通方法上加 <code class="inline">@Tool</code>，框架会通过反射自动生成 JSON Schema 并完成参数绑定。
+    </p>
+
+    <h3>1. Maven 依赖（Spring AI 1.0.x 稳定版）</h3>
+<pre class="xml"><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.4.0&lt;/version&gt;
+        &lt;relativePath/&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-ai-tool-demo&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;17&lt;/java.version&gt;
+        &lt;spring-ai.version&gt;1.0.0&lt;/spring-ai.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-ai-openai-spring-boot-starter&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-ai-bom&lt;/artifactId&gt;
+                &lt;version&gt;${spring-ai.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+&lt;/project&gt;</code></pre>
+
+    <p><code class="inline">application.properties</code> 中配置 API Key：</p>
+<pre><code>spring.ai.openai.api-key=${OPENAI_API_KEY}
+spring.ai.openai.chat.options.model=gpt-4o-mini</code></pre>
+
+    <h3>2. 天气工具：@Tool + @ToolParam</h3>
+<pre><code>package com.example.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+public class WeatherTools {
+
+    // 真实场景下这里会调用第三方天气 API
+    private static final Map&lt;String, String&gt; MOCK = Map.of(
+            "Beijing", "晴，26°C，东北风 3 级",
+            "Shanghai", "多云，29°C",
+            "Tokyo", "小雨，24°C",
+            "London", "阴，18°C"
+    );
+
+    @Tool(description = "根据城市名称查询当前实时天气，返回温度、天气状况和风力信息")
+    public String getCurrentWeather(
+            @ToolParam(description = "中文或英文城市名称，例如 Beijing、上海") String city,
+            @ToolParam(description = "温度单位，C 表示摄氏度，F 表示华氏度", required = false) String unit) {
+
+        String key = city == null ? "" : city.trim();
+        String info = MOCK.getOrDefault(key, "暂无 " + key + " 的天气数据");
+        if ("F".equalsIgnoreCase(unit)) {
+            return info + "（已按华氏度返回）";
+        }
+        return info;
+    }
+}</code></pre>
+
+    <div class="callout">
+      <strong>@Tool 关键属性：</strong><br>
+      <code class="inline">name</code>：工具名（默认取方法名，模型按此名回调，必须在同一工具集中唯一）；<br>
+      <code class="inline">description</code>：强烈建议认真写，模型靠它判断"何时该调"；<br>
+      <code class="inline">returnDirect</code>：为 true 时直接把工具结果返回给调用方，不再让模型二次润色（适合结构化数据）。
+    </div>
+
+    <h3>3. 时间工具：获取用户时区当前时间</h3>
+<pre><code>package com.example.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
+@Component
+public class DateTimeTools {
+
+    private static final DateTimeFormatter FMT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+
+    @Tool(description = "获取当前用户所在时区的日期与时间，无参数")
+    public String getCurrentDateTime() {
+        ZoneId zoneId = LocaleContextHolder.getTimeZone().toZoneId();
+        return LocalDateTime.now().atZone(zoneId).format(FMT);
+    }
+
+    @Tool(description = "在当前时间基础上加上 N 分钟，返回计算后的 ISO-8601 时间")
+    public String plusMinutes(@ToolParam(description = "要增加的分钟数") long minutes) {
+        ZoneId zoneId = LocaleContextHolder.getTimeZone().toZoneId();
+        return LocalDateTime.now().plusMinutes(minutes).atZone(zoneId).format(FMT);
+    }
+}</code></pre>
+
+    <h3>4. 计算工具：把四则运算交给本地代码</h3>
+<pre><code>package com.example.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CalculatorTools {
+
+    @Tool(description = "对两个 double 数值执行加减乘除运算，op 取值 + - * /")
+    public double calculate(
+            @ToolParam(description = "左操作数") double a,
+            @ToolParam(description = "运算符：+、-、*、/") String op,
+            @ToolParam(description = "右操作数") double b) {
+
+        return switch (op) {
+            case "+" -&gt; a + b;
+            case "-" -&gt; a - b;
+            case "*" -gt; a * b;
+            case "/" -&gt; {
+                if (b == 0) throw new IllegalArgumentException("除数不能为 0");
+                yield a / b;
+            }
+            default -&gt; throw new IllegalArgumentException("不支持的运算符: " + op);
+        };
+    }
+}</code></pre>
+
+    <p>
+      到这里，三个工具类都是普通的 Spring Bean。下一步只需把它们"交给" <code class="inline">ChatClient</code>，模型就能看到并使用它们。
+    </p>
+  </section>
+
+  <!-- ==================== PHASE 3 ==================== -->
+  <section class="phase" id="p3">
+    <div class="phase-head">
+      <b class="phase-tag p3">Phase 3</b>
+      <h2>FunctionCallback 方式：编程式工具回调</h2>
+      <b class="dur">预计 15 min</b>
+    </div>
+
+    <p>
+      除了 <code class="inline">@Tool</code> 注解，Spring AI 还允许以编程方式构造工具回调。这在以下场景特别有用：
+      工具来自第三方库、需要在运行时动态生成描述、或者你已经有一个 <code class="inline">java.util.Function</code> 实现想直接复用。
+    </p>
+
+    <div class="callout warn">
+      <strong>版本提示：</strong>在 Spring AI 1.0.x 中，编程式入口为
+      <code class="inline">org.springframework.ai.model.function.FunctionCallback</code>；
+      从 1.1 起官方推荐使用 <code class="inline">ToolCallback</code> /
+      <code class="inline">FunctionToolCallback</code> / <code class="inline">MethodToolCallback</code>，
+      旧 API 被标记为 deprecated。本文同时给出两种写法，方便对照迁移。
+    </div>
+
+    <h3>1. 旧版 API：直接实现 FunctionCallback 接口</h3>
+    <p>
+      <code class="inline">FunctionCallback</code> 是 Spring AI 早期函数调用的核心接口，
+      要求实现 <code class="inline">getName()</code>、<code class="inline">getDescription()</code>、
+      <code class="inline">getInputTypeSchema()</code> 和 <code class="inline">call(String functionInput)</code>。
+      这能帮助你真正理解工具回调的底层契约。
+    </p>
+<pre><code>package com.example.tools;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.ai.model.function.FunctionCallback;
+
+import java.util.function.BiFunction;
+
+/**
+ * 自定义 FunctionCallback：天气查询的"手写版"。
+ * 模型回传的 functionInput 是一段 JSON 字符串，
+ * 我们自己负责解析、执行、再把结果序列化为字符串返回。
+ */
+public class WeatherFunctionCallback implements FunctionCallback {
+
+    private static final String NAME = "getCurrentWeather";
+    private static final String DESC = "查询指定城市当前天气，输入 city 字段";
+
+    private static final String SCHEMA = """
+            {
+              "type": "object",
+              "properties": {
+                "city": { "type": "string", "description": "城市名称" }
+              },
+              "required": ["city"]
+            }
+            """;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    // 真正干活的业务函数，可以是任意 BiFunction / Service
+    private final BiFunction&lt;String, String, String&gt; weatherService;
+
+    public WeatherFunctionCallback(BiFunction&lt;String, String, String&gt; weatherService) {
+        this.weatherService = weatherService;
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public String getDescription() {
+        return DESC;
+    }
+
+    @Override
+    public String getInputTypeSchema() {
+        return SCHEMA;
+    }
+
+    @Override
+    public String call(String functionInput) {
+        try {
+            JsonNode node = mapper.readTree(functionInput);
+            String city = node.path("city").asText();
+            String unit = node.has("unit") ? node.get("unit").asText() : "C";
+            String result = weatherService.apply(city, unit);
+            return mapper.writeValueAsString(java.util.Map.of(
+                    "city", city, "unit", unit, "weather", result));
+        } catch (Exception e) {
+            return "{\"error\":\"" + e.getMessage() + "\"}";
+        }
+    }
+}</code></pre>
+
+    <h3>2. 旧版 Builder 方式：把一个 Function&lt;I,O&gt; 包装成 FunctionCallback</h3>
+    <p>
+      更常见的方式是让你的服务直接实现 <code class="inline">java.util.Function</code>，然后用
+      <code class="inline">FunctionCallback.builder()</code> 包装。Spring AI 会利用
+      <code class="inline">inputType</code> 上的字段反射生成 JSON Schema。
+    </p>
+<pre><code>package com.example.tools;
+
+import java.util.function.Function;
+
+public class MockWeatherService
+        implements Function&lt;MockWeatherService.Request, MockWeatherService.Response&gt; {
+
+    public enum Unit { C, F }
+
+    public record Request(String location, Unit unit) {}
+    public record Response(double temp, Unit unit, String condition) {}
+
+    @Override
+    public Response apply(Request req) {
+        // 真实环境调用天气 API；这里用假数据
+        double base = "Beijing".equalsIgnoreCase(req.location()) ? 26.0 : 20.0;
+        double temp = req.unit() == Unit.F ? base * 9 / 5 + 32 : base;
+        return new Response(temp, req.unit(), "Sunny");
+    }
+}</code></pre>
+
+<pre><code>package com.example.config;
+
+import com.example.tools.MockWeatherService;
+import org.springframework.ai.model.function.FunctionCallback;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class LegacyFunctionConfig {
+
+    @Bean
+    public FunctionCallback weatherFunctionCallback() {
+        return FunctionCallback.builder()
+                .function("getCurrentWeather", new MockWeatherService())
+                .description("查询指定城市的当前天气，输入 location 与 unit")
+                .inputType(MockWeatherService.Request.class)
+                .build();
+    }
+}</code></pre>
+
+    <h3>3. 新版 API（Spring AI 1.1+ / 2.0）：FunctionToolCallback</h3>
+    <p>
+      迁移之后，构建器从 <code class="inline">FunctionCallback.builder().function(...)</code>
+      变成了独立的 <code class="inline">FunctionToolCallback.builder()</code>，
+      接口本身也统一为 <code class="inline">org.springframework.ai.tool.ToolCallback</code>。
+    </p>
+<pre><code>package com.example.config;
+
+import com.example.tools.MockWeatherService;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ToolCallbackConfig {
+
+    @Bean
+    public ToolCallback weatherToolCallback() {
+        return FunctionToolCallback
+                .builder("getCurrentWeather", new MockWeatherService())
+                .description("查询指定城市的当前天气，输入 location 与 unit")
+                .inputType(MockWeatherService.Request.class)
+                .build();
+    }
+}</code></pre>
+
+    <table>
+      <thead>
+        <tr><th>旧版（1.0.x，deprecated）</th><th>新版（1.1+/2.0）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>FunctionCallback</td><td>ToolCallback</td></tr>
+        <tr><td>FunctionCallback.builder().function()</td><td>FunctionToolCallback.builder()</td></tr>
+        <tr><td>FunctionCallback.builder().method()</td><td>MethodToolCallback.builder()</td></tr>
+        <tr><td>FunctionCallingOptions</td><td>ToolCallingChatOptions</td></tr>
+        <tr><td>ChatClient.functions()</td><td>ChatClient.tools()</td></tr>
+        <tr><td>builder().functions(...)</td><td>builder().toolNames(...)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ==================== PHASE 4 ==================== -->
+  <section class="phase" id="p4">
+    <div class="phase-head">
+      <b class="phase-tag p4">Phase 4</b>
+      <h2>工具注册与多工具并行：ChatClient.tools() / ToolCallbackProvider</h2>
+      <b class="dur">预计 15 min</b>
+    </div>
+
+    <p>
+      把工具"注册"到模型有两种粒度：<strong>请求级</strong>（只在某一次 prompt 生效）
+      和<strong>全局级</strong>（通过 Bean / defaultTools 对所有请求生效）。
+    </p>
+
+    <h3>1. 请求级注册：直接把 @Tool 对象传给 ChatClient.tools()</h3>
+<pre><code>package com.example.controller;
+
+import com.example.tools.CalculatorTools;
+import com.example.tools.DateTimeTools;
+import com.example.tools.WeatherTools;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class ToolChatController {
+
+    private final ChatClient chatClient;
+
+    // Spring Boot 自动配置会注入一个 ChatClient.Builder
+    public ToolChatController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+
+    @GetMapping("/ask")
+    public String ask(@RequestParam String q) {
+        return chatClient.prompt()
+                .user(q)
+                // 一次注册三个工具，模型可按需选择，并支持并行调用
+                .tools(new WeatherTools(), new DateTimeTools(), new CalculatorTools())
+                .call()
+                .content();
+    }
+}</code></pre>
+
+    <p>
+      试试这些提问，观察模型如何选择工具（甚至一次调用多个）：
+    </p>
+    <ul>
+      <li>"北京现在天气怎么样？" → 触发 <code class="inline">getCurrentWeather</code></li>
+      <li>"现在是几点？10 分钟后呢？" → 触发 <code class="inline">getCurrentDateTime</code> + <code class="inline">plusMinutes</code></li>
+      <li>"帮我算一下 (123 + 456) * 2，顺便告诉我上海天气" → 并行触发 calculate + getCurrentWeather</li>
+    </ul>
+
+    <h3>2. 全局默认工具：ChatClient.Builder.defaultTools()</h3>
+    <p>
+      如果某些工具（例如时间、计算）每个会话都要用，直接在 Builder 上设置默认工具，
+      所有通过该 ChatClient 发出的请求都会自动携带：
+    </p>
+<pre><code>package com.example.config;
+
+import com.example.tools.CalculatorTools;
+import com.example.tools.DateTimeTools;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ChatClientConfig {
+
+    @Bean
+    public ChatClient chatClient(ChatClient.Builder builder,
+                                 DateTimeTools dateTimeTools,
+                                 CalculatorTools calculatorTools) {
+        return builder
+                .defaultSystem("你是一个会使用工具的助手，需要实时数据或计算时请主动调用工具。")
+                .defaultTools(dateTimeTools, calculatorTools)
+                .build();
+    }
+}</code></pre>
+
+    <h3>3. ToolCallbackProvider：批量、动态地提供工具</h3>
+    <p>
+      <code class="inline">ToolCallbackProvider</code> 是一个函数式接口，返回
+      <code class="inline">ToolCallback[]</code>。它的价值在于：
+      可以把多个来源的工具（@Bean、扫描包、MCP Server、数据库配置等）汇总后一次性注册。
+    </p>
+<pre><code>package com.example.config;
+
+import com.example.tools.DateTimeTools;
+import com.example.tools.WeatherTools;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ToolProviderConfig {
+
+    /**
+     * MethodToolCallbackProvider 会扫描给定对象上所有 @Tool 方法，
+     * 并把它们包装成 ToolCallback。
+     */
+    @Bean
+    public ToolCallbackProvider allToolsProvider(WeatherTools weatherTools,
+                                                 DateTimeTools dateTimeTools) {
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(weatherTools, dateTimeTools)
+                .build();
+    }
+}</code></pre>
+
+    <p>随后可以把 provider 交给 ChatClient：</p>
+<pre><code>@GetMapping("/ask2")
+public String askWithProvider(@RequestParam String q,
+                              ToolCallbackProvider provider) {
+    return chatClient.prompt()
+            .user(q)
+            .toolCallbacks(provider.getToolCallbacks())
+            .call()
+            .content();
+}</code></pre>
+
+    <h3>4. 多工具并行（Parallel Tool Calls）是怎么发生的</h3>
+    <p>
+      当模型在一次响应里返回多个 <code class="inline">tool_calls</code>，Spring AI 的工具管理器会并发执行它们，
+      再把所有结果按 <code class="inline">tool_call_id</code> 拼回同一条消息。
+      对开发者而言几乎是"免费"的——只要工具本身是无状态/线程安全的，就不需要做额外工作。
+    </p>
+<pre><code>// 触发并行调用的典型提问：
+String question = "请同时告诉我北京和东京的天气，再算一下 (18 + 24) * 3 等于多少";
+
+String answer = chatClient.prompt()
+        .user(question)
+        .tools(new WeatherTools(), new CalculatorTools())
+        .call()
+        .content();
+
+// 模型将一次返回 3 个 tool_calls：
+//   getCurrentWeather(Beijing)
+//   getCurrentWeather(Tokyo)
+//   calculate(18, "+", 24)  -- 然后再 calculate(42, "*", 3)
+// Spring AI 并发执行完，再把结果喂回模型生成最终自然语言答案。</code></pre>
+
+    <h3>5. 面试题呼应：MCP vs Function Call（第一梯队）</h3>
+    <div class="callout interview">
+      <strong>Function Call（厂商私有协议）：</strong><br>
+      • 每家大模型都有自己的字段命名（OpenAI 的 <code class="inline">tools</code>/<code class="inline">tool_calls</code>、
+      Anthropic 的 <code class="inline">tools</code>/<code class="inline">tool_use</code> 等）；<br>
+      • 工具与应用紧耦合，换模型常常要改适配代码；<br>
+      • 工具描述随请求一起发送，工具逻辑跑在<em>调用方进程</em>里。<br><br>
+      <strong>MCP（Model Context Protocol，开放标准）：</strong><br>
+      • 由 Anthropic 提出、已被 Spring AI 等生态采纳的 <strong>Client/Server 协议</strong>；<br>
+      • 工具（以及资源、Prompt）由独立的 MCP Server 暴露，任何 MCP Client 都可以即插即用；<br>
+      • Spring AI 中可通过 <code class="inline">spring-ai-starter-mcp-client</code> 把远端 MCP 工具
+      自动适配成 <code class="inline">ToolCallback</code>，用法和本地 <code class="inline">@Tool</code> 完全一致；<br>
+      • 一句话总结：<strong>Function Call 是"模型怎么调函数"的协议；MCP 是"应用怎么连工具生态"的协议。两者并不冲突，MCP 传输的底层仍然是 Function Calling。</strong>
+    </div>
+
+    <p>
+      在 Spring AI 2.0 的架构里，<code class="inline">ToolCallingAdvisor</code> 已经把工具循环提升为 advisor 链中的一等公民，
+      本地 <code class="inline">@Tool</code>、<code class="inline">FunctionToolCallback</code>
+      和 MCP Server 提供的工具可以<strong>混合注册</strong>、由同一个循环统一调度——这正是从"Function Call 会用"走向"Agent 工程化"的起点。
+    </p>
+  </section>
+
+  <!-- ==================== SOURCES ==================== -->
+  <section class="sources" id="sources">
+    <h2>教程来源（References）</h2>
+    <ol>
+      <li>Spring AI 官方参考文档 · Tool Calling（英文稳定版）：
+        <a href="https://docs.spring.io/spring-ai/reference/api/tools.html" target="_blank" rel="noopener">
+          https://docs.spring.io/spring-ai/reference/api/tools.html</a></li>
+      <li>Spring AI 参考文档（中文社区翻译）· 工具调用：
+        <a href="https://docs.springframework.org.cn/spring-ai/reference/api/tools.html" target="_blank" rel="noopener">
+          https://docs.springframework.org.cn/spring-ai/reference/api/tools.html</a></li>
+      <li>Spring AI Reference 1.1 · Migrating from FunctionCallback to ToolCallback API：
+        <a href="https://docs.spring.io/spring-ai/reference/1.1/api/tools-migration.html" target="_blank" rel="noopener">
+          https://docs.spring.io/spring-ai/reference/1.1/api/tools-migration.html</a></li>
+      <li>Baeldung · Implementing an AI Assistant with Spring AI（含 Function Calling 完整示例）：
+        <a href="https://www.baeldung.com/spring-ai-assistant" target="_blank" rel="noopener">
+          https://www.baeldung.com/spring-ai-assistant</a></li>
+      <li>Baeldung · Function Calling in Java and Spring AI Using the Mistral AI API：
+        <a href="https://www.baeldung.com/spring-ai-mistral-api-function-calling" target="_blank" rel="noopener">
+          https://www.baeldung.com/spring-ai-mistral-api-function-calling</a></li>
+      <li>Spring Official Blog · Tool Calling in Spring AI 2.0: A Composable, Agentic Architecture：
+        <a href="https://spring.io/blog/2026/06/15/spring-ai-composable-tool-calling/" target="_blank" rel="noopener">
+          https://spring.io/blog/2026/06/15/spring-ai-composable-tool-calling/</a></li>
+      <li>Spring AI Javadoc · Uses of Interface ToolCallback：
+        <a href="https://docs.spring.io/spring-ai/docs/current/api/org/springframework/ai/tool/class-use/ToolCallback.html" target="_blank" rel="noopener">
+          https://docs.spring.io/spring-ai/docs/current/api/org/springframework/ai/tool/class-use/ToolCallback.html</a></li>
+      <li>spring.io Guides · Spring AI 系列入门指南索引：
+        <a href="https://spring.io/projects/spring-ai" target="_blank" rel="noopener">
+          https://spring.io/projects/spring-ai</a></li>
+    </ol>
+  </section>
+
+  <footer>
+    Spring AI Tool Calling 实战教程 · Phase 0 融合教程 · 总时长 55min
+  </footer>
+
+</div>
+</body>
+</html>

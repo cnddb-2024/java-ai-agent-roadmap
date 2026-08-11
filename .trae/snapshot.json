@@ -1,7 +1,28 @@
 {
-  "snapshot_date": "2026-08-11",
+  "snapshot_date": "2026-08-12",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
+    {
+      "guid": "cdadfb90-1181-47c9-9f15-e9feeca47147",
+      "summary": "技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus",
+      "created_at": "1786487631455",
+      "completed": false,
+      "due": "2026-08-14"
+    },
+    {
+      "guid": "7955c48a-682f-4b15-8d04-3b471196e757",
+      "summary": "智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比",
+      "created_at": "1786487631454",
+      "completed": false,
+      "due": "2026-08-14"
+    },
+    {
+      "guid": "e10d8721-ec0b-46bb-a0e0-57bfcfeb5d61",
+      "summary": "文档解析实战：Apache PDFBox + Apache POI 抽取 PDF/Word/Markdown 纯文本与表格",
+      "created_at": "1786487631453",
+      "completed": false,
+      "due": "2026-08-14"
+    },
     {
       "guid": "ca4b1438-5ae1-4f98-bb31-d09f61068c0c",
       "summary": "本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理",
@@ -48,14 +69,14 @@
       "guid": "40ae67ff-da61-4d73-b826-b49b8c06ef75",
       "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路",
       "created_at": "1785590500000",
-      "completed": false,
+      "completed": true,
       "due": "2026-08-11"
     },
     {
       "guid": "a0c5dd2a-1de3-4d88-898a-680a1c7204a4",
       "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo",
       "created_at": "1785590400000",
-      "completed": false,
+      "completed": true,
       "due": "2026-08-11"
     },
     {
@@ -83,7 +104,7 @@
       "guid": "b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7",
       "summary": "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）",
       "created_at": "1785537370288",
-      "completed": false,
+      "completed": true,
       "due": "2026-08-11"
     },
     {

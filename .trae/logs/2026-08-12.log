@@ -1,0 +1,66 @@
+# 每日维护日志 2026-08-12
+
+## 基本信息
+- 运行时间: 2026-08-12 (北京时间)
+- 当日为第 15/168 天
+- 当前 Phase: Phase 1 (RAG 刚需闭环 + 生产级项目1)
+- 飞书状态: 可用
+
+## 步骤4 反馈层更新（必须执行）
+- [OK] 更新 `java-ai-agent-roadmap.html` 中 today-marker: "Phase 1 · 第 15/168 天"
+- [OK] 更新 `assets/charts.js` 中 `__RADAR_GAP__.me`: [65,44,28,37,54,26,30] -> [80,52,48,40,63,50,42]
+- [OK] 更新 `assets/charts.js` 中 `__RADAR_DAILY__`: [60,55,70,65,55,35] -> [78,65,75,80,55,50]
+
+## 步骤5 飞书任务状态采集
+- 飞书清单 GUID: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+- 飞书任务总数: 19（操作前）
+- NEW_DONE (C=3，旧未完成但飞书已完成):
+  1. RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路
+  2. Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo
+  3. Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）
+- VANISHED: 无
+- NEW_APPEARED: 无
+- 扫描 assignments/ 目录: 近7天作业情况已记录（08-06/07/08/10/11 有产出，08-09/12 无目录）
+- [OK] 步骤5e: 补写 6 个空 description 任务的学习指引全部成功
+
+## 步骤6 滑动窗口任务规划
+- N = 当前未完成任务数 = 6
+- C = NEW_DONE 数 = 3
+- G = max(0, 9 - N) = 3
+- 拆解策略: Phase 0 核心内容已覆盖完毕，进入 Phase 1 首个核心内容点（文档解析/切分/Embedding）
+- 新拆解 3 个任务:
+  1. e10d8721-ec0b-46bb-a0e0-57bfcfeb5d61 文档解析实战：Apache PDFBox + Apache POI 抽取 PDF/Word/Markdown 纯文本与表格
+  2. 7955c48a-682f-4b15-8d04-3b471196e757 智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比
+  3. cdadfb90-1181-47c9-9f15-e9feeca47147 技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus（贯穿线任务）
+- 三个新任务已创建到飞书并加入清单
+- 删除任务数: 0（总未完成恰好9个）
+- due 重新分配（按 snapshot.created_at 从旧到新排序）:
+  - 今天 2026-08-12:
+    1. 3091bd59 Python 模块与包管理实战
+    2. ff91fc34 Spring AI Advisors 机制实战
+    3. ee7c02ae Spring AI Tool Calling 实战
+  - 明天 2026-08-13:
+    4. 004da9dc 目标 JD 收集与刚需能力提取表
+    5. 2544e132 Spring AI 可观测性实战
+    6. ca4b1438 本地 Ollama 部署 Qwen + Spring AI 接入
+  - 后天 2026-08-14:
+    7. e10d8721 文档解析实战 PDFBox/POI
+    8. 7955c48a 智能切分实战
+    9. cdadfb90 技术决策日志 #01 向量库选型
+- [OK] 步骤6g: snapshot.json 已统一保存（22 个任务，9 个未完成）
+
+## 步骤7 融合教程生成
+待处理任务: 今天 due 的 3 个任务（无逾期未完成任务）
+
+| 任务 | Slug | 状态 |
+|------|------|------|
+| Python 模块与包管理实战 | python-modules-packages | 生成成功（22代码块/10来源） |
+| Spring AI Advisors 机制实战 | spring-ai-advisors | 生成成功（11代码块/6来源） |
+| Spring AI Tool Calling 实战 | spring-ai-tool-calling | 生成成功（13代码块/8来源） |
+
+所有教程已通过 Agent 校验：无 span 泄漏、HTML 实体正确转义、DOCTYPE 完整、教程来源≥5。
+
+## 步骤8 写回与兜底
+- [OK] 本日志写入 .trae/logs/2026-08-12.log
+- [OK] git add + commit + push
+- [OK] 飞书任务评论写入 GitHub raw URL

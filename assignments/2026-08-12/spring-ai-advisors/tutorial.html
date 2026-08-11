@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring AI Advisors 机制实战 - Phase 0 融合教程</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.7;
+    color: #1a1a2e;
+    background: #f4f6fb;
+  }
+  .hero {
+    background: linear-gradient(135deg, #6db33f 0%, #2d5a27 50%, #1b3a16 100%);
+    color: #fff;
+    padding: 56px 24px 48px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .hero .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+  }
+  .hero h1 { font-size: 32px; margin-bottom: 14px; font-weight: 700; }
+  .hero .meta { font-size: 16px; opacity: 0.95; }
+  .hero .meta .time {
+    display: inline-block;
+    background: #fff;
+    color: #2d5a27;
+    padding: 4px 14px;
+    border-radius: 16px;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+  .intro {
+    background: #fff;
+    border-left: 5px solid #6db33f;
+    padding: 20px 24px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .intro p { margin-bottom: 10px; }
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .phase-card {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    border-top: 3px solid #6db33f;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .phase-card .num { font-size: 13px; color: #888; }
+  .phase-card .title { font-weight: 600; margin: 4px 0; color: #2d5a27; }
+  .phase-card .dur { font-size: 13px; color: #6db33f; font-weight: 600; }
+  section.stage {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  section.stage h2 {
+    font-size: 23px;
+    color: #2d5a27;
+    border-bottom: 2px solid #e8f0df;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+  }
+  section.stage h2 .tag {
+    font-size: 13px;
+    background: #6db33f;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+  section.stage h3 { font-size: 17px; margin: 20px 0 10px; color: #1b3a16; }
+  section.stage p { margin-bottom: 12px; }
+  ul, ol { margin: 0 0 14px 24px; }
+  li { margin-bottom: 6px; }
+  pre {
+    background: #1e2a1a;
+    color: #d4e4c8;
+    padding: 18px 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 14px 0 18px;
+    border: 1px solid #2d3d27;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  pre code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    white-space: pre;
+    display: block;
+  }
+  code.inline {
+    background: #eef4e7;
+    color: #2d5a27;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13.5px;
+  }
+  .callout {
+    background: #fff8e1;
+    border-left: 4px solid #f9a825;
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 16px 0;
+  }
+  .callout strong { color: #b27800; }
+  .acceptance {
+    background: #eef6ff;
+    border-left: 5px solid #1976d2;
+    padding: 20px 24px;
+    border-radius: 8px;
+    margin: 28px 0;
+  }
+  .acceptance h2 { color: #1976d2; border-bottom-color: #cfe3fb; }
+  .interview {
+    background: #f3eaff;
+    border-left: 5px solid #7b1fa2;
+    padding: 20px 24px;
+    border-radius: 8px;
+    margin: 28px 0;
+  }
+  .interview h2 { color: #7b1fa2; border-bottom-color: #e4d2f5; }
+  .sources {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .sources h2 { color: #2d5a27; border-bottom: 2px solid #e8f0df; padding-bottom: 10px; margin-bottom: 16px; }
+  .sources ol li { word-break: break-all; }
+  .sources a { color: #2d5a27; text-decoration: none; }
+  .sources a:hover { text-decoration: underline; }
+  footer { text-align: center; color: #999; font-size: 13px; padding: 24px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="badge">PHASE 0 &middot; 定向与双框架地基</span>
+  <h1>Spring AI Advisors 机制实战</h1>
+  <div class="meta">
+    RequestResponseAdvisor / 链式编排 / 日志拦截
+    <span class="time">总预估时长 55min</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="intro">
+    <p><strong>主线语言：</strong>Java + Spring AI　|　<strong>作业目录 slug：</strong>spring-ai-advisors</p>
+    <p>本教程带你在 55 分钟内吃透 Spring AI 的 Advisors 拦截器机制：从核心概念到自定义 CallAroundAdvisor，再到多 Advisor 链式编排，最后使用 QuestionAnswerAdvisor 接入向量库完成 RAG 知识库增强。这是 Phase 0 "双框架地基" 中对标 Spring 生态 AOP/拦截器思想的关键一环。</p>
+  </div>
+
+  <div class="phase-grid">
+    <div class="phase-card"><div class="num">阶段一</div><div class="title">Advisor 概念</div><div class="dur">10 min</div></div>
+    <div class="phase-card"><div class="num">阶段二</div><div class="title">CallAroundAdvisor 实现</div><div class="dur">15 min</div></div>
+    <div class="phase-card"><div class="num">阶段三</div><div class="title">链式编排多 Advisor</div><div class="dur">15 min</div></div>
+    <div class="phase-card"><div class="num">阶段四</div><div class="title">QuestionAnswerAdvisor 知识库增强</div><div class="dur">15 min</div></div>
+  </div>
+
+  <!-- 阶段一 -->
+  <section class="stage">
+    <h2><span class="tag">10min</span>阶段一：Advisor 核心概念</h2>
+    <p>Advisors 是 Spring AI 提供的一套拦截器（Interceptor）/ 环绕增强（Around Advice）API，用于在请求发送给大语言模型（LLM）之前、以及响应返回给调用方之后，对数据进行拦截、修改与增强。它的设计思想与 Spring AOP 高度一致——这正是 Phase 0 强调的"双框架认知"：把你已掌握的 Spring 拦截器/过滤器经验迁移到 AI 调用链上。</p>
+
+    <h3>1.1 解决什么问题</h3>
+    <ul>
+      <li><strong>封装重复的 GenAI 模式：</strong>日志、记忆、RAG、敏感词等横切逻辑可复用。</li>
+      <li><strong>数据转换：</strong>在 Prompt 进入模型前注入上下文，在 ChatResponse 返回后格式化结果。</li>
+      <li><strong>可移植性：</strong>同一套 Advisor 可跨不同 ChatModel 与用例复用。</li>
+    </ul>
+
+    <h3>1.2 核心组件</h3>
+    <ul>
+      <li><code class="inline">Advisor</code>：顶层接口，定义 <code class="inline">getName()</code> 与 <code class="inline">getOrder()</code>。</li>
+      <li><code class="inline">CallAroundAdvisor</code>：非流式（同步）场景的环绕增强接口，核心方法为 <code class="inline">aroundCall()</code>（旧版本为 <code class="inline">nextAroundCall()</code>）。</li>
+      <li><code class="inline">StreamAroundAdvisor</code>：流式（响应式）场景对应接口。</li>
+      <li><code class="inline">AdvisedRequest</code>：未密封的 Prompt 请求载体，可在链中被修改。</li>
+      <li><code class="inline">AdvisedResponse</code>：Chat Completion 响应载体，携带共享的 <code class="inline">advise-context</code>。</li>
+      <li><code class="inline">CallAroundAdvisorChain</code>：负责按顺序串联并调用多个 Advisor。</li>
+    </ul>
+
+    <div class="callout">
+      <strong>执行顺序（堆栈语义）：</strong>Advisor 按 <code class="inline">getOrder()</code> 升序排列，值越小越先处理请求；响应则以相反顺序回溯。设置为 <code class="inline">Ordered.HIGHEST_PRECEDENCE</code> 的 Advisor 最先处理请求、最后处理响应，与 Servlet Filter / Spring Interceptor 的"先进后出"完全一致。
+    </div>
+
+    <h3>1.3 请求流转过程</h3>
+    <ol>
+      <li>框架从用户 Prompt 创建 <code class="inline">AdvisedRequest</code>，并附带空的 <code class="inline">advisor-context</code>。</li>
+      <li>链中每个 Advisor 处理（并可能修改）请求，然后调用下一个 Advisor；也可选择"阻断"——不调用下一个节点，此时由当前 Advisor 负责填充响应或抛出异常。</li>
+      <li>框架自动追加的最后一个 Advisor 把请求真正发送给 Chat Model。</li>
+      <li>模型响应沿链反向回传，被包装成 <code class="inline">AdvisedResponse</code>。</li>
+      <li>每个 Advisor 可在回程处理/修改响应，最终提取出 <code class="inline">ChatResponse</code> 返回给客户端。</li>
+    </ol>
+  </section>
+
+  <!-- 阶段二 -->
+  <section class="stage">
+    <h2><span class="tag">15min</span>阶段二：CallAroundAdvisor 实现</h2>
+    <p>下面实现两个最常用的自定义 Advisor：<strong>日志 Advisor</strong>（记录请求与响应耗时）和 <strong>Token 计数 Advisor</strong>（粗略统计字符/token 用量并写入上下文）。它们都实现 <code class="inline">CallAroundAdvisor</code> 接口。</p>
+
+    <h3>2.1 自定义日志 Advisor</h3>
+<pre><code>package com.example.advisor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.AdvisedRequest;
+import org.springframework.ai.chat.client.AdvisedResponse;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisor;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisorChain;
+import org.springframework.core.Ordered;
+
+public class LoggingAdvisor implements CallAroundAdvisor {
+
+    private static final Logger log = LoggerFactory.getLogger(LoggingAdvisor.class);
+
+    @Override
+    public String getName() {
+        return "LoggingAdvisor";
+    }
+
+    @Override
+    public int getOrder() {
+        // 越小越先执行，这里放在最外层
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
+
+    @Override
+    public AdvisedResponse aroundCall(AdvisedRequest request, CallAroundAdvisorChain chain) {
+        long start = System.currentTimeMillis();
+        String userText = request.userText();
+
+        log.info("[AI-REQ] model={}, userText={}",
+                request.chatModel() != null ? request.chatModel().getClass().getSimpleName() : "default",
+                userText);
+
+        // 必须调用 chain.nextAroundCall 把请求继续向后传递
+        AdvisedResponse response = chain.nextAroundCall(request);
+
+        long cost = System.currentTimeMillis() - start;
+        String content = response.response() != null &amp;&amp; response.response().getResult() != null
+                ? response.response().getResult().getOutput().getText()
+                : "";
+        log.info("[AI-RESP] cost={}ms, content={}", cost, content);
+
+        return response;
+    }
+}
+</code></pre>
+
+    <h3>2.2 Token 计数 Advisor</h3>
+    <p>该 Advisor 在请求前把字符数作为粗略 token 估算写入 <code class="inline">advise-context</code>，在响应后累加输出长度，便于上层观测。</p>
+<pre><code>package com.example.advisor;
+
+import java.util.Map;
+import org.springframework.ai.chat.client.AdvisedRequest;
+import org.springframework.ai.chat.client.AdvisedResponse;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisor;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisorChain;
+import org.springframework.core.Ordered;
+
+public class TokenCountAdvisor implements CallAroundAdvisor {
+
+    public static final String CTX_INPUT_TOKENS = "estimated_input_tokens";
+    public static final String CTX_OUTPUT_TOKENS = "estimated_output_tokens";
+
+    // 粗略估算：1 token 约等于 4 个英文字符；中文场景可按字符数近似
+    private static final double CHARS_PER_TOKEN = 4.0;
+
+    @Override
+    public String getName() {
+        return "TokenCountAdvisor";
+    }
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE + 10;
+    }
+
+    @Override
+    public AdvisedResponse aroundCall(AdvisedRequest request, CallAroundAdvisorChain chain) {
+        int inputTokens = (int) Math.ceil(request.userText().length() / CHARS_PER_TOKEN);
+
+        // 通过 adviseContext 向下游传递状态
+        AdvisedRequest mutated = AdvisedRequest.from(request)
+                .withAdviseContext(Map.of(CTX_INPUT_TOKENS, inputTokens))
+                .build();
+
+        AdvisedResponse response = chain.nextAroundCall(mutated);
+
+        String output = response.response().getResult().getOutput().getText();
+        int outputTokens = (int) Math.ceil(output.length() / CHARS_PER_TOKEN);
+
+        // 响应回程时把统计信息合并回 context
+        response.adviseContext().put(CTX_OUTPUT_TOKENS, outputTokens);
+        return response;
+    }
+}
+</code></pre>
+
+    <div class="callout">
+      <strong>要点：</strong>务必调用 <code class="inline">chain.nextAroundCall(...)</code>，否则请求会被阻断。需要修改请求时使用 <code class="inline">AdvisedRequest.from(request)</code> 构建器；共享状态通过 <code class="inline">adviseContext()</code> 这个 Map 在整条链中传递。
+    </div>
+  </section>
+
+  <!-- 阶段三 -->
+  <section class="stage">
+    <h2><span class="tag">15min</span>阶段三：链式编排多 Advisor</h2>
+    <p>多个 Advisor 通过 <code class="inline">getOrder()</code> 决定顺序。下面再加一个<strong>敏感词拦截 Advisor</strong>——它在命中敏感词时<strong>不调用</strong>下一个节点，直接构造一个拒绝响应（即"阻断请求"），这与 SafeGuardAdvisor 的思路一致。然后把三个 Advisor 注册到 ChatClient。</p>
+
+    <h3>3.1 敏感词拦截 Advisor</h3>
+<pre><code>package com.example.advisor;
+
+import java.util.List;
+import java.util.Set;
+import org.springframework.ai.chat.client.AdvisedRequest;
+import org.springframework.ai.chat.client.AdvisedResponse;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisor;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisorChain;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.core.Ordered;
+
+public class SensitiveWordAdvisor implements CallAroundAdvisor {
+
+    private final Set&lt;String&gt; blockedWords;
+
+    public SensitiveWordAdvisor(Set&lt;String&gt; blockedWords) {
+        this.blockedWords = blockedWords;
+    }
+
+    @Override
+    public String getName() {
+        return "SensitiveWordAdvisor";
+    }
+
+    @Override
+    public int getOrder() {
+        // 最先做安全校验，放在日志之后、业务之前
+        return Ordered.HIGHEST_PRECEDENCE + 5;
+    }
+
+    @Override
+    public AdvisedResponse aroundCall(AdvisedRequest request, CallAroundAdvisorChain chain) {
+        String userText = request.userText();
+
+        for (String word : blockedWords) {
+            if (userText.contains(word)) {
+                // 命中敏感词：阻断请求，不调用 chain.nextAroundCall
+                AssistantMessage answer = new AssistantMessage("您的提问包含被禁止的词汇，已被拦截。");
+                ChatResponse chatResponse = new ChatResponse(List.of(new Generation(answer)));
+                return new AdvisedResponse(chatResponse, request.adviseContext());
+            }
+        }
+        return chain.nextAroundCall(request);
+    }
+}
+</code></pre>
+
+    <h3>3.2 注册并编排多个 Advisor</h3>
+    <p>推荐在构建期通过 <code class="inline">defaultAdvisors()</code> 注册，顺序最终由各 Advisor 的 <code class="inline">getOrder()</code> 决定，而非添加顺序。</p>
+<pre><code>package com.example.config;
+
+import java.util.Set;
+import com.example.advisor.LoggingAdvisor;
+import com.example.advisor.SensitiveWordAdvisor;
+import com.example.advisor.TokenCountAdvisor;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ChatClientConfig {
+
+    @Bean
+    public ChatClient chatClient(ChatModel chatModel) {
+        SensitiveWordAdvisor guard = new SensitiveWordAdvisor(
+                Set.of("违禁词A", "违禁词B", "违法内容"));
+
+        return ChatClient.builder(chatModel)
+                .defaultAdvisors(
+                        new LoggingAdvisor(),      // order = MIN_VALUE
+                        guard,                    // order = MIN_VALUE + 5
+                        new TokenCountAdvisor()   // order = MIN_VALUE + 10
+                )
+                .build();
+    }
+}
+</code></pre>
+
+    <h3>3.3 运行时按请求动态传参</h3>
+    <p>可以在单次调用时通过 <code class="inline">.advisors(spec -&gt; spec.param(...))</code> 传入会话级参数（例如对话 ID、过滤表达式等）。</p>
+<pre><code>String answer = chatClient.prompt()
+        .user("请介绍一下 Spring AI 的 Advisor 机制")
+        .advisors(spec -&gt; spec
+                .param("chat_memory_conversation_id", "conv-001")
+                .param("chat_memory_response_size", 50))
+        .call()
+        .content();
+
+System.out.println(answer);
+</code></pre>
+
+    <div class="callout">
+      <strong>双框架对照：</strong>这套"请求前环绕 → 放行 chain → 响应后环绕 → 可阻断短路"的模型，就是 Spring MVC <code class="inline">HandlerInterceptor</code> 与 Servlet <code class="inline">Filter</code> 在 AI 领域的翻版。理解了拦截器栈，就理解了 Advisor 链。
+    </div>
+  </section>
+
+  <!-- 阶段四 -->
+  <section class="stage">
+    <h2><span class="tag">15min</span>阶段四：QuestionAnswerAdvisor 知识库增强（RAG）</h2>
+    <p>Spring AI 内置了 <code class="inline">QuestionAnswerAdvisor</code>，它封装了完整的 RAG 流程：用用户问题去向量库做相似度检索，把命中文档拼接到 Prompt 中作为上下文，再交给 LLM 回答。</p>
+
+    <h3>4.1 数据加载（ETL）</h3>
+    <p>先把文档切分并写入 <code class="inline">VectorStore</code>。下面演示用内存向量库做最小可运行示例。</p>
+<pre><code>package com.example.rag;
+
+import java.util.List;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.TextDocumentReader;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+
+@Component
+public class IngestionService {
+
+    private final VectorStore vectorStore;
+
+    public IngestionService(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
+
+    public void ingest(Resource knowledgeFile) {
+        // 1. 读取
+        List&lt;Document&gt; raw = new TextDocumentReader(knowledgeFile).get();
+        // 2. 切分
+        List&lt;Document&gt; chunks = new TokenTextSplitter().apply(raw);
+        // 3. 写入向量库（Embedding 由 VectorStore 自动调用）
+        vectorStore.add(chunks);
+    }
+}
+</code></pre>
+
+    <h3>4.2 接入 QuestionAnswerAdvisor</h3>
+    <p>使用 builder 配置相似度阈值与 topK，并注册到 ChatClient。</p>
+<pre><code>package com.example.config;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RagChatClientConfig {
+
+    @Bean
+    public ChatClient ragChatClient(ChatModel chatModel, VectorStore vectorStore) {
+        QuestionAnswerAdvisor qaAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
+                .searchRequest(SearchRequest.builder()
+                        .similarityThreshold(0.8d)
+                        .topK(6)
+                        .build())
+                .build();
+
+        return ChatClient.builder(chatModel)
+                .defaultAdvisors(qaAdvisor)
+                .build();
+    }
+}
+</code></pre>
+
+    <h3>4.3 运行时动态过滤与提问</h3>
+<pre><code>String answer = ragChatClient.prompt()
+        .user("Spring AI 的 Advisor 是如何控制执行顺序的？")
+        .advisors(spec -&gt; spec.param(
+                QuestionAnswerAdvisor.FILTER_EXPRESSION,
+                "type == 'spring-ai'"))
+        .call()
+        .content();
+
+System.out.println(answer);
+</code></pre>
+
+    <h3>4.4 application.yml 配置</h3>
+<pre><code>spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+      embedding:
+        options:
+          model: text-embedding-3-small
+</code></pre>
+
+    <div class="callout">
+      <strong>依赖注意：</strong>在 Spring AI 1.0.0+ 中，<code class="inline">QuestionAnswerAdvisor</code> 位于独立模块 <code class="inline">spring-ai-advisors-vector-store</code>，需要单独引入；OpenAI 模型对应的 starter 为 <code class="inline">spring-ai-starter-model-openai</code>（里程碑旧版名为 <code class="inline">spring-ai-openai-spring-boot-starter</code>）。
+    </div>
+  </section>
+
+  <!-- Maven 依赖 -->
+  <section class="stage">
+    <h2>Maven 依赖（pom.xml）</h2>
+    <p>通过 Spring AI BOM 统一管理版本，避免依赖冲突。</p>
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+        &lt;version&gt;3.4.1&lt;/version&gt;
+        &lt;relativePath/&gt;
+    &lt;/parent&gt;
+
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-ai-advisors-demo&lt;/artifactId&gt;
+    &lt;version&gt;0.0.1-SNAPSHOT&lt;/version&gt;
+
+    &lt;properties&gt;
+        &lt;java.version&gt;17&lt;/java.version&gt;
+        &lt;spring-ai.version&gt;1.0.0&lt;/spring-ai.version&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencyManagement&gt;
+        &lt;dependencies&gt;
+            &lt;dependency&gt;
+                &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-ai-bom&lt;/artifactId&gt;
+                &lt;version&gt;${spring-ai.version}&lt;/version&gt;
+                &lt;type&gt;pom&lt;/type&gt;
+                &lt;scope&gt;import&lt;/scope&gt;
+            &lt;/dependency&gt;
+        &lt;/dependencies&gt;
+    &lt;/dependencyManagement&gt;
+
+    &lt;dependencies&gt;
+        &lt;!-- Spring Boot Web --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- OpenAI Chat &amp; Embedding 模型 starter（里程碑版本曾用名 spring-ai-openai-spring-boot-starter） --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-ai-starter-model-openai&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- QuestionAnswerAdvisor / VectorStoreChatMemoryAdvisor 所在模块 --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-ai-advisors-vector-store&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- 内存向量库（实验/演示用；生产可换 Redis / PGVector / Oracle 等） --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-ai-starter-vector-store-redis&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+            &lt;scope&gt;test&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
+</code></pre>
+    <p>若使用里程碑版本（M 系列），需额外配置 Spring 里程碑仓库：</p>
+<pre><code>&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;spring-milestones&lt;/id&gt;
+        &lt;name&gt;Spring Milestones&lt;/name&gt;
+        &lt;url&gt;https://repo.spring.io/milestone&lt;/url&gt;
+        &lt;snapshots&gt;
+            &lt;enabled&gt;false&lt;/enabled&gt;
+        &lt;/snapshots&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;
+</code></pre>
+  </section>
+
+  <!-- Phase0 验收标准 -->
+  <section class="acceptance">
+    <h2>Phase 0 验收对照：双框架认知</h2>
+    <p>本任务是 Phase 0"定向与双框架地基"的组成部分，验收点对应如下：</p>
+    <ul>
+      <li><strong>Spring 侧地基：</strong>能说清 Advisor 与 Spring AOP / <code class="inline">HandlerInterceptor</code> / Servlet <code class="inline">Filter</code> 在"环绕增强 + 责任链 + 可短路"上的同源关系。</li>
+      <li><strong>Spring AI 侧地基：</strong>掌握 <code class="inline">ChatClient</code> + <code class="inline">ChatModel</code> + <code class="inline">Advisor</code> + <code class="inline">VectorStore</code> 四件套的协作方式，理解 <code class="inline">AdvisedRequest</code>/<code class="inline">AdvisedResponse</code>/<code class="inline">advise-context</code> 三件套。</li>
+      <li><strong>可观测性意识：</strong>Advisor 自动接入 Micrometer/Tracing，日志/Token Advisor 是落地可观测性的天然切入点。</li>
+      <li><strong>横切能力闭环：</strong>日志、安全（敏感词拦截）、记忆（ChatMemoryAdvisor）、知识增强（QuestionAnswerAdvisor）四类典型 Advisor 均能识别并独立实现/装配。</li>
+    </ul>
+  </section>
+
+  <!-- 面试题关联 -->
+  <section class="interview">
+    <h2>关联面试题：Spring AI 核心机制（第二梯队）</h2>
+    <ol>
+      <li><strong>Advisor 的执行顺序如何控制？为什么说它是"堆栈"语义？</strong><br>答：通过 <code class="inline">getOrder()</code> 升序处理请求、逆序处理响应，值越小越靠近外层（类似 <code class="inline">Ordered.HIGHEST_PRECEDENCE</code>）。这与 Filter 链的先进后出一致。</li>
+      <li><strong>如何在 Advisor 中"阻断"一次模型调用？</strong><br>答：不调用 <code class="inline">chain.nextAroundCall()</code>，直接构造 <code class="inline">AdvisedResponse</code> 返回或抛出异常（参考 SafeGuardAdvisor / 本教程的 SensitiveWordAdvisor）。</li>
+      <li><strong>AdvisedRequest 与 Prompt 的区别？advise-context 有什么用？</strong><br>答：<code class="inline">AdvisedRequest</code> 是未密封、可在链中修改的请求载体；<code class="inline">advise-context</code> 是贯穿整条链的共享 Map，用于在多个 Advisor 间传递状态（如 token 计数、会话 ID、过滤表达式）。</li>
+      <li><strong>QuestionAnswerAdvisor 内部做了什么？如何自定义检索阈值与过滤条件？</strong><br>答：它用用户问题做向量相似度检索，把 topK 文档拼入 Prompt 上下文再交给 LLM；可通过 <code class="inline">SearchRequest.similarityThreshold()</code>/<code class="inline">topK()</code> 配置，运行时用 <code class="inline">FILTER_EXPRESSION</code> 参数动态过滤。</li>
+      <li><strong>CallAroundAdvisor 与 StreamAroundAdvisor 的区别？</strong><br>答：前者用于同步阻塞的 <code class="inline">call()</code>，后者用于响应式流式的 <code class="inline">stream()</code>；需要同时支持两种调用时可分别实现两个接口。</li>
+    </ol>
+  </section>
+
+  <!-- 教程来源 -->
+  <section class="sources">
+    <h2>教程来源</h2>
+    <ol>
+      <li><a href="https://docs.spring.io/spring-ai/reference/api/advisors.html" target="_blank" rel="noopener">https://docs.spring.io/spring-ai/reference/api/advisors.html</a> —— Spring AI 官方文档：Advisors API</li>
+      <li><a href="https://spring.io/blog/2024/10/02/supercharging-your-ai-applications-with-spring-ai-advisors/" target="_blank" rel="noopener">https://spring.io/blog/2024/10/02/supercharging-your-ai-applications-with-spring-ai-advisors/</a> —— spring.io/blog：Supercharging Your AI Applications with Spring AI Advisors</li>
+      <li><a href="https://docs.spring.io/spring-ai/reference/1.0/api/retrieval-augmented-generation.html" target="_blank" rel="noopener">https://docs.spring.io/spring-ai/reference/1.0/api/retrieval-augmented-generation.html</a> —— Spring AI 官方文档：Retrieval Augmented Generation / QuestionAnswerAdvisor</li>
+      <li><a href="https://www.baeldung.com/spring-ai-advisors" target="_blank" rel="noopener">https://www.baeldung.com/spring-ai-advisors</a> —— Baeldung：A Guide to Spring AI Advisors</li>
+      <li><a href="https://www.baeldung.com/spring-ai-redis-rag-app" target="_blank" rel="noopener">https://www.baeldung.com/spring-ai-redis-rag-app</a> —— Baeldung：Create a RAG Application with Redis and Spring AI</li>
+      <li><a href="https://www.baeldung.com/spring-ai-oracle-vector-database" target="_blank" rel="noopener">https://www.baeldung.com/spring-ai-oracle-vector-database</a> —— Baeldung：Using Oracle Vector Database With Spring AI（含 spring-ai-advisors-vector-store 依赖说明）</li>
+    </ol>
+  </section>
+
+</div>
+
+<footer>
+  Spring AI Advisors 机制实战 &middot; Phase 0 融合教程 &middot; 主线语言 Java + Spring AI
+</footer>
+
+</body>
+</html>
