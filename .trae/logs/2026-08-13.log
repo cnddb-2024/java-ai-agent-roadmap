@@ -1,0 +1,92 @@
+[2026-08-13 每日维护日志]
+北京时间: 2026-08-13 (第16天/168天, Phase 1)
+
+=== 步骤1-2 仓库初始化 ===
+- git clone 成功
+- .trae/logs 目录已存在
+
+=== 步骤3 飞书认证 ===
+- lark-cli auth status 返回"credentials provided externally"（外部凭证模式）
+- 直接使用 lark-cli task 命令验证成功，飞书可用
+
+=== 步骤4 更新反馈层 ===
+4a. 第16天, Phase 1 (第15-56天)
+4b. HTML today-marker 更新: "Phase 1 · 第 15/168 天" -> "Phase 1 · 第 16/168 天"
+4c. charts.js __RADAR_GAP__.me 更新: [80,52,48,40,63,50,42] -> [80,55,53,40,63,55,42]
+    - Spring AI +5 (Tool Calling + Advisors 完成)
+    - Agent编排 +3 (Tool Calling 机制)
+    - Python +5 (模块与包管理完成)
+4d. charts.js __RADAR_DAILY__ 更新: [78,65,75,80,55,50] -> [85,72,80,82,60,57]
+    - 近7天(8/7-8/13): 6天有作业产出, 1天空白(8/9)
+
+=== 步骤5 飞书任务采集 + diff ===
+5a. tasklist GUID: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+5b. 飞书任务总数: 22 (16 completed, 6 uncompleted)
+5c. assignments 扫描: 8个日期目录, 最近7天6天有产出
+
+5d. Diff 结果:
+- NEW_DONE (C=3):
+  1. ee7c02ae - Spring AI Tool Calling 实战
+  2. ff91fc34 - Spring AI Advisors 机制实战
+  3. 3091bd59 - Python 模块与包管理实战
+- VANISHED: 无
+- NEW_APPEARED: 无
+
+5e. description 补写: 所有6个未完成任务均已有description, 无需补写
+
+=== 步骤6 滑动窗口任务规划 ===
+6a. N=6 (未完成任务数), C=3 (新完成数), G=max(0,9-6)=3
+6b. G>0, 需要从路线图拆解3个新任务
+
+6c. Phase 1 核心内容拆解:
+- 文档解析(PDF/Word) -> 已覆盖 (e10d8721)
+- 智能切分(多粒度) -> 已覆盖 (7955c48a)
+- Embedding模型 -> 未覆盖 -> 新任务1
+- 混合检索(向量+BM25) -> 未覆盖 -> 新任务2
+- Rerank重排序 -> 未覆盖 -> 新任务3
+
+新拆解任务(G=3):
+1. Embedding 模型选型与接入实战 (c50dfa2e)
+2. 混合检索实战：向量+BM25融合 (f6068824)
+3. Rerank 重排序实战 (fe5fd757)
+
+6d-6e. 任务分配 (按 created_at 排序):
+- 今天(8/13) due:
+  1. 004da9dc - 目标 JD 收集与刚需能力提取表
+  2. 2544e132 - Spring AI 可观测性实战
+  3. ca4b1438 - 本地 Ollama 部署 Qwen
+- 明天(8/14) due:
+  4. e10d8721 - 文档解析实战
+  5. 7955c48a - 智能切分实战
+  6. cdadfb90 - 技术决策日志 #01
+- 后天(8/15) due (新创建):
+  7. c50dfa2e - Embedding 模型选型与接入
+  8. f6068824 - 混合检索实战
+  9. fe5fd757 - Rerank 重排序实战
+
+6f. excluded.json: 无排除标题
+6g. snapshot.json 已保存: 25个任务 (16 completed, 9 uncompleted)
+
+=== 步骤7 融合教程生成 ===
+当天due任务(3个), 无逾期任务:
+1. ca4b1438 - 本地 Ollama 部署 Qwen
+   - 路径: assignments/2026-08-13/ollama-qwen-local-deploy/tutorial.html
+   - 状态: 新生成, 校验通过, 来源8个
+
+2. 2544e132 - Spring AI 可观测性实战
+   - 路径: assignments/2026-08-13/spring-ai-observability/tutorial.html
+   - 状态: 新生成, 校验通过, 来源9个
+
+3. 004da9dc - 目标 JD 收集与刚需能力提取表
+   - 路径: assignments/2026-08-13/jd-collection-analysis/tutorial.html
+   - 状态: 新生成, 校验通过, 来源10个
+
+7e. 飞书评论: 待git push后写入raw URL
+
+=== 汇总 ===
+- 新完成任务: 3
+- 新创建任务: 3
+- 删除任务: 0
+- due顺延/重分配: 6个已有任务due日期更新
+- 教程生成: 3个新生成, 0个跳过, 0个失败
+- 未完成窗口: 9/9 已满

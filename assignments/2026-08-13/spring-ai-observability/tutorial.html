@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring AI 可观测性实战 | 融合教程</title>
+<style>
+:root{--bg:#f7f8fb;--bg2:#fff;--ink:#1a2332;--muted:#5d6b82;--rule:#e4e9f2;--accent:#2563eb;--accent2:#7c3aed;--ok:#059669;--soft:#eef2ff;--code-bg:#1c2128;--code-fg:#e6edf3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;line-height:1.75;font-size:15px}
+code,pre{font-family:"JetBrains Mono","Fira Code",Consolas,monospace}
+.wrap{max-width:860px;margin:0 auto;padding:0 24px}
+.hero{background:linear-gradient(135deg,#1e3a8a,#2563eb 50%,#7c3aed);color:#fff;padding:48px 24px 40px}
+.hero-inner{max-width:860px;margin:0 auto}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:4px 12px;border-radius:999px;font-size:.8rem;font-weight:600;margin-bottom:12px}
+.hero h1{font-size:1.7rem;margin:0 0 10px;font-weight:700}
+.hero .meta{font-size:.92rem;opacity:.9}
+.hero .time{display:inline-block;margin-top:10px;background:rgba(255,255,255,.15);padding:6px 14px;border-radius:8px;font-weight:600}
+section{padding:12px 0}
+h2{font-size:1.35rem;font-weight:700;margin:32px 0 14px;padding-left:12px;border-left:4px solid var(--accent)}
+h3{font-size:1.08rem;font-weight:700;margin:24px 0 10px;color:var(--accent2)}
+p{margin:0 0 12px}
+.callout{background:var(--bg2);border:1px solid var(--rule);border-left:4px solid var(--accent2);border-radius:8px;padding:14px 18px;margin:16px 0}
+.callout.warn{border-left-color:#d97706;background:#fff8f1}
+.callout.ok{border-left-color:var(--ok);background:#f0fdf4}
+pre code{display:block;background:var(--code-bg);color:var(--code-fg);padding:16px;border-radius:8px;white-space:pre;overflow-x:auto;font-size:.85rem;line-height:1.6}
+p code,li code{background:var(--soft);padding:2px 6px;border-radius:4px;font-size:.88em;color:var(--accent)}
+ol,ul{padding-left:20px}
+li{margin-bottom:6px}
+.stage{background:var(--bg2);border:1px solid var(--rule);border-radius:10px;padding:18px 20px;margin:14px 0}
+.stage h3{margin-top:0}
+.stage .dur{display:inline-block;background:var(--soft);color:var(--accent);font-size:.78rem;font-weight:700;padding:2px 10px;border-radius:999px;margin-bottom:8px}
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:14px 0}
+th{background:var(--soft);text-align:left;padding:10px 12px;border-bottom:2px solid var(--rule)}
+td{padding:9px 12px;border-bottom:1px solid var(--rule)}
+.sources{background:var(--bg2);border-top:1px solid var(--rule);margin-top:40px;padding:30px 24px 40px}
+.sources-inner{max-width:860px;margin:0 auto}
+.sources h2{border:none;padding:0;font-size:1.15rem}
+.sources ol{padding-left:1.3rem;font-size:.85rem;color:var(--muted)}
+.sources li{margin-bottom:.5rem;word-break:break-all}
+.sources a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="hero">
+<div class="hero-inner">
+<span class="tag">Phase 0 · 收尾验收</span>
+<h1>Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪</h1>
+<div class="meta">Phase 0 收尾任务 · 为生产级 RAG 项目建立监控基座</div>
+<div class="time">总预估时长：55 分钟（依赖配置 15min / 指标验证 20min / Token 追踪 20min）</div>
+</div>
+</div>
+
+<div class="wrap">
+<section>
+<h2>学习目标</h2>
+<p>掌握 Spring AI 的可观测性体系，使用 Micrometer + Actuator 暴露 ChatClient 调用指标（耗时、Token 用量、错误率），理解 LLM 应用监控与传统 Web 监控的差异。为后续 RAG 生产项目的成本控制和性能优化打基础。</p>
+<div class="callout">
+<b>前置条件：</b>已有可运行的 Spring AI ChatClient 项目（OpenAI 或 Ollama 均可）；JDK 17+；了解 Spring Boot Actuator 基本概念。
+</div>
+</section>
+
+<section>
+<h2>阶段一：引入 Actuator 与 Micrometer</h2>
+<div class="stage">
+<span class="dur">15 min</span>
+<h3>1.1 添加依赖</h3>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.micrometer&lt;/groupId&gt;
+    &lt;artifactId&gt;micrometer-tracing-bridge-otel&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+<h3>1.2 暴露 Prometheus 端点</h3>
+<pre><code>management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    metrics:
+      enabled: true
+  metrics:
+    tags:
+      application: spring-ai-rag-demo</code></pre>
+<p>启动后访问 <code>http://localhost:8080/actuator/metrics</code> 查看可用指标列表。</p>
+</div>
+</section>
+
+<section>
+<h2>阶段二：验证 Spring AI 自动埋点指标</h2>
+<div class="stage">
+<span class="dur">20 min</span>
+<h3>2.1 核心指标说明</h3>
+<p>Spring AI 自动注册以下 Micrometer 指标（无需手写代码）：</p>
+<table>
+<tr><th>指标名</th><th>类型</th><th>说明</th></tr>
+<tr><td><code>gen_ai.client.operation.duration</code></td><td>Timer</td><td>AI 调用耗时</td></tr>
+<tr><td><code>gen_ai.client.token.usage</code></td><td>DistributionSummary</td><td>Token 用量分布</td></tr>
+<tr><td><code>gen_ai.server.request.duration</code></td><td>Timer</td><td>服务端响应时间</td></tr>
+</table>
+
+<h3>2.2 查看具体指标</h3>
+<pre><code># 查看 Token 用量
+curl http://localhost:8080/actuator/metrics/gen_ai.client.token.usage
+
+# 查看调用耗时（分位数）
+curl "http://localhost:8080/actuator/metrics/gen_ai.client.operation.duration?tag=percentile&percentile=0.95"</code></pre>
+
+<h3>2.3 低基数 vs 高基数标签</h3>
+<p>Spring AI 将标签分为两类：</p>
+<ul>
+<li><b>低基数标签（默认导出）：</b><code>gen_ai.operation.name</code>（chat/embed）、<code>gen_ai.provider</code>（openai/ollama）、<code>error</code>。可安全用于 Prometheus。</li>
+<li><b>高基数标签（需手动开启）：</b><code>gen_ai.request.model</code>、<code>gen_ai.response.model</code>、<code>gen_ai.client.token.usage</code> 的 type 维度（input/output）。开启方式：</li>
+</ul>
+<pre><code>management.observations.annotations.enabled=true
+spring.ai.chat.observations.log-prompt=true
+spring.ai.chat.observations.log-completion=true</code></pre>
+<div class="callout warn">
+<b>注意：</b>prompt/completion 日志可能包含敏感数据，生产环境需评估是否开启。建议仅在调试阶段临时启用。
+</div>
+</div>
+</section>
+
+<section>
+<h2>阶段三：自定义 Token 用量追踪</h2>
+<div class="stage">
+<span class="dur">20 min</span>
+<h3>3.1 通过 Advisor 拦截 Usage</h3>
+<p>Spring AI 的 ChatResponse 中携带 Token 使用信息。通过自定义 Advisor 可持久化记录：</p>
+<pre><code>@Component
+public class TokenUsageAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
+
+    private static final Logger log = LoggerFactory.getLogger(TokenUsageAdvisor.class);
+    private final MeterRegistry meterRegistry;
+
+    public TokenUsageAdvisor(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+    }
+
+    @Override
+    public String getName() { return "TokenUsageAdvisor"; }
+
+    @Override
+    public int getOrder() { return 0; }
+
+    @Override
+    public AdvisedResponse aroundCall(AdvisedRequest request, CallAroundAdvisorChain chain) {
+        AdvisedResponse response = chain.next();
+        ChatResponse chatResponse = response.response();
+        if (chatResponse != null &amp;&amp; chatResponse.getMetadata() != null) {
+            Usage usage = chatResponse.getMetadata().getUsage();
+            if (usage != null) {
+                log.info("Token usage - prompt: {}, completion: {}, total: {}",
+                    usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens());
+                meterRegistry.counter("llm.tokens.total",
+                        "type", "prompt").increment(usage.getPromptTokens());
+                meterRegistry.counter("llm.tokens.total",
+                        "type", "completion").increment(usage.getCompletionTokens());
+            }
+        }
+        return response;
+    }
+
+    @Override
+    public Flux&lt;AdvisedResponse&gt; aroundStream(AdvisedRequest request, StreamAroundAdvisorChain chain) {
+        // 流式场景：在 doFinally 中汇总
+        return chain.next().doFinally(signal -&gt; {
+            // 流式 usage 通常在最后一个 chunk 中
+        });
+    }
+}</code></pre>
+
+<h3>3.2 注册 Advisor</h3>
+<pre><code>@Bean
+public ChatClient chatClient(ChatClient.Builder builder, TokenUsageAdvisor tokenAdvisor) {
+    return builder
+            .defaultAdvisors(tokenAdvisor)
+            .build();
+}</code></pre>
+
+<h3>3.3 对接 Prometheus + Grafana</h3>
+<p>在 <code>prometheus.yml</code> 中添加抓取配置：</p>
+<pre><code>scrape_configs:
+  - job_name: 'spring-ai-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']</code></pre>
+<p>Grafana 中建议配置三个面板：QPS、P95 延迟、Token 消耗速率（按 input/output 分线）。</p>
+</div>
+</section>
+
+<section>
+<h2>验收标准</h2>
+<div class="callout ok">
+<ul>
+<li><code>/actuator/metrics/gen_ai.client.operation.duration</code> 返回非空数据</li>
+<li><code>/actuator/metrics/gen_ai.client.token.usage</code> 能看到 Token 计数</li>
+<li>调用一次 ChatClient 后，日志中打印了 promptTokens/completionTokens</li>
+<li>能口述低基数标签和高基数标签的区别，以及为什么不能把 prompt 内容作为 Prometheus 标签</li>
+<li>记录"选择哪些指标做告警"到技术决策日志</li>
+</ul>
+</div>
+</section>
+
+<section>
+<h2>相关面试题</h2>
+<div class="callout">
+<b>第二梯队：</b>LLM 应用的可观测性和传统 Web 应用有什么不同？Token 用量怎么做成本告警？如何在流式输出中统计 Token？
+</div>
+</section>
+</div>
+
+<div class="sources">
+<div class="sources-inner">
+<h2>教程来源</h2>
+<ol>
+<li>Spring AI 官方文档 — Observability — <a href="https://docs.spring.io/spring-ai/reference/1.0/observability/index.html">https://docs.spring.io/spring-ai/reference/1.0/observability/index.html</a></li>
+<li>Spring AI 官方文档中文版 — 可观测性 — <a href="https://docs.springframework.org.cn/spring-ai/reference/observability/index.html">https://docs.springframework.org.cn/spring-ai/reference/observability/index.html</a></li>
+<li>Spring AI 官方文档 — Using Chat/Embedding Response Usage — <a href="https://docs.spring.io/spring-ai/reference/api/usage-handling.html">https://docs.spring.io/spring-ai/reference/api/usage-handling.html</a></li>
+<li>Spring Boot 官方文档 — Tracing (Actuator) — <a href="https://docs.spring.io/spring-boot/4.0/reference/actuator/tracing.html">https://docs.spring.io/spring-boot/4.0/reference/actuator/tracing.html</a></li>
+<li>Base14: Java AI Observability (Spring AI + OpenTelemetry) — <a href="https://docs.base14.io/guides/ai-observability/spring-ai-llm-observability/">https://docs.base14.io/guides/ai-observability/spring-ai-llm-observability/</a></li>
+<li>BootCampToProd: Spring AI Observability Deep Dive — <a href="https://bootcamptoprod.com/spring-ai-chat-client-metrics-guide/">https://bootcamptoprod.com/spring-ai-chat-client-metrics-guide/</a></li>
+<li>DevGlan: Monitoring Token Usage and Cost in Spring AI — <a href="https://www.devglan.com/spring-ai/monitoring-spring-ai-token-usage">https://www.devglan.com/spring-ai/monitoring-spring-ai-token-usage</a></li>
+<li>CSDN: Spring AI Alibaba 可观测性实践 — <a href="https://blog.csdn.net/wayle123/article/details/159290317">https://blog.csdn.net/wayle123/article/details/159290317</a></li>
+<li>掘金: Spring AI 应用上生产最先缺的是可观测性 — <a href="https://juejin.cn/post/7632266564818534426">https://juejin.cn/post/7632266564818534426</a></li>
+</ol>
+</div>
+</div>
+</body>
+</html>
