@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring AI 可观测性实战 | Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #2c7a50;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero {
+  border-left: 4px solid var(--accent);
+  padding: 8px 0 8px 20px;
+  margin-bottom: 40px;
+}
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 {
+  font-size: 1.3rem;
+  margin-top: 44px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg2); font-weight: 600; }
+.callout {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent2);
+  padding: 14px 18px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+.callout-title { font-weight: 600; margin-bottom: 6px; color: var(--accent2); }
+.timeline { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+.timeline .step {
+  flex: 1;
+  min-width: 140px;
+  background: var(--bg2);
+  padding: 14px;
+  border-radius: 8px;
+  border-top: 3px solid var(--accent);
+}
+.timeline .step .time { font-size: 0.82rem; color: var(--muted); }
+.timeline .step .label { font-weight: 600; margin-top: 4px; }
+.sources { font-size: 0.92rem; }
+.sources li { margin: 8px 0; word-break: break-all; }
+.sources a { color: var(--accent); text-decoration: none; }
+.sources a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · RAG 刚需闭环 + 生产级项目 1</div>
+  <h1>Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪</h1>
+  <div class="meta">
+    总预估时长：<strong>55 分钟</strong>（依赖接入 10min / ChatClient 指标 20min / Token 用量 15min / 面板与验收 10min）<br>
+    任务全称：Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪
+  </div>
+</div>
+
+<p>把 Spring AI 应用从"能跑"推进到"能看见每次调用花了多少 token、多少钱、慢在哪"。Spring AI 1.0 基于 Micrometer Observation API 原生输出指标，无需手写 AOP。本教程聚焦最小可用闭环：Actuator 端点暴露 → Prometheus 抓取 → 关键指标解读。</p>
+
+<div class="timeline">
+  <div class="step"><div class="time">0-10 min</div><div class="label">依赖与端点</div></div>
+  <div class="step"><div class="time">10-30 min</div><div class="label">ChatClient 指标</div></div>
+  <div class="step"><div class="time">30-45 min</div><div class="label">Token 用量</div></div>
+  <div class="step"><div class="time">45-55 min</div><div class="label">验收与面试话术</div></div>
+</div>
+
+<h2>一、依赖与 Actuator 端点</h2>
+
+<p>在已有 Spring AI 项目（Spring Boot 3.3+ / Spring AI 1.0+）上加两个依赖：</p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.micrometer&lt;/groupId&gt;
+    &lt;artifactId&gt;micrometer-registry-prometheus&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+<p><code>application.yml</code> 暴露指标端点：</p>
+
+<pre><code>management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name:rag-demo}
+  observations:
+    annotations:
+      enabled: true
+
+spring:
+  ai:
+    chat:
+      client:
+        observations:
+          log-prompt: false
+          log-completion: false
+    chat:
+      observations:
+        log-prompt: false
+        log-completion: false</code></pre>
+
+<div class="callout">
+  <div class="callout-title">为什么默认关闭 prompt/completion 日志</div>
+  prompt 和 completion 是高基数数据，可能含敏感信息。Spring AI 默认不导出，只在 trace 中可见。开发环境可临时开启排查问题，生产环境务必保持关闭，通过独立日志 advisor 脱敏后再记录。
+</div>
+
+<h2>二、ChatClient 自动产生的指标</h2>
+
+<p>启动应用，调用一次 ChatClient 后访问：</p>
+
+<pre><code>curl -s http://localhost:8080/actuator/metrics/gen_ai.client.operation.duration | jq
+curl -s http://localhost:8080/actuator/metrics/gen_ai.client.token.usage  | jq</code></pre>
+
+<p>Spring AI 自动注册的核心指标（命名遵循 OpenTelemetry GenAI 语义约定）：</p>
+
+<table>
+<thead><tr><th>指标名</th><th>类型</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><code>gen_ai.client.operation.duration</code></td><td>Timer</td><td>每次 ChatClient 调用耗时，含 model/operation 标签</td></tr>
+<tr><td><code>gen_ai.client.token.usage</code></td><td>DistributionSummary</td><td>输入/输出 token 数，按 <code>gen_ai.token.type</code>=input/output 区分</td></tr>
+<tr><td><code>gen_ai.client.request.count</code></td><td>Counter</td><td>调用总次数（1.0+ 版本合并到 duration 统计中）</td></tr>
+<tr><td><code>spring.ai.chat.client</code></td><td>Observation</td><td>ChatClient.call/stream 的完整 span，可接入 Zipkin/Tempo</td></tr>
+</tbody>
+</table>
+
+<h3>2.1 查看 Token 用量</h3>
+
+<pre><code>$ curl -s localhost:8080/actuator/metrics/gen_ai.client.token.usage
+{
+  "name": "gen_ai.client.token.usage",
+  "description": "Measures number of input and output tokens used",
+  "measurements": [
+    { "statistic": "COUNT", "value": 12 },
+    { "statistic": "TOTAL_AMOUNT", "value": 1847 }
+  ],
+  "availableTags": [
+    { "tag": "gen_ai.token.type", "values": ["input", "output"] },
+    { "tag": "gen_ai.system",     "values": ["openai", "ollama"] }
+  ]
+}</code></pre>
+
+<p>Prometheus 抓取后，用 PromQL 算每分钟 token 消耗：</p>
+
+<pre><code>rate(gen_ai_client_token_usage_total[1m])</code></pre>
+
+<h2>三、Advisor 链路中的可观测维度</h2>
+
+<p>QuestionAnswerAdvisor / RetrievalAugmentationAdvisor 在调用向量库时会产生 <code>spring.ai.vector.store</code> observation，包含：</p>
+
+<ul>
+<li><code>db.system</code>：pgvector / qdrant / milvus 等</li>
+<li><code>db.operation</code>：similarity_search / add</li>
+<li><code>spring.ai.vectorstore.dimension</code>：向量维度</li>
+<li>耗时：能定位"检索慢"还是"模型慢"</li>
+</ul>
+
+<p>这是 Phase 1 做 RAG 性能调优的重要入口 —— 一旦 rerank 加上去，能在 trace 里看到检索、rerank、LLM 三段各自的耗时分布。</p>
+
+<h2>四、自定义成本统计（可选，10 分钟）</h2>
+
+<p>对于按 token 计费的模型，注册一个 <code>ObservationHandler</code> 把 token 数乘以单价落到自定义 counter：</p>
+
+<pre><code>@Component
+public class CostObservationHandler implements ObservationHandler&lt;Observation.Context&gt; {
+
+    private final MeterRegistry registry;
+    private final double inputPricePerToken  = 0.0000025;  // USD
+    private final double outputPricePerToken = 0.00001;
+
+    public CostObservationHandler(MeterRegistry registry) {
+        this.registry = registry;
+    }
+
+    @Override
+    public boolean supportsContext(Observation.Context context) {
+        return context instanceof ChatModelObservationContext;
+    }
+
+    @Override
+    public void onStop(Observation.Context context) {
+        ChatModelObservationContext ctx = (ChatModelObservationContext) context;
+        if (ctx.getResponse() == null
+            || ctx.getResponse().getMetadata() == null
+            || ctx.getResponse().getMetadata().getUsage() == null) {
+            return;
+        }
+        Usage usage = ctx.getResponse().getMetadata().getUsage();
+        double cost = usage.getPromptTokens()     * inputPricePerToken
+                    + usage.getCompletionTokens() * outputPricePerToken;
+        registry.counter("llm.cost.usd",
+                "model", ctx.getChatOptions().getModel())
+                .increment(cost);
+    }
+}</code></pre>
+
+<p>访问 <code>/actuator/metrics/llm.cost.usd</code> 即可看到累计成本。</p>
+
+<h2>五、本地验收脚本</h2>
+
+<pre><code># 1. 发一次对话
+curl -X POST http://localhost:8080/chat -H 'Content-Type: application/json' \
+     -d '{"message":"用一句话解释 RAG"}'
+
+# 2. 确认 token 指标存在
+curl -s http://localhost:8080/actuator/metrics/gen_ai.client.token.usage \
+  | grep -q '"name"' &amp;&amp; echo "OK: token metric"
+
+# 3. 确认 duration 指标存在
+curl -s http://localhost:8080/actuator/metrics/gen_ai.client.operation.duration \
+  | grep -q '"name"' &amp;&amp; echo "OK: duration metric"
+
+# 4. Prometheus 端点可被抓取
+curl -s http://localhost:8080/actuator/prometheus | grep gen_ai &amp;&amp; echo "OK: prometheus"</code></pre>
+
+<h2>六、面试话术（1 分钟口述）</h2>
+
+<ol>
+<li>Spring AI 1.0 基于 Micrometer Observation，自动产出 <code>gen_ai.client.*</code> 指标，不需要 AOP。</li>
+<li>Token 用量通过 <code>gen_ai.client.token.usage</code> 拿到，用 input/output tag 拆分，乘以单价就是成本。</li>
+<li>ChatClient / Advisor / VectorStore 三层都有独立 observation，接 Tempo/Zipkin 后能看到检索慢还是 LLM 慢。</li>
+<li>Prompt/completion 默认不导出，避免敏感信息泄漏；要调试用独立日志 advisor。</li>
+</ol>
+
+<div class="callout">
+  <div class="callout-title">相关面试题</div>
+  Spring AI vs LangChain4j 选型（第一梯队）—— 可观测性是重要差异点：Spring AI 原生接 Micrometer，与 Actuator/Prometheus 无缝；LangChain4j 需手动接。
+</div>
+
+<h2>教程来源</h2>
+<ol class="sources">
+  <li><a href="https://docs.spring.io/spring-ai/reference/1.1/observability/index.html">Spring AI Reference — Observability</a></li>
+  <li><a href="https://bootcamptoprod.com/spring-ai-chat-client-metrics-guide/">Spring AI Observability: A Deep Dive into Chat Client Metrics and Prompt Logging</a></li>
+  <li><a href="https://www.51cto.com/article/816575.html">Spring AI Observations：让 AI 应用监控变得简单高效</a></li>
+  <li><a href="https://www.devglan.com/spring-ai/monitoring-spring-ai-token-usage">Build a Monitoring System for Token Usage and Cost in Spring AI</a></li>
+  <li><a href="https://pranjal.net/blog/2025/12/19/observability-spring-ai-and-beyond.html">Spring AI Series #6: Observability with Grafana, Prometheus, Loki and Tempo</a></li>
+  <li><a href="https://github.com/cnddb-2024/java-ai-agent-roadmap">路线图仓库：java-ai-agent-roadmap（Phase 1 验收标准）</a></li>
+</ol>
+
+</div>
+</body>
+</html>

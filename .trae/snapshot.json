@@ -1,5 +1,5 @@
 {
-  "snapshot_date": "2026-08-13",
+  "snapshot_date": "2026-08-14",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
     {
@@ -7,63 +7,63 @@
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
       "created_at": "1786574146455",
       "completed": false,
-      "due": "2026-08-15"
+      "due": "2026-08-16"
     },
     {
       "guid": "f6068824-91f9-4465-bc40-4cc568c1c181",
       "summary": "混合检索实战：向量检索 + BM25 关键词检索融合（Spring AI + Elasticsearch/PGVector）",
       "created_at": "1786574145473",
       "completed": false,
-      "due": "2026-08-15"
+      "due": "2026-08-16"
     },
     {
       "guid": "c50dfa2e-4117-48f9-9871-b47592cdeda9",
       "summary": "Embedding 模型选型与接入实战：bge-large-zh / text-embedding-3 / m3e 对比 + Spring AI 接入",
       "created_at": "1786574144621",
       "completed": false,
-      "due": "2026-08-15"
+      "due": "2026-08-16"
     },
     {
       "guid": "cdadfb90-1181-47c9-9f15-e9feeca47147",
       "summary": "技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus",
       "created_at": "1786487631455",
       "completed": false,
-      "due": "2026-08-14"
+      "due": "2026-08-15"
     },
     {
       "guid": "7955c48a-682f-4b15-8d04-3b471196e757",
       "summary": "智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比",
       "created_at": "1786487631454",
       "completed": false,
-      "due": "2026-08-14"
+      "due": "2026-08-15"
     },
     {
       "guid": "e10d8721-ec0b-46bb-a0e0-57bfcfeb5d61",
       "summary": "文档解析实战：Apache PDFBox + Apache POI 抽取 PDF/Word/Markdown 纯文本与表格",
       "created_at": "1786487631453",
       "completed": false,
-      "due": "2026-08-14"
+      "due": "2026-08-15"
     },
     {
       "guid": "ca4b1438-5ae1-4f98-bb31-d09f61068c0c",
       "summary": "本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理",
       "created_at": "1786419278414",
       "completed": false,
-      "due": "2026-08-13"
+      "due": "2026-08-14"
     },
     {
       "guid": "2544e132-c0d0-418d-ad15-76ed68a04237",
       "summary": "Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪",
       "created_at": "1786419277834",
       "completed": false,
-      "due": "2026-08-13"
+      "due": "2026-08-14"
     },
     {
       "guid": "004da9dc-6c2a-4dcd-b79e-1c1f4347d8db",
       "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）",
       "created_at": "1785796641257",
       "completed": false,
-      "due": "2026-08-13"
+      "due": "2026-08-14"
     },
     {
       "guid": "ee7c02ae-4537-4773-807f-7d6d7f3afbb4",
