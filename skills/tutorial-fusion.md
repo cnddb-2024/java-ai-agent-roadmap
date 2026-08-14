@@ -140,22 +140,22 @@ pre code {
 
 ### 9. 幂等性检查（防重复生成）
 
-- **生成前必须检查**：目标路径 `assignments/YYYY-MM-DD/<slug>/tutorial.html` 是否已存在
-- **已存在则跳过**：该任务已有融合教程，不重复生成、不覆盖、不追加评论
-- **逾期任务处理**：任务 due 日期早于今天（北京时间）且未完成 → 仍视为待处理任务
-  - 先检查逾期任务对应日期的目录下是否已有 `tutorial.html`
-  - **已有**：跳过该任务，不重复生成
-  - **没有**：正常生成，但存入该任务**原始 due 日期**对应的 `assignments/` 目录（而非今天日期）
-  - 逾期任务的 `tutorial.html` 存放路径用 **due 日期**，不是当天日期
-- **幂等规则总结**：同一任务（同 guid 或同 summary+due 组合）的 `tutorial.html` 只生成一次
+- **核心原则：只要某任务已有融合教程，就不再生成**（无论 due 是否顺延、无论存放在哪个日期目录）。
+- **生成前必须全局扫描**：计算该任务的 slug，然后扫描 `assignments/` 下**所有日期子目录**，查找是否存在 `<slug>/tutorial.html`。
+  - 命中任意一个（即 `assignments/*/<slug>/tutorial.html` 存在） -> 跳过该任务，不重复生成、不覆盖、不追加评论，记录日志"已有教程，跳过"
+  - 全部不存在 -> 继续生成
+- **slug 匹配优先级**：先用 summary 的 kebab-case 作为 slug 去匹配；若该任务历史上用过其他 slug（按 summary 关键词模糊匹配已有目录名），也视为同一任务。
+- **存放路径**：新教程仍存入 `assignments/<当前due日期>/<slug>/tutorial.html`（用任务当前的 due 日期，不是今天日期）。
+- **幂等规则总结**：同一任务（同 slug 或同 summary 关键词）的 `tutorial.html` 在整个 `assignments/` 树中只生成一次；due 顺延不触发重新生成。
 
 ### 10. 任务筛选规则
 
-- 当天 due 的任务：优先处理，存入 `assignments/<TODAY>/<slug>/tutorial.html`
-- 逾期任务（due < TODAY 且未完成）：检查原始 due 日期目录下是否已有教程
-  - 有 -> 跳过
-  - 无 -> 生成并存入 `assignments/<原始due日期>/<slug>/tutorial.html`
+- 当天 due 的任务：优先处理，存入 `assignments/<当前due日期>/<slug>/tutorial.html`
+- 逾期任务（due < TODAY 且未完成）：同样按第 9 节全局扫描判断是否已有教程
+  - 任意日期目录下已有该 slug 的 `tutorial.html` -> 跳过
+  - 全部没有 -> 生成并存入 `assignments/<当前due日期>/<slug>/tutorial.html`
 - 已完成任务：跳过，不生成教程
+- **关键变更**：不再因 due 顺延而重新生成教程。一个任务只要生成过一次教程，后续顺延/重新分配 due 时一律跳过。
 
 ### 11. Agent 校验环节（生成后必须执行，禁止跳过）
 
@@ -236,9 +236,9 @@ else:
 ## 执行步骤
 
 ```
-1. 【幂等检查】检查 assignments/<due日期>/<slug>/tutorial.html 是否已存在
-   - 存在 → 跳过该任务，记录日志"已有教程，跳过"
-   - 不存在 → 继续
+1. 【全局幂等检查】计算任务 slug，扫描 assignments/ 下所有日期子目录
+   - 任意 assignments/*/<slug>/tutorial.html 存在 -> 跳过该任务，记录日志"已有教程，跳过"
+   - 全部不存在 -> 继续
 2. 获取飞书任务详情（summary + description）
 3. 解析路线图 HTML，确定当前 Phase，提取相关推荐项目和面试题
 4. 搜索互联网教程（至少 5 个来源）
