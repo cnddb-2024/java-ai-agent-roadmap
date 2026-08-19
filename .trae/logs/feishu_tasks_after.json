@@ -1,0 +1,268 @@
+[page 1] fetching...
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "has_more": false,
+    "items": [
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787356800000"
+        },
+        "guid": "fe5fd757-cd63-4848-bafb-3e39cd001cee",
+        "subtask_count": 0,
+        "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787356800000"
+        },
+        "guid": "f6068824-91f9-4465-bc40-4cc568c1c181",
+        "subtask_count": 0,
+        "summary": "混合检索实战：向量检索 + BM25 关键词检索融合（Spring AI + Elasticsearch/PGVector）"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787356800000"
+        },
+        "guid": "c50dfa2e-4117-48f9-9871-b47592cdeda9",
+        "subtask_count": 0,
+        "summary": "Embedding 模型选型与接入实战：bge-large-zh / text-embedding-3 / m3e 对比 + Spring AI 接入"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787270400000"
+        },
+        "guid": "cdadfb90-1181-47c9-9f15-e9feeca47147",
+        "subtask_count": 0,
+        "summary": "技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787270400000"
+        },
+        "guid": "7955c48a-682f-4b15-8d04-3b471196e757",
+        "subtask_count": 0,
+        "summary": "智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787270400000"
+        },
+        "guid": "e10d8721-ec0b-46bb-a0e0-57bfcfeb5d61",
+        "subtask_count": 0,
+        "summary": "文档解析实战：Apache PDFBox + Apache POI 抽取 PDF/Word/Markdown 纯文本与表格"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787184000000"
+        },
+        "guid": "ca4b1438-5ae1-4f98-bb31-d09f61068c0c",
+        "subtask_count": 0,
+        "summary": "本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787184000000"
+        },
+        "guid": "2544e132-c0d0-418d-ad15-76ed68a04237",
+        "subtask_count": 0,
+        "summary": "Spring AI 可观测性实战：Micrometer + Actuator 指标监控与 Token 用量追踪"
+      },
+      {
+        "completed_at": "0",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1787184000000"
+        },
+        "guid": "004da9dc-6c2a-4dcd-b79e-1c1f4347d8db",
+        "subtask_count": 0,
+        "summary": "目标 JD 收集与刚需能力提取表（Phase0验收项）"
+      },
+      {
+        "completed_at": "1786542153000",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786492800000"
+        },
+        "guid": "ee7c02ae-4537-4773-807f-7d6d7f3afbb4",
+        "subtask_count": 0,
+        "summary": "Spring AI Tool Calling 实战：@Tool注解/FunctionCallback/工具注册与调用demo"
+      },
+      {
+        "completed_at": "1786542153000",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786492800000"
+        },
+        "guid": "ff91fc34-b270-448b-a963-72e9422bdc20",
+        "subtask_count": 0,
+        "summary": "Spring AI Advisors 机制实战：RequestResponseAdvisor/链式编排/日志拦截"
+      },
+      {
+        "completed_at": "1786522255000",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786492800000"
+        },
+        "guid": "3091bd59-fc44-44fc-86d2-292633ef7c63",
+        "subtask_count": 0,
+        "summary": "Python 模块与包管理实战：pip/venv/虚拟环境/标准库速览"
+      },
+      {
+        "completed_at": "1786456532047",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786406400000"
+        },
+        "guid": "40ae67ff-da61-4d73-b826-b49b8c06ef75",
+        "subtask_count": 0,
+        "summary": "RAG 知识库问答 demo 搭建：使用 Spring AI 或 LangChain4j 实现提问→检索本地文档→回答完整链路"
+      },
+      {
+        "completed_at": "1786439128319",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786406400000"
+        },
+        "guid": "a0c5dd2a-1de3-4d88-898a-680a1c7204a4",
+        "subtask_count": 0,
+        "summary": "Function Calling 与 Tool Use 原理实战：理解 LLM 工具调用机制，编写 Spring AI 或 LangChain4j 的 Tool Calling demo"
+      },
+      {
+        "completed_at": "1786111311000",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786060800000"
+        },
+        "guid": "3112e317-9976-4eb3-84e6-d0a3e7304cb3",
+        "subtask_count": 0,
+        "summary": "整理第一周学习笔记并推送到 GitHub（覆盖 Python/Spring AI/RAG 基础）"
+      },
+      {
+        "completed_at": "1786111305000",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786060800000"
+        },
+        "guid": "2f060e48-34a6-46eb-b1b4-9dd24cc8f53c",
+        "subtask_count": 0,
+        "summary": "向量数据库本地部署：Docker 部署 Qdrant + Python/Java SDK 写入与检索测试"
+      },
+      {
+        "completed_at": "1786404037284",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786320000000"
+        },
+        "guid": "a5931ab7-af12-4f17-9d22-354133594103",
+        "subtask_count": 0,
+        "summary": "Python 面向对象编程实战：类/继承/多态/异常处理（对比Java OOP，写练习代码）"
+      },
+      {
+        "completed_at": "1786439129583",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786406400000"
+        },
+        "guid": "b92b1e0d-f886-4ed5-b3f1-fd3186d7b7c7",
+        "subtask_count": 0,
+        "summary": "Spring AI vs LangChain4j 选型对比笔记与口述练习（Phase0验收项）"
+      },
+      {
+        "completed_at": "1786026046997",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1785974400000"
+        },
+        "guid": "0e1d9f3a-2b30-4d4f-8484-a3446c30cfb8",
+        "subtask_count": 0,
+        "summary": "Spring AI 集成 OpenAI API：完成 ChatClient 流式对话调用 demo"
+      },
+      {
+        "completed_at": "1785507203826",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1785456000000"
+        },
+        "guid": "72a66dc2-1adc-4061-8139-abcddd47f09c",
+        "members": [
+          {
+            "id": "ou_0cca5c0dbe2c383b42cf523538b250bf",
+            "role": "follower",
+            "type": "user"
+          }
+        ],
+        "subtask_count": 0,
+        "summary": "Java Web 转 AI Agent 知识体系思维导图输出（Phase0 验收项）"
+      },
+      {
+        "completed_at": "1785507202614",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1785456000000"
+        },
+        "guid": "922cb234-2017-4885-ac2d-9e17b0826aa8",
+        "subtask_count": 0,
+        "summary": "LangChain4j 框架结构研读：克隆官方仓库并跑通 QuickStart 示例"
+      },
+      {
+        "completed_at": "1786098546000",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1786060800000"
+        },
+        "guid": "b0342461-c918-42e9-85bf-105d616fe135",
+        "subtask_count": 0,
+        "summary": "Python 数据结构实战：列表/字典/集合/文件IO（对标 Java 集合框架，写练习代码）"
+      },
+      {
+        "completed_at": "1786026056561",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1785974400000"
+        },
+        "guid": "53707db7-8956-4530-aacd-359c9284a9bb",
+        "subtask_count": 0,
+        "summary": "RAG 核心概念学习：Embedding/向量检索/Chunking/重排序 原理笔记"
+      },
+      {
+        "completed_at": "1785590392270",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1785628800000"
+        },
+        "guid": "3b6c3874-8fa8-43dd-9e1d-64270b3c75f5",
+        "subtask_count": 0,
+        "summary": "Spring AI 入门：创建 Spring Boot 3 项目并集成 spring-ai-openai starter 依赖"
+      },
+      {
+        "completed_at": "1785585518184",
+        "due": {
+          "is_all_day": true,
+          "timestamp": "1785628800000"
+        },
+        "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
+        "subtask_count": 0,
+        "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）"
+      }
+    ],
+    "page_token": ""
+  }
+}

@@ -1,0 +1,59 @@
+# Java AI Agent 转型学习计划 · 每日维护日志 2026-08-20
+
+## 步骤1-2：拉取仓库与日志目录
+- git clone 成功，已进入 roadmap-repo；mkdir -p .trae/logs 完成。
+
+## 步骤3：初始化时间与阶段（全程复用）
+- TODAY=2026-08-20（北京时间）
+- DAY_NUM=23
+- PHASE=1（第15-56天区间）
+- TODAY_TS=1787184000000 / TOMORROW_TS=1787270400000 / DAY_AFTER_TS=1787356800000
+
+## 步骤4：飞书鉴权
+- `lark-cli auth status --as user` 不支持 --as 参数（凭证由环境外部提供）；
+  改用实际任务命令 `lark-cli task tasklists list --as user` 验证鉴权成功（ok=true, identity=user）。
+- 找到清单「Java AI Agent 转型学习计划」tasklist_guid=5a08bfe3-e67f-49d7-9a33-f5681f22648d，已缓存至 .trae/feishu_cache.json。
+
+## 步骤5：更新反馈层
+- 5.1 java-ai-agent-roadmap.html today-marker：Phase 1 · 第 22/168 天 → Phase 1 · 第 23/168 天。
+- 5.2 charts.js __RADAR_GAP__.me 维持 [58,40,55,38,52,60,45]：本次无新完成任务（completed=true 无新增），按规则不推进。
+- 5.3 charts.js __RADAR_DAILY__ 由 [15,10,25,8,12,5] 更新为 [8,6,18,5,10,3]：
+  近7天（08-14~08-20）仅 08-14 存在3篇教程（无作业产物），08-15 起无任何作业活动，到期任务完成 0/6，打卡中断。
+
+## 步骤6：采集飞书任务状态 + 扫描作业
+- 6.1/6.2 清单任务共25个：已完成16、未完成9。
+- 6.3 assignments/ 扫描：最新目录 2026-08-14（3篇教程：jd-collection-analysis / ollama-qwen-local-deploy / spring-ai-observability，均无作业产物）。
+- 6.4 diff（对比 2026-08-19 快照）：
+  - NEW_DONE：[]（无新完成任务）
+  - VANISHED：[]（excluded_titles 不变，仍为空）
+  - NEW_APPEARED：[]（25=25，guid 完全对齐）
+- 6.5 描述补写：9个未完成任务 description 均已非空（均含【学习目标】等规范字段），无需补写。
+
+## 步骤7：滑动窗口任务规划
+- 7.1 N=9（活跃未完成且未冻结），G=max(0,9-9)=0 → 无需拆解新任务，无需解冻（冻结0个）。
+- 7.2 按 snapshot created_at 从旧到新排序恰好9个，无窗口外任务需冻结。
+- 窗口锚定（patch 无条件重写 due，9/9 成功）：
+  - 今天 2026-08-20：目标 JD 收集与刚需能力提取表（Phase0验收项）/ Spring AI 可观测性实战 / 本地 Ollama 部署 Qwen 大模型
+  - 明天 2026-08-21：文档解析实战（PDFBox+POI）/ 智能切分实战 / 技术决策日志 #01（向量库选型）
+  - 后天 2026-08-22：Embedding 模型选型 / 混合检索实战（BM25+向量）/ Rerank 重排序实战
+- 7.6 excluded.json 标题未复活（列表为空）。
+- 7.7 snapshot.json 已保存：总数25（已完成16 / 活跃9 / 冻结0），created_at 全部有值（沿用旧快照）。
+
+## 步骤8：融合教程生成
+- 8.1 待处理任务3个（当天due，锚定后无逾期任务）：目标 JD 收集 / Spring AI 可观测性 / Ollama 本地部署。
+- 8.2 幂等检查（文件检查命中即跳过）：
+  - 目标 JD 收集 → slug=jd-collection-analysis → assignments/2026-08-13/jd-collection-analysis/tutorial.html 已存在 → 跳过
+  - Spring AI 可观测性 → slug=spring-ai-observability → assignments/2026-08-13/spring-ai-observability/tutorial.html 已存在 → 跳过
+  - Ollama 本地部署 → slug=ollama-qwen-local-deploy → assignments/2026-08-13/ollama-qwen-local-deploy/tutorial.html 已存在 → 跳过
+- 生成0篇、跳过3篇、失败0篇 → 8.4/8.5（教程提交与评论）本次无操作。
+- 备注：明天due的3个任务（文档解析/智能切分/技术决策日志）尚无教程，预计明日运行时生成。
+
+## 步骤9：写回与兜底
+- 本日志写入 .trae/logs/2026-08-20.log。
+- git add . && git commit -m "chore(daily): 2026-08-20 每日维护" && git push main。
+
+## 运行结果摘要
+- 全流程无致命错误；飞书硬依赖满足。
+- 反馈层已更新（第23/168天 + 每日雷达回落，反映近一周停滞）。
+- 窗口滚动正常：9个活跃任务锚定到 08-20/08-21/08-22。
+- 本次无新完成任务、无新增任务、无冻结任务、无教程生成（3个全部幂等跳过）。
