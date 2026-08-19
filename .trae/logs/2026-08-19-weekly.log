@@ -1,0 +1,87 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-08-19 (北京时间)
+当前Phase: Phase 1 · 第 22/168 天 (RAG全链路 + 生产级项目1, 项目期)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定), 本次维持20条 (高匹配16 / 中匹配4 / 暂避0)
+- 淘汰: 16条 (时效过期, 超15天, 与上次周报口径一致)
+  * 宁波全拓海伦数智科技(旧档2026-08-02, 17天) — 同岗新档已刷新保留
+  * 炎科技术·AI Agent应用开发工程师 (2026-08-01, 18天)
+  * 猎头·Java研发工程师(Agent方向·北京) (2026-08-01, 18天)
+  * 鑫锡软件·Java开发工程师(AI Agent/智能体方向) (2026-07-29, 21天)
+  * 中科昊萌·软件开发工程师 (2026-07-29, 21天)
+  * 环绕智能·AI Java后端工程师 (2026-07-29, 21天)
+  * 美团·Agent基础框架设计与开发 (2026-07-29, 21天)
+  * 百川智能·大模型应用后端开发工程师 (2026-07-29, 21天)
+  * 阿里巴巴·千问大模型Agent算法专家 (2026-07-29, 21天; 算法岗偏离Java工程方向, 双重淘汰依据)
+  * 猎头·Agent开发工程师(AIGC) (2026-07-29, 21天)
+  * 数珩SHAUE·后端开发工程师(旧档2026-07-28, 22天) — 同公司新档已刷新保留
+  * 智谱华章·Agent后端工程师(Java) (2026-07-28, 22天; Java+Python双硬性暂避档)
+  * 京东家装·AI Agent开发工程师 (2026-07-26, 24天)
+  * 高级Agent开发/专家(互联网) (2026-07-26, 24天)
+  * 大模型应用高级Java工程师(LLM应用研发, 旧档2026-07-26) — 同岗新档已刷新保留
+  * Java研发(agent方向) (2026-07-24, 26天)
+- 保留: 4条 (时效内: 宁波力易达08-09 / 字节跳动08-08 / 捷科智诚08-08 / 中国电子科技08-08)
+- 刷新: 3条 (同岗位/同公司新档, 更新日期与URL)
+  * 宁波全拓海伦数智科技·Java Agent开发工程师 (2026-08-18更新)
+  * 上海数珩信息科技·Java高级开发(AI应用) (2026-08-18更新)
+  * 北京某中型人工智能公司·大模型应用高级Java工程师 (2026-08-18更新)
+- 新增: 13条 (WebSearch检索, Boss直聘/猎聘/前程无忧)
+  * 博彦科技·Java开发工程师(AI项目) (Boss直聘, 2026-08-19, 高) — 大模型接入平台+RAG核心引擎+Milvus/Weaviate
+  * 中数智汇·Java开发工程师(AI应用/C端方向) (Boss直聘, 2026-08-19检索, 高) — 大模型能力封装标准API
+  * 上海艾策通讯·AI应用研发工程师(Java方向) (前程无忧, 2026-08-19检索, 高) — Spring AI/LangChain4j优先+RAG+FC
+  * 深圳创见网络·Java开发工程师(AI应用方向) (前程无忧, 2026-08-19检索, 中) — AI编程工具+Python基础加分
+  * 杭州某大型计算机软件上市公司·大模型后端开发(Java或Python) (Boss直聘, 2026-08-19, 中)
+  * 文慧通智能·AI应用开发/大模型智能体开发工程师 (Boss直聘, 2026-08-19检索, 中) — RAG/GraphRAG/AgentRAG
+  * 中电信人工智能公司·AI应用研发工程师 (Boss直聘, 2026-08-18, 高) — Java技术栈AI Agent应用平台
+  * 天宇股份·AI Agent应用开发工程师 (Boss直聘, 2026-08-18, 高)
+  * 北京某人工智能公司·Java开发工程师(Agent) (猎聘, 2026-08-18, 高) — Spring全家桶+RAG+ReAct
+  * 北京某互联网公司·Java+Agent研发工程师 (猎聘, 2026-08-18, 高) — 多Agent协作+编程Agent工具
+  * 辉瑞制药·大模型应用开发工程师 (Boss直聘, 2026-08-18, 高) — Java+医学知识库RAG+向量检索
+  * 杰夫与友·Java开发工程师(AIGC产品方向) (Boss直聘, 2026-08-12, 高) — LLM API+向量检索+LangChain4j
+  * (第13条为某大型国有计算机软件公司·AI后端工程Java, Boss直聘, 2026-08-17, 高, 见刷新与新增合计口径)
+  注: 无明确发布日期的4条以检索确认日2026-08-19计; 本轮淘汰16条+保留4条=原20条, 补位16条(新增13+刷新3)维持20条
+- 当前总数: 20条 (高16 / 中4)
+
+【区块2 实战项目】
+- 动态上限: 5条在学 (Phase 1 项目期, base 3升至4-5)
+- 淘汰: 0条 (snapshot无项目完成标记, 原有3条在学项目均保留)
+- 新增: 4条
+  * springai-knowledge-server (在学) — Spring Boot 4+Spring AI+pgvector+RabbitMQ+bge-reranker; 混合检索→RRF融合→bge-reranker二次重排完整链路, 直接对应当前待办"混合检索实战/Rerank实战/Embedding选型"
+    GitHub: github.com/xy3082043438/springai-knowledge-server
+  * rag-knowledge-system (在学) — Spring AI 1.1+pgvector HNSW+Ollama+Tika; 混合检索双通道(pgvector+pg_trgm, RRF k=60)+异步入库状态机, 对应"Ollama部署/智能切分/文档解析"待办
+    GitHub: github.com/OOMEcho/rag-knowledge-system
+  * spring-ai-ragas (参考) — RAG评测Java库(RAGAS对齐), 六大类指标, 补最弱维度"RAG评测"
+    GitHub: github.com/ai-qa-solutions/spring-ai-ragas
+  * rag-study-helper (参考) — LangChain4j+Milvus/Chroma/InMemory三向量库切换, 对应待办"技术决策日志#01: 向量库选型pgvector vs Qdrant vs Milvus"
+    GitHub: github.com/worenbudaoni/rag-study-helper
+- 当前总数: 12条 (在学5 / 参考7)
+  * 在学: spring-ai-alibaba-playground, knowledgeops-agent, spring-al-alibaba-customer, springai-knowledge-server, rag-knowledge-system
+  * 参考: springboot-ai-rag-tutorial, Java-LLM-integration, Spring AI Alibaba官方生态, java-ai-labs, ai-code-helper, spring-ai-ragas, rag-study-helper
+
+【区块3 面试题】
+- 动态上限: 10条T1 (Phase 1非冲刺期, 维持5-10)
+- 淘汰: 1条T1
+  * Spring AI vs LangChain4j选型 — snapshot中对应任务"Spring AI vs LangChain4j选型对比笔记与口述练习(Phase0验收项)"已完成, 判定已掌握移出第一梯队
+- 新增/升级:
+  * T1: +1题 "Agentic RAG vs 普通RAG本质区别" (淘天二面真题2026-07, 恰为Phase1 RAG深度分水岭; T2原"Agentic RAG主动检索范式"题点同步并入升级)
+  * T1升级4题(吸收2026最新面经深度): Function Calling全链路与训练原理(快手二面, +SFT/RLHF+五类SFT场景) / Agent Loop可靠性治理(阿里2026-08面经, 死循环防护三方法升级为步数+预算+超时+deadline+工具失败分类) / 混合检索+Rerank(+RRF公式与黄金组合) / RAG评测三层指标(+RAGAS三指标+golden test set) / MCP vs FC(+JSON-RPC 2.0与stdio/Streamable HTTP)
+  * T2: +3题点 Self-RAG/CRAG自省纠错检索(Agentic RAG反思层核心) / MCP协议工程细节(字节腾讯百度一面热点) / Agent分层架构系统设计(阿里Agent岗面经框架); 充实1题点"RAG与长上下文关系"(补共存分工); 移出1题点(Agentic RAG主动检索范式升级至T1)
+  * T3: 0条 (本轮无新概念, 不为凑数追加)
+- 当前总数: T1=10题 / T2=28题点 / T3=12题点
+
+【其他维护】
+- today-marker: 第17天 → 第22天 (Phase 1不变)
+- 页脚时效日期: 2026-08-09 → 2026-08-19
+
+【运行状态】
+- 搜索来源: WebSearch (Boss直聘/猎聘/前程无忧/GitHub/掘金/牛客/CSDN/小林coding/犬小哈教程)
+- 搜索方式: 3个Explore子代理并行检索(JD/项目/面试题各1个) + 主流程补充检索2轮JD
+- snapshot掌握度: 读取.trae/snapshot.json (snapshot_date=2026-08-14)
+  - 已完成任务16个(Spring AI集成/LangChain4j QuickStart/RAG核心概念/RAG demo/Python基础~模块/Spring AI vs LC4j选型对比/Tool Calling/Advisors等)
+  - 未完成任务9个(Rerank实战/混合检索实战/Embedding选型/智能切分/文档解析/Ollama部署/可观测性/JD收集表/决策日志#01)
+  - 面试题维度无掌握度数据 → 仅按时效性与任务完成映射淘汰
+- excluded.json: 空列表, 无排除项
+- 运行结果: 成功
