@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比 | Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+th { background: var(--bg2); font-weight: 600; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · RAG 刚需闭环 + 生产级项目 1 · 第 24/168 天</div>
+  <h1>智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比</h1>
+  <div class="meta">总预估时长：<strong>约 60 分钟</strong>（原理 10min / 三种策略实现 25min / 对比实验 15min / 面试串联 10min）· 主线 Java（LangChain4j + Spring AI 双路径），Python 仅辅助</div>
+</div>
+
+<h2>一、切分为什么决定 RAG 上限（10min）</h2>
+<p>检索的最小单元是 chunk 而不是文档：chunk 太大，向量语义被稀释、命中精度下降；chunk 太小，上下文碎片化、回答缺依据。经验区间是 <strong>256-512 token 为甜点区，overlap 取 chunk_size 的 10%-20%</strong>（LangChain4j 社区基准与多个 2026 年测评均指向该区间）。切分策略的演进逻辑只有一条主线：<strong>从"按长度切"到"按语义结构切"</strong>。</p>
+
+<h2>二、三种策略的 Java 实现（25min）</h2>
+
+<h3>策略一：TokenTextSplitter（Spring AI）</h3>
+<p>Spring AI 的 <code>TokenTextSplitter</code> 使用 CL100K_BASE 编码按 token 数切分，是 ETL 管道里的默认组件：</p>
+<pre><code>import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.document.Document;
+
+TokenTextSplitter splitter = TokenTextSplitter.builder()
+        .withDefaultChunkSize(400)       // 每个 chunk 的 token 上限
+        .withMinChunkSizeChars(120)      // 最小字符数，防碎块
+        .withMinChunkSizeToEmbed(30)
+        .withKeepSeparator(true)
+        .build();
+
+List&lt;Document&gt; chunks = splitter.apply(List.of(document));</code></pre>
+<p>它的问题：不懂结构，会把句子、列表、代码块从中间切断。俄罗斯 Raiffeisenbank 的 JVM RAG 实践就记录了这个坑——默认配置很快遇到"表格被腰斩"的质量问题，这正是要引入递归切分的原因。</p>
+
+<h3>策略二：递归字符切分（LangChain4j DocumentSplitters）</h3>
+<p>递归切分是 LangChain 系的默认策略，也是生产环境约 80% 场景的选择：按分隔符层级递归（段落 → 行 → 空格 → 字符），尽可能保住语义单元的完整性。LangChain4j 对应实现：</p>
+<pre><code>import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.model.embedding.Tokenizer;
+
+DocumentSplitter splitter = DocumentSplitters.recursive(
+        512,   // chunk_size：甜点区间上限
+        64,    // overlap：约 12%
+        tokenizer
+);
+
+List&lt;TextSegment&gt; segments = splitter.split(document);</code></pre>
+
+<h3>策略三：按标题多粒度切分（自实现）</h3>
+<p>对 Markdown 语料，标题层级是天然切分锚点：H2/H3 内聚成块、标题路径写入元数据，检索命中后可回溯上下文。Spring AI 没有现成的 <code>MarkdownHeaderTextSplitter</code>，自己实现核心逻辑只需 30 行：</p>
+<pre><code>public List&lt;Document&gt; splitByHeadings(String markdown, String source) {
+    List&lt;Document&gt; result = new ArrayList&lt;&gt;();
+    Deque&lt;String&gt; headingStack = new ArrayDeque&lt;&gt;();
+    StringBuilder current = new StringBuilder();
+
+    for (String line : markdown.split("\n", -1)) {
+        Matcher m = Pattern.compile("^(#{1,4})\\s+(.*)$").matcher(line);
+        if (m.matches()) {
+            if (current.length() &gt; 0) {
+                result.add(new Document(current.toString(),
+                        Map.of("source", source, "headings", String.join(" &gt; ", headingStack))));
+                current = new StringBuilder();
+            }
+            int level = m.group(1).length();
+            while (headingStack.size() &gt;= level) headingStack.pollLast();
+            headingStack.offerLast(m.group(2));
+        }
+        current.append(line).append("\n");
+    }
+    if (current.length() &gt; 0) {
+        result.add(new Document(current.toString(),
+                Map.of("source", source, "headings", String.join(" &gt; ", headingStack))));
+    }
+    return result;
+}</code></pre>
+<div class="tip">多粒度的真正含义：标题块太大时（&gt;512 token）在其内部再跑一次递归切分，并让父块元数据（标题路径）跟随子块——检索命中子块，展示带上下文，这是"小块检索、大块生成"（small-to-big）思想的雏形。路线图推荐项目 springai-knowledge-server 提供了分块策略在线热调整的生产级参照。</div>
+
+<h2>三、对比实验设计（15min）</h2>
+<p>三种策略必须用同一份语料 + 同一批问题跑对比，否则结论不可信。最小实验设计：</p>
+<table>
+<tr><th>策略</th><th>参数</th><th>观察指标</th><th>预期结果</th></tr>
+<tr><td>TokenTextSplitter</td><td>chunk=400</td><td>Recall@5 / 断句破坏率</td><td>基线，表格/列表易被切断</td></tr>
+<tr><td>递归字符切分</td><td>512/64</td><td>Recall@5 / 平均块完整度</td><td>基线 +5~10% 召回</td></tr>
+<tr><td>按标题多粒度</td><td>512 内 + 标题元数据</td><td>Recall@5 / 可溯源率</td><td>结构化文档提升最明显</td></tr>
+</table>
+<p>用昨天完成的文档解析任务产出的 3 份文档作为语料，各跑 5 个问题，把数字记入决策日志——这份数据将在「RAG 评测实战」任务里扩展成完整评测报告（路线图验收标准要求"改切分前后真实对比数字"）。</p>
+
+<h2>四、面试串联（10min）</h2>
+<p>第一梯队面试题「RAG 完整链路 + Chunking」的切分环节标准答法：</p>
+<ul>
+<li><strong>翻车点</strong>：固定长度切分把表格一行劈成两个 chunk，检索命中半行，回答必然残缺。</li>
+<li><strong>原理</strong>：递归切分按语义边界（段落→句子→词）层级回退；多粒度切分让结构与检索粒度解耦（small-to-big）。</li>
+<li><strong>数据</strong>：报出你自己实验的 Recall@5 变化，如"递归切分 + overlap 让 Recall@5 从 62% 提到 74%"——有数字的答案才能过第一梯队。</li>
+</ul>
+
+<h2 class="src-h">教程来源</h2>
+<ol class="src">
+<li><a href="https://docs.spring.io/spring-ai/reference/1.0/api/etl-pipeline.html">Spring AI 官方文档 - ETL Pipeline（TokenTextSplitter 与 CL100K_BASE）</a></li>
+<li><a href="https://www.smallyoung.cn/docs/027-RAG%E6%96%87%E6%A1%A3%E5%88%86%E5%9D%97%E7%AD%96%E7%95%A5%E5%AE%8C%E5%85%A8%E6%8C%87%E5%8D%97">SmallYoung - RAG 文档分块策略完全指南：从原理到 Java 实战</a></li>
+<li><a href="https://chunkforge.com/blog/rag-chunking-strategies">ChunkForge - Top 8 RAG Chunking Strategies for Peak Retrieval Performance</a></li>
+<li><a href="https://github.com/BigKunLun/Agent-Interview-100/blob/main/02-rag/013-chunking-strategies.md">Agent-Interview-100 - 文档分块（Chunking）策略有哪些？各有什么优缺点？</a></li>
+<li><a href="https://github.com/harmonyzhang/LangChain4j-for-Beginners/blob/main/translations/tl/03-rag/README.md">LangChain4j for Beginners - Module 03: RAG（DocumentSplitters.recursive 示例）</a></li>
+<li><a href="https://habr.com/ru/companies/raiffeisenbank/articles/1012666/">Habr（Raiffeisenbank）- JVM 栈 RAG 实践：TokenTextSplitter 的坑</a></li>
+<li><a href="https://blog.csdn.net/qq_63159036/article/details/163416616">CSDN - RAG 文档切分(Chunking)策略与实现细节：全网技术汇总</a></li>
+<li><a href="https://github.com/tucanoo/springboot-ai-rag-tutorial">springboot-ai-rag-tutorial（路线图推荐项目：Spring Boot + Spring AI + PGVector RAG 应用）</a></li>
+</ol>
+
+<footer>Phase 1 · 智能切分实战 · 生成于 2026-08-21 每日维护 · 总预估时长约 60 分钟</footer>
+</div>
+</body>
+</html>
