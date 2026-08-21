@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus | Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+th { background: var(--bg2); font-weight: 600; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · RAG 刚需闭环 + 生产级项目 1 · 第 24/168 天</div>
+  <h1>技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus</h1>
+  <div class="meta">总预估时长：<strong>约 45 分钟</strong>（选型框架 10min / 三者数据对比 15min / 决策日志模板与撰写 10min / 面试话术 10min）· 主线 Java（Spring AI + LangChain4j 视角），Python 仅辅助</div>
+</div>
+
+<h2>一、先立选型框架，再看数据（10min）</h2>
+<p>向量库选型最常见的翻车方式是"看 benchmark 焦虑"——论文里 QPS 最高的那个未必适合你。Java 背景转 AI Agent 的工程师选型，先固定五个维度再谈优劣：</p>
+<ul>
+<li><strong>规模</strong>：企业知识库多为 10 万~500 万向量级，不是亿级互联网场景。</li>
+<li><strong>运维成本</strong>：多引入一个独立组件 = 多一个故障域 + 备份恢复 + 监控告警。</li>
+<li><strong>混合检索</strong>：RAG 刚需闭环要求向量 + 关键词（BM25/tsvector）融合，谁能一条 SQL/一次 API 搞定。</li>
+<li><strong>事务一致性</strong>：元数据与向量同库才能同事务写入，异库必有最终一致窗口。</li>
+<li><strong>团队栈</strong>：会 PostgreSQL 的团队用 pgvector 的边际学习成本接近零。</li>
+</ul>
+
+<h2>二、三者关键数据对比（15min）</h2>
+<table>
+<tr><th>维度</th><th>pgvector (PG17)</th><th>Qdrant</th><th>Milvus</th></tr>
+<tr><td>延迟（实测）</td><td>50-200ms（混合检索 15-30ms 有索引时）</td><td>CPU 场景最低，p99 约 4.5-15ms</td><td>HNSW P99 约 8ms，+GPU 可到 3ms</td></tr>
+<tr><td>召回/质量</td><td>HNSW recall &gt; 98%（调参后）</td><td>开箱召回 &gt; 99%（评测居前）</td><td>HNSW Recall@10 约 96.5%</td></tr>
+<tr><td>吞吐</td><td>单进程约 536 QPS</td><td>455 QPS（多进程扩展比 4.1x）</td><td>930 QPS（多进程 5.4x）</td></tr>
+<tr><td>混合检索</td><td>原生：pgvector + tsvector 同库同 SQL</td><td>需 payload 过滤拼装</td><td>需外接 BM25 或 2.x sparse 能力</td></tr>
+<tr><td>运维形态</td><td>复用现有 PG，无新组件</td><td>独立 Rust 服务（Docker 单容器轻）</td><td>分布式集群，组件最多最重</td></tr>
+<tr><td>已知陷阱</td><td>向量+元数据过滤时查询计划器在特定 LIMIT 阈值下误判走顺序扫描</td><td>大规模下 Java 客户端生态相对年轻</td><td>学习/运维成本高，小规模杀鸡用牛刀</td></tr>
+</table>
+<p>数据要点解读：2026 年 arXiv 的系统性实证评测显示，Qdrant 在完整数据库中延迟最优（中位 4.55ms）、Weaviate 开箱召回最高；51CTO 的中文实测里 Milvus+GPU 极致性能但 pgvector 在中小规模完全够用；dev.to 的 2026 对比则点破关键——<strong>pgvector 在百万向量以下没问题，超过百万且无专用 ANN 索引时差距才明显拉开</strong>。而企业知识库 RAG 的典型规模恰好在安全区内。</p>
+<div class="tip">pgvector 的 HNSW 参数直接决定质量：<code>m=16, ef_construction=64</code> 起步，查询时 <code>SET hnsw.ef_search = 40</code>（默认）向上调可换召回。混合检索实践中，两侧各取 20 候选再融合（RRF）是经过验证的起点。路线图推荐项目 rag-knowledge-system 用 PostgreSQL 17 + pgvector(HNSW) + pg_trgm 做双通道混合检索；spring-al-alibaba-customer 用 pgvector + tsvector 落地企业级客服——两个"在学"项目都选了 pgvector，这不是巧合。</div>
+
+<h2>三、决策日志模板与本次决策（10min）</h2>
+<p>技术决策日志的固定三问（路线图贯穿线要求）：<strong>为什么选它 / 放弃了什么 / 代价是什么</strong>。本任务的产出就是按此模板写下 #01 篇：</p>
+<pre><code># 技术决策日志 #01：RAG 项目向量库选型
+
+## 决策：pgvector（PostgreSQL 17）
+
+## 为什么选它
+1. 知识库规模预估 &lt; 500 万向量，pgvector HNSW recall&gt;98%、
+   混合检索延迟 15-30ms，满足 SLA 且无余量焦虑；
+2. 元数据与向量同库同事务，文档入库无最终一致窗口；
+3. 混合检索一条 SQL 完成（pgvector + tsvector + RRF），
+   是 Phase1「混合检索+Rerank」任务的基础设施前提；
+4. 复用团队 PostgreSQL 运维体系（备份/监控/主从），
+   边际学习成本最低，符合在职转型的时间预算。
+
+## 放弃了什么
+- Qdrant：延迟最优，但引入独立组件 + 新故障域，
+  收益（p99 从 ~10ms 到 ~5ms）对本场景无感；
+- Milvus：吞吐/扩展天花板最高，但分布式运维成本
+  与 300 万以下向量规模完全不匹配。
+
+## 代价是什么
+- 百万向量以上规模需重新评估（预埋迁移方案：
+  Spring AI VectorStore 抽象层换实现类）；
+- 向量+强元数据过滤存在查询计划器陷阱，
+  需要 iterative_scan 与预热查询规避；
+- 极致性能场景（&lt;5ms p99）让位于运维简单性。
+
+## 复核触发条件
+向量数 &gt; 3百万 或 p99 &gt; 200ms 持续一周，重开选型。
+</code></pre>
+<div class="tip">迁移预案的技术依托：Spring AI 的 <code>VectorStore</code> 接口与 LangChain4j 的 <code>EmbeddingStore</code> 抽象让"换库"收敛为换一个 starter 依赖 + 建表脚本，这是框架层的解耦红利，也是决策"可逆性"的来源——可逆的决策才敢快做。</div>
+
+<h2>四、面试话术（10min）</h2>
+<p>对应第一梯队「RAG 评测三层指标」与「混合检索 + Rerank」的选型追问，30 秒版本：</p>
+<ul>
+<li><strong>被问"为什么不用专门的向量数据库"</strong>：先报规模与 SLA（&lt;500 万向量 / p99 &lt;200ms），再讲事务一致性与运维复用，最后给迁移预案——体现的是工程权衡而非技术跟风。</li>
+<li><strong>被追问"pgvector 的坑"</strong>：向量+元数据过滤的计划器陷阱、HNSW 内存开销、百万级以上 ANN 索引差距——能讲坑才证明真用过。</li>
+<li><strong>被追问"什么时候换"</strong>：报出决策日志里的复核触发条件（3 百万向量 / p99 超标），决策有边界才可信。</li>
+</ul>
+
+<h2 class="src-h">教程来源</h2>
+<ol class="src">
+<li><a href="https://arxiv.org/pdf/2608.12812">arXiv 2026 - A Comprehensive Empirical Evaluation of Vector Database Systems（Qdrant 延迟 4.55ms 中位等数据）</a></li>
+<li><a href="https://blog.51cto.com/u_16213571/14651045">51CTO - 深入比较四种向量数据库：性能秘密（Milvus/Qdrant/pgvector 延迟与 Recall 实测表）</a></li>
+<li><a href="https://dev.to/darshit_01/the-best-vector-database-in-2026-qdrant-vs-pinecone-vs-weaviate-vs-milvus-vs-pgvector-3147">dev.to - The Best Vector Database in 2026: Qdrant vs Pinecone vs Weaviate vs Milvus vs pgvector</a></li>
+<li><a href="https://aimultiple.com/open-source-vector-databases">AIMultiple - Vector Database Benchmark: 7 Open-Source Engines for RAG（QPS/p99 对比表）</a></li>
+<li><a href="https://github.com/pgvector/pgvector">pgvector 官方仓库（HNSW 建索引参数 m/ef_construction/ef_search）</a></li>
+<li><a href="https://rivestack.io/blog/hybrid-search-pgvector-postgres">Rivestack - Hybrid Search with pgvector and PostgreSQL Full-Text Search（两侧 20 候选与 15-30ms 延迟）</a></li>
+<li><a href="https://github.com/tharindu-sankalpa/pgvector-filtering-investigation">pgvector-filtering-investigation - 向量+元数据过滤的查询计划器陷阱</a></li>
+<li><a href="https://github.com/tucanoo/springboot-ai-rag-tutorial">springboot-ai-rag-tutorial（路线图推荐项目：Spring AI + PGVector RAG 应用）</a></li>
+<li><a href="https://github.com/yuquanquan/spring-al-alibaba-customer">spring-al-alibaba-customer（路线图推荐项目：pgvector + tsvector 企业级智能客服）</a></li>
+</ol>
+
+<footer>Phase 1 · 技术决策日志 #01 · 生成于 2026-08-21 每日维护 · 总预估时长约 45 分钟</footer>
+</div>
+</body>
+</html>

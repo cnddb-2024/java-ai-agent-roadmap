@@ -48,20 +48,9 @@
 
 
 	<dependencies>
-		<!-- Spring AI - OpenAI starter（保留以便切换云端 API） -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai</artifactId>
-		</dependency>
-		<!-- Spring AI - Ollama starter（本作业接入本地推理） -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-ollama</artifactId>
-		</dependency>
-		<!-- Webflux 用于 SSE 流式响应（/api/chat/stream） -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
