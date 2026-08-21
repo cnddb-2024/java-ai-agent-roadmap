@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>混合检索实战：向量检索 + BM25 关键词检索融合（Spring AI + Elasticsearch/PGVector） | Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+  display: block;
+}
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+th { background: var(--bg2); font-weight: 600; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · RAG 刚需闭环 + 生产级项目 1 · 第 25/168 天</div>
+  <h1>混合检索实战：向量检索 + BM25 关键词检索融合（Spring AI + Elasticsearch/PGVector）</h1>
+  <div class="meta">总预估时长：<strong>约 60 分钟</strong>（互补原理 10min / BM25 与 RRF 公式 12min / PGVector 双通道实现 20min / Spring AI 与 LangChain4j 路径 10min / 面试串联 8min）· 主线 Java（Spring AI + LangChain4j 双路径），Python 仅辅助</div>
+</div>
+
+<h2>一、为什么纯向量检索不够（10min）</h2>
+<p>稠密向量检索擅长"语义匹配"——"怎么省钱"能召回"成本优化方案"。但它有三种典型翻车场景：</p>
+<ul>
+  <li><strong>精确实体</strong>：查"K8s 节点 node-abc-123 的告警"，向量把注意力分散到语义，型号/主机名这类精确 token 反而排不上来。</li>
+  <li><strong>版本号与代码标识符</strong>：查"Spring Boot 3.4 的 bug CVE-2025-22233"，向量检索对数字串几乎无感，BM25 一发命中。</li>
+  <li><strong>低频专有名词</strong>：企业内部黑话、产品代号在训练语料里没出现过，向量空间里没有良好表征。</li>
+</ul>
+<p>BM25 这类稀疏关键词检索恰好互补：它是精确词项匹配（TF-IDF 家族），对实体、版本号、代号零失误，但对同义改写无能为力。两者融合 = <strong>语义泛化能力 + 精确匹配能力</strong>，这就是混合检索被称为 RAG 检索优化"黄金组合前半段"的原因（后半段是 Rerank，见后续任务）。</p>
+<div class="tip">面试一句话版本：稠密检索解决"意思相近"，稀疏检索解决"字面一致"，RRF 把两路排名融合成一个统一排序，互为兜底。</div>
+
+<h2>二、BM25 与 RRF 融合公式（12min）</h2>
+<h3>2.1 BM25 三要素</h3>
+<p>BM25 打分由三部分构成：<strong>词频饱和</strong>（TF 越高得分越高但增量递减，避免一个词重复刷分）、<strong>逆文档频率 IDF</strong>（越稀有的词越重要）、<strong>文档长度归一化</strong>（长文档不因词多而占便宜）。相比原始 TF-IDF，它对"长文档偏置"和"高频词刷分"做了修正，是 30 年来最难被替代的经典算法。</p>
+<h3>2.2 RRF（Reciprocal Rank Fusion）</h3>
+<p>两路检索的分数量纲完全不同（余弦相似度 0~1，BM25 可以到几十），直接加权需要先归一化，容易踩坑。RRF 的思路是<strong>只看排名不看分数</strong>：</p>
+<pre><code>score(d) = SUM over r in R of 1 / (k + rank_r(d))     // k 默认 60</code></pre>
+<p>某文档在向量检索排第 1（贡献 1/61）、在 BM25 排第 3（贡献 1/63），总分约 0.0323；一个只在单路排第 1 的文档只有 0.0164。两路都靠前的文档天然胜出，且对异常分数完全免疫。k=60 是 Elastic、Azure AI Search 等各家实践沉淀的默认值——它让第 1 名和第 60 名贡献差距约 61 倍，头部权重高但中段不至于清零。</p>
+<div class="tip">RRF 优点：免归一化、免调权、对分数分布鲁棒。缺点：丢弃了分数信息，两路置信度差异无法表达——如果需要精细加权，用加权归一化（Linear fusion），生产首选仍是 RRF 起步。</div>
+
+<h2>三、PGVector + tsvector 单库双通道实现（20min）</h2>
+<p>PostgreSQL 一个库就能做混合检索：pgvector 负责 HNSW 向量近邻，tsvector + GIN 索引负责全文检索。建表：</p>
+<pre><code>CREATE TABLE docs (
+    id BIGSERIAL PRIMARY KEY,
+    content TEXT,
+    content_tsv TSVECTOR,          -- 全文检索列
+    embedding VECTOR(1024)         -- bge-large-zh 维度
+);
+CREATE INDEX idx_docs_tsv ON docs USING GIN (content_tsv);
+CREATE INDEX idx_docs_vec ON docs USING hnsw (embedding VECTOR_COSINE_OPERATORS);</code></pre>
+<p>入库时同步写入两列（Java 侧用 Spring JDBC / MyBatis 均可）：</p>
+<pre><code>-- to_tsvector 需选对中文分词配置：simple 或 zhparser/jieba 扩展
+INSERT INTO docs (content, content_tsv, embedding)
+VALUES (
+    'Spring Boot 3.4 升级注意事项',
+    to_tsvector('simple', 'Spring Boot 3.4 升级注意事项'),
+    '[0.12, -0.35, ...]'::vector
+);</code></pre>
+<p>检索时一条 SQL 完成"双路召回 + RRF 融合"，这是混合检索最优雅的单库实现：</p>
+<pre><code>WITH vec AS (                       -- 向量通道：取 Top 20
+    SELECT id, ROW_NUMBER() OVER (ORDER BY embedding &lt;=&gt; :query_vec) AS rank
+    FROM docs
+    ORDER BY embedding &lt;=&gt; :query_vec
+    LIMIT 20
+),
+bm25 AS (                           -- 关键词通道：取 Top 20
+    SELECT id, ROW_NUMBER() OVER (ORDER BY ts_rank_cd(content_tsv, query) DESC) AS rank
+    FROM docs, plainto_tsquery('simple', :query_text) AS query
+    WHERE content_tsv @@ query
+    ORDER BY rank
+    LIMIT 20
+)
+SELECT d.id, d.content,
+       COALESCE(1.0 / (60 + vec.rank), 0) +
+       COALESCE(1.0 / (60 + bm25.rank), 0) AS rrf_score
+FROM vec
+FULL OUTER JOIN bm25 ON vec.id = bm25.id
+JOIN docs d ON d.id = COALESCE(vec.id, bm25.id)
+ORDER BY rrf_score DESC
+LIMIT 10;</code></pre>
+<div class="tip">中文分词坑：PG 原生 tsvector 对中文按字切分效果差，生产要么装 zhparser/jieba 扩展，要么在 Java 侧分好词再拼 tsquery。这是"PG 单库方案"最大的工程代价，也是很多人转向 Elasticsearch 的原因。</div>
+
+<h2>四、Spring AI 与 LangChain4j 融合路径（10min）</h2>
+<h3>4.1 Spring AI：RetrievalAugmentationAdvisor</h3>
+<p>Spring AI 1.x 的 RAG 模块把检索抽象为 Retriever + PostProcessor 管道，多路检索结果可以自定义融合：</p>
+<pre><code>// 向量通道
+DocumentRetriever vectorRetriever = VectorStoreDocumentRetriever.builder()
+        .vectorStore(vectorStore)
+        .similarityThreshold(0.6)
+        .topK(20)
+        .build();
+
+// 混合检索 Advisor：检索后接自定义 RRF 后处理器
+RetrievalAugmentationAdvisor advisor = RetrievalAugmentationAdvisor.builder()
+        .documentRetriever(vectorRetriever)
+        .documentPostProcessor(documents -&gt; rrfMerge(documents, bm25Top20(query)))
+        .build();
+
+String answer = chatClient.prompt()
+        .advisors(advisor)
+        .user(query)
+        .call()
+        .content();</code></pre>
+<h3>4.2 LangChain4j：ContentRetriever + ContentAggregator</h3>
+<p>LangChain4j 原生为多路检索设计了 <code>ContentAggregator</code>（聚合多路内容并统一重排），官方还提供 <code>RelevanceScoreAggregator</code>，与 RRF 思路同构：</p>
+<pre><code>ContentRetriever vectorRetriever = EmbeddingStoreContentRetriever.builder()
+        .embeddingStore(embeddingStore)
+        .embeddingModel(embeddingModel)
+        .maxResults(20)
+        .build();
+
+RetrievalAugmentor augmentor = DefaultRetrievalAugmentor.builder()
+        .queryRouter(new DefaultQueryRouter(vectorRetriever, bm25Retriever))
+        .contentAggregator(new RelevanceScoreAggregator())  // 多路融合
+        .contentInjector(new DefaultContentInjector())
+        .build();</code></pre>
+<h3>4.3 Elasticsearch 声明式 RRF</h3>
+<p>如果向量库选 ES，RRF 直接内置为 retriever，无需手写融合逻辑：</p>
+<pre><code>GET /docs/_search
+{
+  "retriever": {
+    "rrf": {
+      "retrievers": [
+        { "standard": { "query": { "match": { "content": "混合检索" } } } },
+        { "knn": { "field": "embedding", "query_vector": [0.12, ...], "k": 20, "num_candidates": 100 } }
+      ],
+      "rank_constant": 60,
+      "rank_window_size": 20
+    }
+  }
+}</code></pre>
+
+<h2>五、面试串联与验收（8min）</h2>
+<h3>5.1 第一梯队考点：「混合检索 + Rerank 原理」</h3>
+<ul>
+  <li><strong>为什么互补</strong>：稠密向量覆盖语义泛化，BM25 覆盖字面精确匹配；单路召回率天花板明显，融合后 Recall@5 普遍能提升 20 个百分点以上（你的评测任务要用真实数字验证这句话）。</li>
+  <li><strong>RRF 公式手写</strong>：score(d) = Σ 1/(k + rank_r(d))，强调"只看排名不看分"，规避两路分数归一化难题。</li>
+  <li><strong>与 Rerank 的分工</strong>：混合检索负责"召回全"（多路粗排，Top 20-50），Rerank（Cross-Encoder 精排）负责"排得准"（Top 5-10 进上下文）——这是黄金组合的完整逻辑链。</li>
+  <li><strong>量化话术</strong>（路线图验收标准原话）："混合检索（向量+BM25）使 Recall@5 从 62% 提升至 89%"——今天写的 SQL 就是你评测报告的实验基座。</li>
+</ul>
+<h3>5.2 动手验收清单</h3>
+<ol>
+  <li>建好 docs 双列表 + 双索引，灌入 20 条以上中文文档。</li>
+  <li>跑通 RRF 融合 SQL，用一个含精确标识符的查询（如版本号/代号）对比纯向量结果与混合结果差异。</li>
+  <li>把 k 从 60 改成 10/200 各跑一遍，观察头部排名稳定性，记录进技术决策日志。</li>
+  <li>（进阶）用 LangChain4j ContentAggregator 复刻同一实验，与 SQL 版对比结果一致性。</li>
+</ol>
+
+<h2 class="src-title">教程来源</h2>
+<ol class="src">
+  <li>Elastic 官方文档 — Reciprocal Rank Fusion (RRF) API：<a href="https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion">https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion</a></li>
+  <li>Elastic Search Labs 官方教程 — Hybrid Search（全文 + 语义检索 + RRF）：<a href="https://www.elastic.co/search-labs/tutorials/search-tutorial/semantic-search/hybrid-search">https://www.elastic.co/search-labs/tutorials/search-tutorial/semantic-search/hybrid-search</a></li>
+  <li>Elastic 官方文档 — Retrievers Overview（RRF/Linear retriever 体系）：<a href="https://www.elastic.co/docs/solutions/search/retrievers-overview">https://www.elastic.co/docs/solutions/search/retrievers-overview</a></li>
+  <li>Spring AI 官方文档 — Retrieval Augmented Generation：<a href="https://docs.spring.io/spring-ai/reference/1.1/api/retrieval-augmented-generation.html">https://docs.spring.io/spring-ai/reference/1.1/api/retrieval-augmented-generation.html</a></li>
+  <li>LangChain4j 官方教程 — RAG（ContentAggregator 多路聚合）：<a href="https://github.com/langchain4j/langchain4j/blob/main/docs/docs/tutorials/rag.md">https://github.com/langchain4j/langchain4j/blob/main/docs/docs/tutorials/rag.md</a></li>
+  <li>ParadeDB — Hybrid Search in PostgreSQL: The Missing Manual：<a href="https://www.paradedb.com/blog/hybrid-search-in-postgresql-the-missing-manual">https://www.paradedb.com/blog/hybrid-search-in-postgresql-the-missing-manual</a></li>
+  <li>Rivestack — Hybrid Search with pgvector and PostgreSQL Full-Text Search（tsvector+HNSW 双索引与 RRF SQL）：<a href="https://rivestack.io/blog/hybrid-search-pgvector-postgres">https://rivestack.io/blog/hybrid-search-pgvector-postgres</a></li>
+  <li>Microsoft Learn — 混合搜索中使用 RRF 的相关性评分（RRF 公式与 k=60 说明）：<a href="https://learn.microsoft.com/zh-cn/azure/search/hybrid-search-ranking">https://learn.microsoft.com/zh-cn/azure/search/hybrid-search-ranking</a></li>
+  <li>掘金 — Spring Boot + LangChain4j 实战：BM25 混合检索 + RRF 算法：<a href="https://juejin.cn/post/7632264201231368226">https://juejin.cn/post/7632264201231368226</a></li>
+  <li>InfoQ — Why Vector Search Alone Isn't Enough: Hybrid Retrieval for RAG：<a href="https://www.infoq.com/articles/vector-search-hybrid-retrieval-rag/">https://www.infoq.com/articles/vector-search-hybrid-retrieval-rag/</a></li>
+  <li>路线图推荐项目 — spring-al-alibaba-customer（Spring AI Alibaba + pgvector + tsvector 企业级混合检索）：<a href="https://github.com/yuquanquan/spring-al-alibaba-customer">https://github.com/yuquanquan/spring-al-alibaba-customer</a></li>
+  <li>路线图推荐项目 — springboot-ai-rag-tutorial（Spring Boot + Spring AI + PGVector 完整可运行 RAG 应用）：<a href="https://github.com/tucanoo/springboot-ai-rag-tutorial">https://github.com/tucanoo/springboot-ai-rag-tutorial</a></li>
+</ol>
+
+<footer>Java AI Agent 转型学习计划 · Phase 1 · 每日维护自动生成 · 2026-08-22</footer>
+</div>
+</body>
+</html>
