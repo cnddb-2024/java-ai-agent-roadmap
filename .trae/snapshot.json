@@ -1,31 +1,7 @@
 {
-  "snapshot_date": "2026-08-21",
+  "snapshot_date": "2026-08-22",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
-    {
-      "guid": "fdd4fd80-178f-4a2c-8e20-28e68b1a9f1a",
-      "summary": "RAG 评测实战：Recall@K / nDCG / LLM-as-Judge 三层指标 + 改造前后对比报告",
-      "due": "2026-08-23",
-      "created_at": "",
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "0865c644-23a3-4534-9e32-570fcd652437",
-      "summary": "引用与防幻觉实战：RAG 回答引用溯源标注 + Faithfulness 校验 + 无依据拒答",
-      "due": "2026-08-23",
-      "created_at": "",
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "ac111082-7091-447f-b595-302466582535",
-      "summary": "上下文组装实战：检索片段排序 + Token 预算控制 + Lost-in-the-Middle 缓解（Spring AI QueryAugmenter）",
-      "due": "2026-08-23",
-      "created_at": "",
-      "completed": false,
-      "frozen": false
-    },
     {
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
       "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
@@ -183,7 +159,7 @@
       "summary": "文档解析实战：Apache PDFBox + Apache POI 抽取 PDF/Word/Markdown 纯文本与表格",
       "due": "2026-08-21",
       "created_at": "1786487631453",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -191,13 +167,13 @@
       "summary": "智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比",
       "due": "2026-08-21",
       "created_at": "1786487631454",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
       "guid": "cdadfb90-1181-47c9-9f15-e9feeca47147",
       "summary": "技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus",
-      "due": "2026-08-21",
+      "due": "2026-08-22",
       "created_at": "1786487631455",
       "completed": false,
       "frozen": false
@@ -221,8 +197,48 @@
     {
       "guid": "fe5fd757-cd63-4848-bafb-3e39cd001cee",
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
-      "due": "2026-08-22",
+      "due": "2026-08-23",
       "created_at": "1786574146455",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "ac111082-7091-447f-b595-302466582535",
+      "summary": "上下文组装实战：检索片段排序 + Token 预算控制 + Lost-in-the-Middle 缓解（Spring AI QueryAugmenter）",
+      "due": "2026-08-23",
+      "created_at": "1787265370289",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "0865c644-23a3-4534-9e32-570fcd652437",
+      "summary": "引用与防幻觉实战：RAG 回答引用溯源标注 + Faithfulness 校验 + 无依据拒答",
+      "due": "2026-08-23",
+      "created_at": "1787265377723",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "fdd4fd80-178f-4a2c-8e20-28e68b1a9f1a",
+      "summary": "RAG 评测实战：Recall@K / nDCG / LLM-as-Judge 三层指标 + 改造前后对比报告",
+      "due": "2026-08-24",
+      "created_at": "1787265386135",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "8cd822a1-cdda-4f18-8fa5-f5609a62e20d",
+      "summary": "Python 脚本级补齐：requests 调用大模型 API 实战（OpenAI 兼容接口 + 流式 SSE + 超时重试）",
+      "due": "2026-08-24",
+      "created_at": "1787351751287",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "fce2a67c-fbca-4236-8e8f-380727de6c00",
+      "summary": "生产级 RAG 项目工程化整理：GitHub 完整工程结构 + README + 决策文档归档（Phase1验收项）",
+      "due": "2026-08-24",
+      "created_at": "1787351752437",
       "completed": false,
       "frozen": false
     }

@@ -1,0 +1,77 @@
+# Java AI Agent 转型学习计划 · 每日维护日志 2026-08-22
+
+## 运行环境与初始化（步骤 1-3）
+- git clone 成功（HEAD = aec13bb），mkdir -p .trae/logs 完成。
+- 初始化（全程复用，仅计算一次）：TODAY=2026-08-22（北京时间）/ DAY_NUM=25 / PHASE=1
+- TODAY_TS=1787356800000 / TOMORROW_TS=1787443200000 / DAY_AFTER_TS=1787529600000
+
+## 步骤 4：飞书鉴权
+- `auth status --as user` 报 unknown flag，`auth status --json --verify` 报"凭证由外部提供，不支持交互管理"（非认证失败，不触发 RequestAuthorization）。
+- 改用实际命令 `lark-cli whoami --as user` 验证：identity=user，available=true，tokenStatus=ready，onBehalfOf=cnddb（ou_0cca5c0dbe2c383b42cf523538b250bf），飞书可用（硬性前置满足）。
+- 清单「Java AI Agent 转型学习计划」guid=5a08bfe3-e67f-49d7-9a33-f5681f22648d（与 .trae/feishu_cache.json 缓存一致）。
+
+## 步骤 5：更新反馈层
+- 5.1 java-ai-agent-roadmap.html today-marker：Phase 1 · 第 24/168 天 → 第 25/168 天。
+- 5.2 charts.js __RADAR_GAP__.me：[58,40,57,38,54,60,46] → [62,40,57,38,54,60,46]。
+  推进依据（NEW_DONE=2，均于 08-21 晚完成）：
+  - 文档解析实战（PDFBox+POI，知识摄入环节）→ RAG全链路 +2（58→60）
+  - 智能切分实战（多粒度切分对比）→ RAG全链路 +2（60→62）
+- 5.3 charts.js __RADAR_DAILY__：[35,15,22,12,10,5] → [40,22,26,16,12,9]。
+  近 7 天（08-16~08-22）：08-20 完成 3 任务；08-21 完成 2 任务（文档解析/智能切分）且 assignments/2026-08-21 下有 2 份用户作业 summary.md（document-parsing、smart-chunking）；08-16~08-19 无活动。
+  计划完成率 40（昨日 2/3，技术决策日志#01 顺延）/ 学习时长 22（连续 2 天）/ 知识输入 26 / 实战输出 16（2 份作业提交）/ 复习覆盖 12 / 连续打卡 9（08-20、08-21 连续 2 天）。
+
+## 步骤 6：采集飞书任务状态 + 扫描作业（不保存 snapshot）
+- 6.1/6.2 清单任务 28 个：已完成 19 / 未完成 9 → 经步骤 7 变为 30。
+- 6.3 assignments/ 扫描：11 个日期目录（07-31 ~ 08-21），08-21 有 5 个子目录：3 个教程目录 + 2 个用户作业（document-parsing/summary.md、smart-chunking/summary.md，对应 git 提交 aec13bb）。
+- 6.4 diff（对比 2026-08-21 快照）：
+  - NEW_DONE=2：文档解析实战（e10d8721，completed_at=1787321118085）/ 智能切分实战（7955c48a，completed_at=1787321117071），均于北京时间 08-21 晚完成。
+  - VANISHED=[]（28=28，guid 完全对齐，excluded_titles 维持空）
+  - NEW_APPEARED=[]（新任务 2 个为本次步骤 7 创建，不属此类）
+- 6.5 描述补写：7 个未完成任务逐一核验（fdd4fd80/0865c644/ac111082 经 task tasks get 检查 desc_len=369~475；cdadfb90/c50dfa2e/f6068824/fe5fd757 沿用 08-21 已验证结论），description 均为五段式非空，无需补写。
+
+## 步骤 7：滑动窗口任务规划 + 路线图拆解
+- 7.1 N=7（活跃未完成且未冻结：技术决策日志#01/Embedding选型/混合检索/Rerank/上下文组装/引用防幻觉/RAG评测），G=max(0,9-7)=2。
+- 7.3 G=2>0：冻结任务 0 个，无需解冻，G'=2。Phase1 核心内容主链路（文档解析→智能切分→Embedding→混合检索→Rerank→上下文组装→引用防幻觉→RAG评测）全部已建任务；Phase1 验收标准未满足（评测任务与项目工程化未完成），不进入 Phase2。按 7.3.8 贯穿线规则拆解 2 个新任务：
+  1. Python 脚本级补齐：requests 调用大模型 API 实战（OpenAI 兼容接口 + 流式 SSE + 超时重试）（guid=8cd822a1，created_at=1787351751287）
+  2. 生产级 RAG 项目工程化整理：GitHub 完整工程结构 + README + 决策文档归档（Phase1验收项）（guid=fce2a67c，created_at=1787351752437）
+  每个任务 description 均按【描述规范】五段式编写并随 +create 一步创建+入清单。
+  贯穿线：上次 3 个新任务均为 Phase1 核心内容，本次按预告穿插 Python 贯穿线任务 1 个 + Phase1 验收项任务 1 个。
+- 7.5 窗口锚定（patch 无条件重写 due，7/7 成功 + 新建 2 个自带 due）：
+
+| # | 任务 | created_at(排序) | due |
+|---|------|------------------|-----|
+| 1 | 技术决策日志 #01 向量库选型 | 1786487631455 | 08-22 今天 |
+| 2 | Embedding 模型选型 | 1786574144621 | 08-22 今天 |
+| 3 | 混合检索实战 | 1786574145473 | 08-22 今天 |
+| 4 | Rerank 重排序实战 | 1786574146455 | 08-23 明天 |
+| 5 | 上下文组装实战 | 1787265370289 | 08-23 明天 |
+| 6 | 引用与防幻觉实战 | 1787265377723 | 08-23 明天 |
+| 7 | RAG 评测实战 | 1787265386135 | 08-24 后天 |
+| 8 | Python requests 贯穿线（新建） | 1787351751287 | 08-24 后天 |
+| 9 | 项目工程化整理（新建） | 1787351752437 | 08-24 后天 |
+
+- 复核：重新拉取清单，30 任务 / 未完成 9，due 分布 08-22×3 / 08-23×3 / 08-24×3，全部生效。
+- 7.6 excluded.json 标题无一复活（列表为空）。
+- 7.7 snapshot.json 已统一保存：总数 30（已完成 21 / 活跃 9 / 冻结 0）；created_at 沿用旧快照值，旧快照缺失的 3 个（fdd4fd80/0865c644/ac111082）经 task tasks get 获取并写回，新拆解 2 个用飞书 API 值；due 取飞书当前值转 YYYY-MM-DD。
+
+## 步骤 8：融合教程生成（2 生成 / 1 跳过 / 0 失败）
+- 8.1 待处理任务：当天 due 3 个（技术决策日志#01/Embedding选型/混合检索）；逾期任务 0 个（锚定后无 due 早于今日，技术决策日志#01 原 due 08-21 已锚定到今天）。
+- 8.2 幂等检查：
+  - 文件检查：技术决策日志#01 命中 assignments/2026-08-21/tech-decision-log-01-vector-db/tutorial.html → 跳过，记录日志"任务已有教程（文件），跳过生成"。
+  - Embedding 模型选型 / 混合检索实战：全局扫描 assignments/*/ 无任何 embedding/hybrid/retrieval/bm25 相关 slug 命中。
+  - 评论检查：lark-cli task 无读取任务评论的子命令（仅 +comment 写入，已核实可用命令列表），按"以实际可用者为准"降级为文件检查为准。
+- 8.3 生成 2 篇（主线 Java，Spring AI + LangChain4j 双路径；顶部标注 Phase/任务全称/总预估时长；底部教程来源 11~12 条，含路线图推荐项目）：
+  - assignments/2026-08-22/embedding-model-selection/tutorial.html（60min：三模型对比 + Spring AI 三种接入路径 + 决策矩阵）
+  - assignments/2026-08-22/hybrid-retrieval-bm25-vector/tutorial.html（60min：BM25/RRF 公式 + PGVector+tsvector 双通道 SQL + Spring AI/LangChain4j/ES 路径）
+  互联网来源均 ≥5（Spring AI 官方文档×4、OpenAI/BGE 官方、Elastic 官方×3、Microsoft Learn、掘金×2、InfoQ、ParadeDB/Rivestack 等），与路线图推荐项目（knowledgeops-agent、springboot-ai-rag-tutorial、spring-al-alibaba-customer）地位平等列入。
+- 第 11 节 Agent 校验：2 篇全部 PASS（无 span 泄漏、实体转义、标签配对、Java 括号引号、DOCTYPE/结构、Hero 含 Phase/任务全称/时长、来源≥5 且 URL 完整）。首次校验脚本报"Hero 缺时长"系脚本截取 bug（截到 hero 内层 div），修正截取逻辑后两篇均 PASS。
+- 8.4 教程单独提交：commit bd86527 "feat(tutorial): 2026-08-22 生成2篇融合教程"，已 push main。（首次 commit 因 git 身份未配置失败，配置为历史作者 TraeWork Bot 后成功）
+- 8.5 飞书评论（2 条，格式「📚 专属融合教程已生成：<raw_url>」）：
+  - Embedding 模型选型 c50dfa2e：OK
+  - 混合检索实战 f6068824：OK
+  备注：raw.githubusercontent.com 在沙箱内匿名访问 404（含昨日已存在教程），经 GitHub API（带 token）确认仓库为私有（private=true）且两个目录已在 main 分支存在，属沙箱网络对 raw CDN 的访问限制与私有仓库预期行为，非文件缺失。
+- 8.6 无失败。
+
+## 步骤 9：写回与兜底
+- 本日志写入 .trae/logs/2026-08-22.log。
+- 剩余变更（snapshot.json / excluded.json / 日志 / java-ai-agent-roadmap.html / assets/charts.js）统一提交："chore(daily): 2026-08-22 每日维护"，push main。
