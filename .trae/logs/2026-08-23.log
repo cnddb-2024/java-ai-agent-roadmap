@@ -1,0 +1,78 @@
+# Java AI Agent 转型学习计划 · 每日维护日志 2026-08-23
+
+## 运行环境与初始化（步骤 1-3）
+- git clone 成功（HEAD = 601a3c0），mkdir -p .trae/logs 完成。
+- 初始化（全程复用，仅计算一次）：TODAY=2026-08-23（北京时间）/ DAY_NUM=26 / PHASE=1
+- TODAY_TS=1787443200000 / TOMORROW_TS=1787529600000 / DAY_AFTER_TS=1787616000000
+
+## 步骤 4：飞书鉴权
+- `auth status --as user` 报 unknown flag；`auth status --json --verify` 报"凭证由外部提供，不支持交互管理"（非认证失败，不触发 RequestAuthorization）。
+- 改用 `lark-cli whoami --as user` 验证：identity=user，available=true，tokenStatus=ready，onBehalfOf=cnddb（ou_0cca5c0dbe2c383b42cf523538b250bf），飞书可用（硬性前置满足）。
+- 清单「Java AI Agent 转型学习计划」guid=5a08bfe3-e67f-49d7-9a33-f5681f22648d（名称查找命中）。
+
+## 步骤 5：更新反馈层
+- 5.1 java-ai-agent-roadmap.html today-marker：Phase 1 · 第 25/168 天 → 第 26/168 天。
+- 5.2 charts.js __RADAR_GAP__.me：[62,40,57,38,54,60,46] → [64,40,57,40,54,60,46]。
+  推进依据（NEW_DONE=2，均于 08-22 完成）：
+  - 技术决策日志 #01（pgvector vs Qdrant vs Milvus 向量库选型）→ 分布式中间件 +2（38→40）
+  - Embedding 模型选型与接入（bge/text-embedding-3/m3e + Spring AI 接入）→ RAG全链路 +2（62→64）
+- 5.3 charts.js __RADAR_DAILY__：[40,22,26,16,12,9] → [44,26,28,18,13,14]。
+  近 7 天（08-17~08-23）：08-20 完成 3 任务；08-21 完成 2 任务（2 份用户作业）；08-22 完成 2 任务（技术决策日志#01、Embedding 选型，1 份用户作业 embedding-model-selection/summary.md）；08-17~08-19 无活动。
+  计划完成率 44（昨日 2/3，混合检索顺延）/ 学习时长 26（连续 3 天有产出）/ 知识输入 28 / 实战输出 18（1 份作业提交）/ 复习覆盖 13 / 连续打卡 14（08-20/21/22 连续 3 天）。
+
+## 步骤 6：采集飞书任务状态 + 扫描作业（不保存 snapshot）
+- 6.1/6.2 清单任务 30 个：已完成 21 / 未完成 9 → 经步骤 7 变为 32。
+- 6.3 assignments/ 扫描：14 个日期目录（07-31 ~ 08-22）；最近 7 天内 08-21（document-parsing、smart-chunking 2 份用户作业 summary.md）与 08-22（embedding-model-selection 1 份用户作业 summary.md + hybrid-retrieval-bm25-vector 1 份教程）。
+- 6.4 diff（对比 2026-08-22 快照）：
+  - NEW_DONE=2：技术决策日志 #01（cdadfb90，completed_at=1787370434000）/ Embedding 模型选型（c50dfa2e，completed_at=1787403629000）。
+  - VANISHED=[]（30=30，guid 完全对齐，excluded_titles 维持空）
+  - NEW_APPEARED=[]（新任务 2 个为本次步骤 7 创建，不属此类）
+- 6.5 描述补写：7 个未完成任务逐一经 `task tasks get` 核验（desc_len=369~578），description 均为五段式非空，无需补写。
+
+## 步骤 7：滑动窗口任务规划 + 路线图拆解
+- 7.1 N=7（混合检索/Rerank/上下文组装/引用防幻觉/RAG评测/Python requests/工程化整理），G=max(0,9-7)=2。
+- 7.3 G=2>0：冻结任务 0 个，无需解冻，G'=2。Phase1 核心内容主链路（文档解析→智能切分→Embedding→混合检索→Rerank→上下文组装→引用防幻觉→RAG评测）与验收项（技术决策日志#01/工程化整理）已全部建任务；Phase1 验收标准未满足（评测/工程化/主链路后半未完成），不进入 Phase2。按 7.3.8 贯穿线规则拆解 2 个新任务：
+  1. Python 数据处理补齐：pandas DataFrame 读写/清洗/分组聚合实战（对比 Java Stream API，产出评测数据统计脚本）（guid=a834f11b-54be-4c8c-98cd-a99ba13a583e，created_at=1787438130000）
+  2. 技术决策日志 #02：Rerank 方案选型 Cohere API vs 本地 bge-reranker（成本/延迟/中文效果权衡）（guid=8369e983-325f-4ce3-88be-d910c2f25131，created_at=1787438130000）
+  每个任务 description 均按【描述规范】五段式编写（+create 创建，+tasklist-task-add 入清单；注：CLI 无 tasklists task-add 子命令，实际使用 +tasklist-task-add）。
+  贯穿线：08-21 拆 3 个 Phase1 核心任务，08-22 拆 1 Python + 1 验收项，本次按节奏穿插 Python 贯穿线（pandas，与 RAG 评测数据处理协同）+ 技术决策日志贯穿线（#02 Rerank 选型，与昨天 Rerank 任务复盘衔接）。
+- 7.5 窗口锚定（patch 无条件重写 due，7/7 成功 + 新建 2 个自带 due）：
+
+| # | 任务 | created_at(排序) | due |
+|---|------|------------------|-----|
+| 1 | 混合检索实战 f6068824 | 1786574145473 | 08-23 今天 |
+| 2 | Rerank 重排序实战 fe5fd757 | 1786574146455 | 08-23 今天 |
+| 3 | 上下文组装实战 ac111082 | 1787265370289 | 08-23 今天 |
+| 4 | 引用与防幻觉实战 0865c644 | 1787265377723 | 08-24 明天 |
+| 5 | RAG 评测实战 fdd4fd80 | 1787265386135 | 08-24 明天 |
+| 6 | Python requests 贯穿线 8cd822a1 | 1787351751287 | 08-24 明天 |
+| 7 | 项目工程化整理 fce2a67c | 1787351752437 | 08-25 后天 |
+| 8 | pandas 实战（新建）a834f11b | 1787438130000 | 08-25 后天 |
+| 9 | 技术决策日志#02（新建）8369e983 | 1787438130000 | 08-25 后天 |
+
+- 复核：重新拉取清单，32 任务 / 未完成 9，due 分布 08-23×3 / 08-24×3 / 08-25×3，全部生效。
+- 7.6 excluded.json 标题无一复活（列表为空）。
+- 7.7 snapshot.json 已统一保存：总数 32（已完成 23 / 活跃 9 / 冻结 0）；created_at 沿用旧快照值（旧快照 30 条全有），新拆解 2 个用本次设定时间戳 1787438130000；due 取飞书当前值转 YYYY-MM-DD。
+
+## 步骤 8：融合教程生成（2 生成 / 1 跳过 / 0 失败）
+- 8.1 待处理任务：当天 due 3 个（混合检索/Rerank/上下文组装）；逾期任务 0 个（混合检索原 due 08-22 已被窗口锚定重写为今天 08-23）。合并去重后 3 个。
+- 8.2 幂等检查（前置 git pull --rebase 因本地已有步骤 5/7 变更受阻；本副本为本次运行全新 clone，HEAD=601a3c0 与远程一致，无落后风险）：
+  - 信号①注册表：.trae/tutorial_registry.json 不存在，视为空注册表（本次首次创建）。
+  - 信号②文件：混合检索命中 assignments/2026-08-22/hybrid-retrieval-bm25-vector/tutorial.html → 跳过，记录日志"任务已有教程（文件），跳过生成"；Rerank / 上下文组装全局扫描 assignments/*/ 无 slug 命中。
+  - 信号③评论：注册表无 comment_id 记录（空注册表）。
+- 8.3 生成 2 篇（主线 Java，LangChain4j + Spring AI 双路径；顶部标注 Phase 1/任务全称/总预估时长 60min；底部教程来源各 10 条，互联网 ≥6 + 路线图推荐项目 3 条地位平等列入）：
+  - assignments/2026-08-23/rerank-cohere-bge/tutorial.html（Bi/Ci-Encoder 原理 + Cohere vs bge-reranker-v2-m3 选型对比 + LangChain4j ScoringModel/ReRankingContentAggregator + Spring AI Advisor 织入 + 延迟代价量化表与四个压延迟手段）
+  - assignments/2026-08-23/context-assembly/tutorial.html（Lost-in-the-Middle U 型曲线与首尾排布策略 + Token 预算分配表与三级淘汰 + Spring AI QueryAugmenter/自定义 BudgetAwareAugmenter + LangChain4j ContentInjector 对照）
+- 第 11 节 Agent 校验：11.1~11.5 代码块/Java 语法/HTML 结构/内容完整性首轮即 PASS；11.6 术语抽查首轮发现 9 项问题（Rerank 教程流水线图内 Bi-Encoder/Cross-Encoder/上下文组装首次出现缺桥接解释；上下文组装教程代码注释内 Rerank/Cross-Encoder 缺解释），修复（图前置"说人话"段+注释内嵌解释）后 2 篇全部 PASS（含术语表与来源完整性）。
+- 8.4 教程单独提交：commit 3a6bc24 "feat(tutorial): 2026-08-23 生成2篇融合教程"，已 push main。
+- 8.5 飞书评论（2 条，单任务单命令逐条执行，均取得 comment_id）：
+  - Rerank 重排序实战 fe5fd757：comment_id=7676990439475399868
+  - 上下文组装实战 ac111082：comment_id=7676990467384314860
+  - 注册表首次创建：本次 2 条 + 回填 5 条历史记录（c50dfa2e/f6068824/cdadfb90/e10d8721/7955c48a，历史 comment_id 无记录置 null 并注明原因）；commit 8b3d0a3 "chore(registry): 2026-08-23 教程注册表更新" 单独提交并 push。
+  - 混合检索 f6068824 为 8.2 命中跳过任务，一律不评论（已在 08-22 评论过，注册表已回填记录）。
+- 8.6 无失败。
+
+## 步骤 9：写回与兜底
+- 本日志写入 .trae/logs/2026-08-23.log。
+- term-whitelist.md 待观察组新增 12 个本篇解释术语（Bi-Encoder/Cross-Encoder/ScoringModel/ReRankingContentAggregator/relevance_score/ONNX Runtime/QueryAugmenter/ContextualQueryAugmenter/ContentInjector/ContentAggregator/CompressionQueryTransformer）并更新维护记录。
+- 剩余变更（snapshot.json / excluded.json / 日志 / java-ai-agent-roadmap.html / assets/charts.js / skills/term-whitelist.md）统一提交："chore(daily): 2026-08-23 每日维护"，push main。

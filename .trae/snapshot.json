@@ -1,5 +1,5 @@
 {
-  "snapshot_date": "2026-08-22",
+  "snapshot_date": "2026-08-23",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
     {
@@ -175,7 +175,7 @@
       "summary": "技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus",
       "due": "2026-08-22",
       "created_at": "1786487631455",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -183,13 +183,13 @@
       "summary": "Embedding 模型选型与接入实战：bge-large-zh / text-embedding-3 / m3e 对比 + Spring AI 接入",
       "due": "2026-08-22",
       "created_at": "1786574144621",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
       "guid": "f6068824-91f9-4465-bc40-4cc568c1c181",
       "summary": "混合检索实战：向量检索 + BM25 关键词检索融合（Spring AI + Elasticsearch/PGVector）",
-      "due": "2026-08-22",
+      "due": "2026-08-23",
       "created_at": "1786574145473",
       "completed": false,
       "frozen": false
@@ -213,7 +213,7 @@
     {
       "guid": "0865c644-23a3-4534-9e32-570fcd652437",
       "summary": "引用与防幻觉实战：RAG 回答引用溯源标注 + Faithfulness 校验 + 无依据拒答",
-      "due": "2026-08-23",
+      "due": "2026-08-24",
       "created_at": "1787265377723",
       "completed": false,
       "frozen": false
@@ -237,8 +237,24 @@
     {
       "guid": "fce2a67c-fbca-4236-8e8f-380727de6c00",
       "summary": "生产级 RAG 项目工程化整理：GitHub 完整工程结构 + README + 决策文档归档（Phase1验收项）",
-      "due": "2026-08-24",
+      "due": "2026-08-25",
       "created_at": "1787351752437",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "8369e983-325f-4ce3-88be-d910c2f25131",
+      "summary": "技术决策日志 #02：Rerank 方案选型 Cohere API vs 本地 bge-reranker（成本/延迟/中文效果权衡）",
+      "due": "2026-08-25",
+      "created_at": "1787438130000",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "a834f11b-54be-4c8c-98cd-a99ba13a583e",
+      "summary": "Python 数据处理补齐：pandas DataFrame 读写/清洗/分组聚合实战（对比 Java Stream API，产出评测数据统计脚本）",
+      "due": "2026-08-25",
+      "created_at": "1787438130000",
       "completed": false,
       "frozen": false
     }

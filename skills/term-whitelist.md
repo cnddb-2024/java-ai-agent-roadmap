@@ -23,8 +23,9 @@ Java, Spring Boot, Spring MVC, Spring 全家桶常见注解（@Autowired/@Servic
 
 ## 待观察（解释过或即将学到，仍必须解释）
 
-BM25, RRF（倒数排序融合）, 混合检索, Rerank（重排序）, 上下文组装, Token 预算控制, Lost-in-the-Middle, 引用溯源, Faithfulness（忠实度）, 幻觉/防幻觉, Recall@K, nDCG, LLM-as-Judge, RAG 评测, Milvus, Qdrant, Elasticsearch, tsvector, 全文检索, 向量相似度（余弦/欧氏）, 温度参数（Temperature）, 微调（Fine-tuning）, Agent, ReAct, MCP, 多模态, 知识库问答, 技术决策日志（ADR）
+BM25, RRF（倒数排序融合）, 混合检索, Rerank（重排序）, 上下文组装, Token 预算控制, Lost-in-the-Middle, 引用溯源, Faithfulness（忠实度）, 幻觉/防幻觉, Recall@K, nDCG, LLM-as-Judge, RAG 评测, Milvus, Qdrant, Elasticsearch, tsvector, 全文检索, 向量相似度（余弦/欧氏）, 温度参数（Temperature）, 微调（Fine-tuning）, Agent, ReAct, MCP, 多模态, 知识库问答, 技术决策日志（ADR）, Bi-Encoder（双编码器）, Cross-Encoder（交叉编码器）, ScoringModel（评分模型）, ReRankingContentAggregator（重排序内容聚合器）, relevance_score（相关性分数）, ONNX Runtime, QueryAugmenter（查询增强器）, ContextualQueryAugmenter, ContentInjector（内容注入器）, ContentAggregator（内容聚合器）, CompressionQueryTransformer（查询压缩器）
 
 ## 维护记录
 
 - 2026-08-22：初始版本。后端基础按职业背景录入；AI 侧按 07-31~08-22 已完成作业录入；待观察组为 Phase1 剩余任务及 Phase2 预计涉及术语。
+- 2026-08-23：新增 Rerank / 上下文组装两篇教程解释的 12 个术语至待观察组（Bi-Encoder、Cross-Encoder、ScoringModel、ReRankingContentAggregator、relevance_score、ONNX Runtime、QueryAugmenter、ContextualQueryAugmenter、ContentInjector、ContentAggregator、CompressionQueryTransformer 等）。
