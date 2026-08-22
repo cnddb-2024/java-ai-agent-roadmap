@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>上下文组装实战：检索片段排序 + Token 预算控制 + Lost-in-the-Middle 缓解（Spring AI QueryAugmenter）| Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+  display: block;
+}
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+th { background: var(--bg2); font-weight: 600; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · RAG 刚需闭环 + 生产级项目 1 · 第 26/168 天</div>
+  <h1>上下文组装实战：检索片段排序 + Token 预算控制 + Lost-in-the-Middle 缓解（Spring AI QueryAugmenter）</h1>
+  <div class="meta">总预估时长：<strong>约 60 分钟</strong>（问题定位与 U 型曲线 12min / 排序策略 10min / Token 预算控制 10min / Spring AI QueryAugmenter 实战 18min / LangChain4j 对照 6min / 面试要点 4min）。主线 Java（Spring AI + LangChain4j 双路径）。</div>
+</div>
+
+<h2>一、上下文组装：RAG 链路里最容易被忽视的一环（12min）</h2>
+<p>上下文组装（Context Assembly——检索完成后、调用大模型之前，把若干检索片段"拼装"成最终 Prompt 的环节，类似 MyBatis 把查询结果映射成 Java 对象前的结果装配）决定了大模型"看到什么"。检索再准，如果片段<strong>顺序不对、超长被截断、噪声占预算</strong>，回答照样翻车。它要回答三个问题：</p>
+<ul>
+<li><strong>排序</strong>：哪些片段放前面？——答案藏在本节的 U 型曲线里；</li>
+<li><strong>预算</strong>：上下文窗口有限、API 按 token 计费，给每个片段多少预算？</li>
+<li><strong>格式</strong>：片段怎么标注来源、怎么和用户问题拼接？</li>
+</ul>
+<h3>1.1 Lost-in-the-Middle：为什么要专门管顺序</h3>
+<p><strong>Lost-in-the-Middle（中间遗忘现象）</strong>：Stanford 等机构 2023 年的研究发现，大模型对长上下文里<strong>开头和结尾</strong>的信息利用率高，对<strong>中间</strong>的信息显著"失明"——性能随相关信息位置呈 U 型曲线（类似人背单词表时对首尾单词记得最牢的"系列位置效应"）。这意味着：你把最相关的片段随手放在 Prompt 中段，模型可能恰好忽略它。</p>
+<table>
+<thead><tr><th>片段位置</th><th>模型利用率</th><th>组装策略</th></tr></thead>
+<tbody>
+<tr><td>开头</td><td>高（首因效应）</td><td>放最重要的片段</td></tr>
+<tr><td>结尾</td><td>高（近因效应）</td><td>放次重要的片段</td></tr>
+<tr><td>中间</td><td>低（U 型谷底）</td><td>放最弱/兜底片段</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>实用排序法</strong>：按相关性分数降序排好后，把<strong>第 1 名放最前、第 2 名放最后、第 3 名放中间</strong>……这比单纯降序排列在评测中更稳，也是明天 RAG 评测任务里"改造前后对比"的现成实验变量。</div>
+
+<h2>二、Token 预算控制（10min）</h2>
+<p><strong>Token 预算控制</strong>（在上下文窗口和成本约束内，给系统提示、历史对话、检索片段分配 token 配额的机制——类比 JVM 堆内存分区：各区域各得其所，超了就按策略淘汰）是生产级 RAG 的硬需求。典型预算分配：</p>
+<pre><code>总预算（假设 8K token，预留 1K 给输出）
+├── 系统提示 + 工具说明      ~500 token（固定）
+├── 多轮历史对话（截断/压缩）~1000 token（滑动窗口）
+├── 检索片段区              ~5500 token（主战场）
+└── 用户当前问题 + 拼接模板  ~500 token
+</code></pre>
+<p>检索片段区的三种淘汰策略（预算不够时按序触发）：</p>
+<ul>
+<li><strong>按分数淘汰</strong>：低于阈值的整段丢弃（你昨天混合检索里的 minScore 思路平移过来）；</li>
+<li><strong>按片段截断</strong>：保留每片段前 N token（配合引用溯源标注"内容有截断"）；</li>
+<li><strong>按配额递减</strong>：排名越靠后的片段配额越少——第 1 名 1500、第 2 名 1000、第 3 名 700……像限流算法里按优先级分配令牌。</li>
+</ul>
+
+<h2>三、Spring AI 实战：QueryAugmenter + Advisor 管道（18min）</h2>
+<p>Spring AI 中承担组装职责的核心抽象是 <code>QueryAugmenter</code>（查询增强器——把检索到的文档内容与用户 Query 拼装成最终提示词的组件，可以理解为 Spring AI 版的"Prompt 总装车间"）。开箱实现 <code>ContextualQueryAugmenter</code> 支持模板化拼接与空文档兜底：</p>
+<h3>3.1 基础用法：ContextualQueryAugmenter</h3>
+<pre><code>QueryAugmenter queryAugmenter = ContextualQueryAugmenter.builder()
+    .allowEmptyContext(false)          // 检索结果为空时拒绝硬编答案
+    .build();
+
+RetrievalAugmentationAdvisor advisor = RetrievalAugmentationAdvisor.builder()
+    .documentRetriever(vectorRetriever)
+    .queryAugmenter(queryAugmenter)
+    .build();
+
+String answer = ChatClient.create(chatModel)
+    .prompt()
+    .advisors(advisor)
+    .user("我们知识库里关于报销流程的规定是什么？")
+    .call()
+    .content();</code></pre>
+<p><code>allowEmptyContext(false)</code> 是防幻觉的第一道闸门：检索不到内容时不给模型"无米之炊"的上下文，让它老老实实说"知识库中没有相关内容"——这与你明天的「引用与防幻觉」任务直接衔接。</p>
+<h3>3.2 自定义增强器：排序 + 预算 + 编号溯源一体</h3>
+<p>默认实现不管顺序和预算，生产上需要自定义。实现 <code>QueryAugmenter</code> 接口，把第一节、第二节的策略落进代码：</p>
+<pre><code>public class BudgetAwareAugmenter implements QueryAugmenter {
+
+    private static final int CONTEXT_BUDGET = 5500; // 检索片段区 token 预算
+
+    @Override
+    public Query augment(Query query, List&lt;Document&gt; documents) {
+        // 1. 按相关性分数降序排序
+        //    （分数可来自 Rerank——昨天任务的精排环节，用 Cross-Encoder
+        //     交叉编码器把 query 和文档拼在一起深度比对打分——
+        //     或直接用向量相似度分数）
+        List&lt;Document&gt; sorted = documents.stream()
+            .sorted(Comparator.comparingDouble(this::score).reversed())
+            .toList();
+
+        // 2. Lost-in-the-Middle 缓解：第1名最前、第2名最后、其余居中
+        List&lt;Document&gt; arranged = arrangeByUShape(sorted);
+
+        // 3. 预算内逐段装入，配额递减；超预算立即停止
+        StringBuilder context = new StringBuilder();
+        int used = 0;
+        int quota = 1500;
+        for (int i = 0; i &lt; arranged.size() &amp;&amp; quota &gt; 0; i++) {
+            String chunk = truncate(arranged.get(i).getText(), quota);
+            context.append("[片段").append(i + 1).append("] ")
+                   .append(chunk).append("\n\n");
+            used += estimateTokens(chunk);
+            quota = Math.min(1500, CONTEXT_BUDGET - used) / 2; // 配额递减
+        }
+
+        // 4. 带编号溯源的拼接模板（引用溯源：回答时按片段编号标注依据）
+        String augmented = """
+            请仅依据以下知识库片段回答问题，并标注引用片段编号：
+            %s
+            问题：%s
+            """.formatted(context, query.text());
+
+        return new Query(augmented);
+    }
+
+    private List&lt;Document&gt; arrangeByUShape(List&lt;Document&gt; sorted) {
+        // 首位放第1名，末位放第2名，中间按剩余顺序填入
+        if (sorted.size() &lt; 3) return sorted;
+        List&lt;Document&gt; result = new ArrayList&lt;&gt;();
+        result.add(sorted.get(0));
+        result.addAll(sorted.subList(2, sorted.size()));
+        result.add(sorted.get(1));
+        return result;
+    }
+}</code></pre>
+<h3>3.3 多轮对话的上下文压缩</h3>
+<p>多轮问答时，历史对话也要占预算。Spring AI 的 MessageChatMemoryRetriever 思路是"只把<strong>与当前问题相关</strong>的历史取回组装"——LangChain4j 对应 <code>CompressionQueryTransformer</code>（查询压缩器——把长对话历史压缩改写成一句独立完整问题的组件，类似把多轮聊天记录"蒸馏"成单次提问）。Spring AI Alibaba 的教程对此有完整示例（见来源列表）。</p>
+
+<h2>四、LangChain4j 对照：RetrievalAugmentor 管道（6min）</h2>
+<p>LangChain4j 把组装拆成两个可插拔组件：<code>ContentAggregator</code>（内容聚合器——多路召回结果的重排与淘汰，昨天 Rerank 已接触）与 <code>ContentInjector</code>（内容注入器——把最终片段注入 Prompt 模板的最后一环）：</p>
+<pre><code>ContentInjector contentInjector = ContentInjector.builder()
+    .promptTemplate(PromptTemplate.from("""
+        回答以下问题。可用上下文：
+        {{contents}}
+        问题：{{userMessage}}
+        """))
+    .metadataKeysToInclude(List.of("source", "segment")) // 片段带来源元数据
+    .build();
+
+RetrievalAugmentor augmentor = DefaultRetrievalAugmentor.builder()
+    .contentRetriever(contentRetriever)
+    .contentAggregator(contentAggregator)   // Rerank 精排（昨天成果）
+    .contentInjector(contentInjector)       // 组装注入（今天主题）
+    .build();</code></pre>
+<div class="tip"><strong>双框架对比记忆点</strong>：Spring AI 用 <code>QueryAugmenter</code> 一个抽象覆盖"拼接"并靠你自定义扩展排序与预算；LangChain4j 把"聚合排序"与"模板注入"拆成两个组件自由组合——粒度更细，学习曲线略陡。面试聊双框架选型时，这是 RAG 环节的具体差异例证。</div>
+
+<h2>五、面试要点速记（4min）</h2>
+<ul>
+<li><strong>第一梯队「RAG 完整链路 + Chunking 策略」</strong>的组装部分：能画出"检索 → 重排 → 组装（排序/预算/格式）→ 生成"完整链路并讲清每环节 why；</li>
+<li>Lost-in-the-Middle：说出 U 型曲线结论 + "首尾放重要片段"对策，再补一句"这与人类记忆的系列位置效应同构"即出彩；</li>
+<li>Token 预算：讲清"预算分配表 + 三级淘汰策略"，落在成本数字上（预算超 10% 响应成本涨多少）；</li>
+<li>空上下文兜底：allowEmptyContext(false) / 无依据拒答，衔接明天「引用与防幻觉」任务。</li>
+</ul>
+
+<h2>📝 术语表</h2>
+<ul>
+<li><strong>上下文组装（Context Assembly）</strong>：检索后、生成前，把检索片段排序、截断、拼接成最终 Prompt 的环节，类比 MyBatis 的结果装配。</li>
+<li><strong>Lost-in-the-Middle（中间遗忘）</strong>：LLM 对长上下文首尾信息利用率高、中间显著下降的 U 型曲线现象，类比人类记忆的系列位置效应。</li>
+<li><strong>Token 预算控制</strong>：在上下文窗口与成本约束内为各内容区分配 token 配额并按策略淘汰的机制，类比 JVM 堆内存分区管理。</li>
+<li><strong>QueryAugmenter（查询增强器）</strong>：Spring AI 中把文档内容与用户 Query 拼装成最终提示词的组件抽象，开箱实现为 ContextualQueryAugmenter。</li>
+<li><strong>ContentInjector（内容注入器）</strong>：LangChain4j 管道中把最终片段按模板注入 Prompt 的最后一环组件，与 ContentAggregator 配合。</li>
+<li><strong>CompressionQueryTransformer（查询压缩器）</strong>：LangChain4j 中把多轮对话历史压缩改写成单句独立问题的组件，用于控制历史 token 占用。</li>
+<li><strong>引用溯源</strong>：回答中按片段编号标注依据来源的机制，是防幻觉与可信度验收的基础（明天任务展开）。</li>
+</ul>
+
+<h2>教程来源</h2>
+<ol class="src">
+<li>Spring AI 官方文档 · 检索增强生成（QueryAugmenter / ContextualQueryAugmenter）— <a href="https://docs.springframework.org.cn/spring-ai/reference/api/retrieval-augmented-generation.html">https://docs.springframework.org.cn/spring-ai/reference/api/retrieval-augmented-generation.html</a></li>
+<li>博客园 · Spring AI RAG Pipeline 深度分析（重排/去重/压缩/选择）— <a href="https://www.cnblogs.com/yumingwen/p/19758984">https://www.cnblogs.com/yumingwen/p/19758984</a></li>
+<li>CSDN · Retrieval-Augmented Generation(RAG)：QuestionAnswerAdvisor 与 RetrievalAugmentationAdvisor — <a href="https://blog.csdn.net/yvya_/article/details/150604001">https://blog.csdn.net/yvya_/article/details/150604001</a></li>
+<li>java2ai · 第六章 Rag 增强问答质量（ContextualQueryAugmenter 源码解析）— <a href="https://java2ai.com/docs/1.0.0.2/spring-ai-sourcecode-explained/chapter-6-rag-enhanced-qa/">https://java2ai.com/docs/1.0.0.2/spring-ai-sourcecode-explained/chapter-6-rag-enhanced-qa/</a></li>
+<li>Spring AI Alibaba 官网 · 检索增强生成 RAG（CompressionQueryTransformer 多轮改写）— <a href="https://java2ai.com/en/docs/1.0.0-M5.1/tutorials/rag/">https://java2ai.com/en/docs/1.0.0-M5.1/tutorials/rag/</a></li>
+<li>Stanford · 论文 Lost in the Middle: How Language Models Use Long Contexts — <a href="https://cs.stanford.edu/~nfliu/papers/lost-in-the-middle.arxiv2023.pdf">https://cs.stanford.edu/~nfliu/papers/lost-in-the-middle.arxiv2023.pdf</a></li>
+<li>CSDN · 论文精读《Lost in the Middle》：为什么 LLM 会迷失在长上下文中间 — <a href="https://blog.csdn.net/zyctimes/article/details/160382265">https://blog.csdn.net/zyctimes/article/details/160382265</a></li>
+<li>掘金 · 大模型长上下文研究三篇论文总结（U 型曲线与注意力位置偏差）— <a href="https://juejin.cn/post/7661303393303101450">https://juejin.cn/post/7661303393303101450</a></li>
+<li>路线图推荐项目 · springboot-ai-rag-tutorial（引用可追溯、防幻觉拒答最小链路）— <a href="https://github.com/tucanoo/springboot-ai-rag-tutorial">https://github.com/tucanoo/springboot-ai-rag-tutorial</a></li>
+<li>路线图推荐项目 · rag-knowledge-system（多轮追问改写 + SSE 流式 + 检索质量回归）— <a href="https://github.com/spring-projects/spring-ai">https://github.com/spring-projects/spring-ai</a>（工程结构参考见仓库 assignments 与决策文档）</li>
+</ol>
+
+<footer>Java AI Agent 转型学习计划 · Phase 1 融合教程 · 生成于 2026-08-23 每日无人值守维护</footer>
+</div>
+</body>
+</html>
