@@ -95,24 +95,33 @@ updated: "2026-08-17"
    读取 roadmap-repo/skills/tutorial-fusion.md 中的 Skill 规范，为需要处理的任务生成专属融合教程。（详细融合规则见该 Skill 文件，主提示词不再复述）
    8.1 确定待处理任务列表（合并两类）：当天due任务：步骤7中due设为今天的3个任务（正常情况）；逾期未完成任务：飞书中 completed_at="0" 且 due 日期早于 TODAY 的任务。合并去重后得到待处理列表（通常3-6个）。
    8.2 对每个待处理任务执行全局幂等检查（极其重要：只要某任务已有融合教程，就不再生成，无论due是否顺延）：
-        - 计算该任务的slug：先按summary关键词匹配assignments目录中已有的子目录名，若无匹配则用summary的kebab-case。
-        - 文件检查：全局扫描 assignments/ 下所有日期子目录，查找是否存在 <slug>/tutorial.html（即检查 assignments/*/<slug>/tutorial.html 是否存在任意一个）。
-        - 评论检查：用 lark-cli task tasks comments --as user --task-guid <guid> 读取该任务的飞书评论（若子命令不同，以实际可用者为准），若任意一条评论包含「专属融合教程已生成」或教程 raw URL（含 tutorial.html 的 https 链接），视为已生成。
-        - 命中条件：文件检查命中 OR 评论检查命中 -> 跳过，记录日志"任务<summary>已有教程（文件/评论），跳过生成"，不重复生成、不覆盖、不追加评论。
-        - 两者皆未命中 -> 继续生成。
+        前置（必做）：git pull --rebase origin main 同步远程，保证本地副本不落后——不同会话/副本若未同步会导致误判"未生成"而重复生成+重复评论（2026-08-22 重复评论事故根因）。
+        三信号检查，任一命中即跳过：
+        - 信号①注册表（权威）：读 .trae/tutorial_registry.json，按任务 guid 精确匹配（guid 全局唯一且稳定，优先于 slug 模糊匹配）。注册表记录每个已生成教程任务的 summary/slug/tutorial_path/raw_url/comment_id/generated_at。文件不存在视为空注册表（首次运行自动创建）。
+        - 信号②文件：计算该任务的slug（先按summary关键词匹配assignments目录中已有的子目录名，若无匹配则用summary的kebab-case），全局扫描 assignments/ 下所有日期子目录，查找是否存在 <slug>/tutorial.html（即 assignments/*/<slug>/tutorial.html 任意一个存在）。
+        - 信号③评论状态：lark-cli task 当前仅有 +comment 写入、无评论读取命令（已实测确认，勿再猜测子命令）。"是否已评论"以注册表中的 comment_id 字段为等价记录；若未来 CLI 支持读评论，可增加"任意评论含「专属融合教程已生成」或 tutorial.html 链接即命中"的直查。
+        - 命中任一信号 -> 跳过，记录日志"任务<summary>已有教程（注册表/文件），跳过生成"，不重复生成、不覆盖、不追加评论。
+        - 三信号皆未命中 -> 继续生成。
         - 新教程存入 assignments/<当前due日期>/<slug>/tutorial.html（用任务当前的due日期，不是今天日期）。
-        - 关键：due顺延不触发重新生成；飞书评论中已留下教程链接的任务，后续顺延/重新分配due时一律跳过。
+        - 关键：due顺延不触发重新生成；注册表或 assignments 树中已有该任务记录/教程的，后续顺延/重新分配due时一律跳过。
    8.3 对需要生成教程的每个任务，按 tutorial-fusion.md 规范执行：
         - 获取飞书任务详情（summary + description）
         - 解析 java-ai-agent-roadmap.html 确定当前 Phase，提取相关推荐项目链接和面试题
         - 搜索互联网教程（至少5个来源），同时提取路线图中推荐的参考项目链接
+        - 读取 skills/term-whitelist.md 区分"已掌握/待观察"术语，按 tutorial-fusion.md 第12节规范：白名单外专有名词首次出现必须桥接式解释（类比 Java/Spring/MySQL/Redis 已有知识），教程底部附术语表
         - 按 tutorial-fusion.md 规范融合生成 tutorial.html：主线语言 Java（LangChain4j + Spring AI），Python 仅辅助；顶部标注总预估时长（≤1小时，极限1.5小时）；顶部标注 Phase 和任务全称；底部"教程来源"列出所有来源链接（互联网+路线图推荐项目，地位平等）；自包含 HTML，使用 html-report skill 规范。
         - 存入 assignments/<当前due日期>/<slug>/tutorial.html
    8.4 教程生成完成后，先提交一次以便拿到 raw URL 供 8.5 评论：git add assignments/ && git commit -m "feat(tutorial): <TODAY> 生成<N>篇融合教程" && git push
-   8.5 对每个新生成教程的任务，获取 GitHub raw URL，用 lark-cli task +comment --as user 将 raw URL 写入飞书任务评论。评论格式："📚 专属融合教程已生成：<raw_url>"。幂等：只在首次生成时评论，已跳过的任务不重复评论。
+   8.5 对每个新生成教程的任务，获取 GitHub raw URL，用 lark-cli task +comment --as user 将 raw URL 写入飞书任务评论。评论格式："📚 专属融合教程已生成：<raw_url>"。
+        幂等与防重（2026-08-22 重复评论事故修复，硬性规则）：
+        - 发送前必查注册表：该任务 guid 已有 comment_id 记录 -> 禁止再次发送。
+        - 单任务单命令：+comment 逐条执行，禁止 && 批量链；返回结果中取得 comment_id 才算成功。输出不完整/超时时，先用 --dry-run 核对参数并重查注册表，禁止盲目重发（2026-08-21 曾因批量链输出不完整重发导致疑似重复）。
+        - 评论成功后立即将 guid -> {summary, slug, tutorial_path, raw_url, comment_id, generated_at} 写入 .trae/tutorial_registry.json（guid 已存在则更新而非新增）。
+        - 所有评论完成后立即单独提交注册表：git add .trae/tutorial_registry.json && git commit -m "chore(registry): <TODAY> 教程注册表更新" && git push（评论状态尽快持久化，防中断丢失）。
+        - 已跳过（8.2 命中）的任务一律不评论。
    8.6 若某任务的教程生成失败，记录错误日志，继续处理下一个任务，不中断整体流程。
 
 9. 写回与兜底
-   9.1 写入 .trae/logs/YYYY-MM-DD.log，记录每步执行结果、N值、G值、新增/删除(冻结)/顺延的任务列表、教程生成情况（生成/跳过/失败）、新拆解任务列表（如有）。
+   9.1 写入 .trae/logs/YYYY-MM-DD.log，记录每步执行结果、N值、G值、新增/删除(冻结)/顺延的任务列表、教程生成情况（生成/跳过/失败，含幂等命中信号：注册表/文件）、新拆解任务列表（如有）、注册表变更明细。
    9.2 所有步骤完成后，统一提交剩余变更（snapshot.json、excluded.json、日志、HTML/JS 等）：git add . && git commit -m "chore(daily): <TODAY> 每日维护" && git push main。时序：8.4 的 push 必须先于 8.5（评论需 raw URL）；9.2 的 push 在最后，覆盖其余全部变更。
    9.3 汇报本次运行结果。
