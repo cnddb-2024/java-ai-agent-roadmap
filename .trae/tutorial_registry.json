@@ -1,0 +1,66 @@
+{
+  "updated": "2026-08-23",
+  "entries": {
+    "fe5fd757-cd63-4848-bafb-3e39cd001cee": {
+      "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
+      "slug": "rerank-cohere-bge",
+      "tutorial_path": "assignments/2026-08-23/rerank-cohere-bge/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-23/rerank-cohere-bge/tutorial.html",
+      "comment_id": "7676990439475399868",
+      "generated_at": "2026-08-23"
+    },
+    "ac111082-7091-447f-b595-302466582535": {
+      "summary": "上下文组装实战：检索片段排序 + Token 预算控制 + Lost-in-the-Middle 缓解（Spring AI QueryAugmenter）",
+      "slug": "context-assembly",
+      "tutorial_path": "assignments/2026-08-23/context-assembly/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-23/context-assembly/tutorial.html",
+      "comment_id": "7676990467384314860",
+      "generated_at": "2026-08-23"
+    },
+    "c50dfa2e-4117-48f9-9871-b47592cdeda9": {
+      "summary": "Embedding 模型选型与接入实战：bge-large-zh / text-embedding-3 / m3e 对比 + Spring AI 接入",
+      "slug": "embedding-model-selection",
+      "tutorial_path": "assignments/2026-08-22/embedding-model-selection/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-22/embedding-model-selection/tutorial.html",
+      "comment_id": null,
+      "generated_at": "2026-08-22",
+      "note": "回填记录：2026-08-22 运行时生成并已评论，comment_id 当时未持久化（注册表机制 2026-08-23 上线）"
+    },
+    "f6068824-91f9-4465-bc40-4cc568c1c181": {
+      "summary": "混合检索实战：向量检索 + BM25 关键词检索融合（Spring AI + Elasticsearch/PGVector）",
+      "slug": "hybrid-retrieval-bm25-vector",
+      "tutorial_path": "assignments/2026-08-22/hybrid-retrieval-bm25-vector/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-22/hybrid-retrieval-bm25-vector/tutorial.html",
+      "comment_id": null,
+      "generated_at": "2026-08-22",
+      "note": "回填记录：2026-08-22 运行时生成并已评论，comment_id 当时未持久化（注册表机制 2026-08-23 上线）"
+    },
+    "cdadfb90-1181-47c9-9f15-e9feeca47147": {
+      "summary": "技术决策日志 #01：RAG 项目向量库选型 pgvector vs Qdrant vs Milvus",
+      "slug": "tech-decision-log-01-vector-db",
+      "tutorial_path": "assignments/2026-08-21/tech-decision-log-01-vector-db/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-21/tech-decision-log-01-vector-db/tutorial.html",
+      "comment_id": null,
+      "generated_at": "2026-08-21",
+      "note": "回填记录：2026-08-22 运行时经文件信号确认已存在"
+    },
+    "e10d8721-ec0b-46bb-a0e0-57bfcfeb5d61": {
+      "summary": "文档解析实战：Apache PDFBox + Apache POI 抽取 PDF/Word/Markdown 纯文本与表格",
+      "slug": "document-parsing-pdfbox-poi",
+      "tutorial_path": "assignments/2026-08-21/document-parsing-pdfbox-poi/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-21/document-parsing-pdfbox-poi/tutorial.html",
+      "comment_id": null,
+      "generated_at": "2026-08-21",
+      "note": "回填记录：按 assignments/2026-08-21 目录与任务 summary 语义对应回填"
+    },
+    "7955c48a-682f-4b15-8d04-3b471196e757": {
+      "summary": "智能切分实战：TokenTextSplitter / 递归字符切分 / 按标题多粒度切分对比",
+      "slug": "intelligent-chunking-comparison",
+      "tutorial_path": "assignments/2026-08-21/intelligent-chunking-comparison/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-21/intelligent-chunking-comparison/tutorial.html",
+      "comment_id": null,
+      "generated_at": "2026-08-21",
+      "note": "回填记录：按 assignments/2026-08-21 目录与任务 summary 语义对应回填"
+    }
+  }
+}
