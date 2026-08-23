@@ -1,0 +1,68 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-08-23 (北京时间, 周日)
+当前Phase: Phase 1 · 第 26/168 天 (RAG全链路 + 生产级项目1, 项目期)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定), 本次维持20条 (高匹配17 / 中匹配3 / 暂避0)
+- 淘汰: 5条 (时效过期或临界, 与上次周报"超15天"口径衔接, 按"最具时效性优先"执行)
+  * 杰夫与友·Java开发工程师(AIGC产品方向) (2026-08-12, 11天)
+  * 宁波力易达(金融科技代招)·高级Java开发工程师(AI方向) (2026-08-09, 14天)
+  * 字节跳动·AI应用后端开发工程师(Java方向) (2026-08-08, 15天临界)
+  * 捷科智诚·Java大模型应用开发工程师 (2026-08-08, 15天临界)
+  * 中国电子科技网络信息安全·后端开发工程师 (2026-08-08, 15天临界, 中匹配)
+- 刷新: 4条 (本轮检索确认同岗仍在招, 更新日期)
+  * 上海艾策通讯·AI应用研发工程师(Java方向) (08-19 → 08-23, 前程无忧)
+  * 北京某人工智能公司·Java开发工程师(Agent) (08-18 → 08-22, 猎聘)
+  * 上海数珩信息科技·Java高级开发(AI应用) (08-18 → 08-22, Boss直聘)
+  * 北京某中型人工智能公司·大模型应用高级Java工程师 (08-18 → 08-22, Boss直聘)
+- 新增: 5条 (WebSearch检索, Boss直聘)
+  * LinkDoc·大模型应用开发工程师 (2026-08-23, 高) — Agent+RAG端到端开发, RAG检索模块优化, 大模型Workflow
+  * 上海某大型移动互联网公司·AI Agent开发专家 (2026-08-22, 高) — Agent框架设计: 任务规划/意图理解/多Agent协同
+  * 成都某大型互联网招聘平台公司·Agent开发工程师 (2026-08-22, 高) — Java构建Agent运行时, 统一模型网关+Token成本管控, LangChain4j/Spring AI
+  * 某大型半导体公司(深圳)·Java Agent开发 (2026-08-21, 高) — Agent平台核心组件: 调度框架/工具调用引擎/记忆知识库
+  * 悦智人工智能(深圳)·Java开发(大模型应用开发) (2026-08-21, 高) — 大模型应用层落地, Prompt+RAG优化, 向量库+网关+缓存整合
+- 弃选: 2条 (双硬性暂避: 北京某中型AI大模型研发公司·大模型应用开发专家Java+Python精通双硬性 / 杭州爱助手·AI智能体开发工程师Java+Python双语)
+- 当前总数: 20条 (高17 / 中3), 时效分布: 08-21~08-23共9条, 08-17~08-19共11条
+
+【区块2 实战项目】
+- 动态上限: 5条在学 (Phase 1 项目期, base 3升至4-5)
+- 淘汰/降级: 1条
+  * spring-ai-alibaba-playground (在学→参考) — snapshot显示Phase 0全部验收项已完成(Spring AI入门/Advisors/Tool Calling/可观测性/选型对比), 该项目为Phase 0综合实践参照, 学习目标达成移入参考池
+- 新增: 2条
+  * cryptocopilot (在学) — Spring AI 1.0.8+pgvector+Ollama/OpenAI双运行时; strictly-grounded生成器+[N]级引用标注+检索空/超语料拒答+recall@8门禁, 直接对应当前待办"引用与防幻觉实战(08-24)/RAG评测实战(08-24)/上下文组装(08-23)"
+    GitHub: github.com/hzajkani/cryptocopilot
+  * spring-ai-crossborder-customer-service (参考) — Spring AI 2.0+pgvector+RocketMQ; 证据级citation工作台+CONTRACT/GOLD Eval+RAG Eval报告(nDCG/no-answer/poisoning), 对应待办"RAG评测实战"
+    GitHub: github.com/RyanCoreAI/spring-ai-crossborder-customer-service
+- 弃选: spring-ai-queryexpansion-rag (Multi-Query扩展模式, 知识点已被T2题点覆盖, 抗堆叠不追加)
+- 当前总数: 14条 (在学5 / 参考9)
+  * 在学: knowledgeops-agent, spring-al-alibaba-customer, springai-knowledge-server, rag-knowledge-system, cryptocopilot
+  * 参考: springboot-ai-rag-tutorial, Java-LLM-integration, Spring AI Alibaba官方生态, java-ai-labs, ai-code-helper, spring-ai-ragas, rag-study-helper, spring-ai-alibaba-playground, spring-ai-crossborder-customer-service
+
+【区块3 面试题】
+- 动态上限: 10题T1 (Phase 1非冲刺期, 维持5-10)
+- 淘汰: 1条T1
+  * "RAG完整链路+Chunking策略" — snapshot中对应任务"文档解析实战(08-21完成)/智能切分实战(08-21完成)/RAG知识库问答demo(08-11完成)"均已done, 考察内容(离线在线两阶段+四种切分+多粒度索引)已掌握移出第一梯队
+- 新增: 1条T1
+  * "RAG幻觉分层治理+引用溯源与拒答" (滴滴Agent岗二面真题2026-08掘金面经) — 检索层编造(Rerank分数门控拒答) vs 生成层超发挥(Prompt约束+[N]引用+Faithfulness核查), 恰为Phase 1收官待办"引用与防幻觉实战"
+- T2增量: +3题点
+  * 上下文组装与Lost-in-the-Middle缓解 (LongContextReorder首尾重排+chunk粒度噪声治理+Token预算, CSDN 2026; 对应08-23待办"上下文组装实战")
+  * 多轮对话Query重写与上下文依赖检索 (检索器无状态/改写query检索vs原始对话生成, CSDN 2026; 对应rag-knowledge-system多轮追问改写)
+  * Embedding模型评估与选型深度 (Spearman/Pearson+BGE-M3三模式+text-embedding-3维度截断, 快手二面2026; 对应08-22已完成"Embedding选型实战"巩固)
+- T3: 0条 (本轮无新概念, 不为凑数追加)
+- 当前总数: T1=10题 / T2=31题点 / T3=12题点
+
+【其他维护】
+- today-marker: 已为第26/168天(Phase 1), 与北京时间2026-08-23一致, 无需变更
+- 页脚时效日期: 2026-08-19 → 2026-08-23
+- HTML结构校验: JD tbody=20行, 项目在学5/参考9, T1=10行, 标签闭合无误
+
+【运行状态】
+- 搜索来源: WebSearch (Boss直聘/猎聘/前程无忧/GitHub/CSDN/掘金/牛客/小林面试笔记/51CTO)
+- 搜索方式: 3个Explore子代理并行检索(JD/项目/面试题各1个) + 主流程补充检索1轮JD
+- snapshot掌握度: 读取.trae/snapshot.json (snapshot_date=2026-08-23)
+  - 已完成任务23个 (Phase 0全部 + Phase 1文档解析/智能切分/向量库选型/Embedding选型等)
+  - 未完成任务9个 (混合检索/Rerank/上下文组装/引用防幻觉/RAG评测/requests脚本/RAG工程化/决策日志#02/pandas)
+- excluded.json: 空列表, 无排除项
+- 运行结果: 成功
