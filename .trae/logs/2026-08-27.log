@@ -1,0 +1,79 @@
+# Java AI Agent 转型学习计划 · 每日维护日志 2026-08-27
+
+## 运行环境与初始化（步骤 1-3）
+- git clone 成功（HEAD = 0b923d3，与远程 origin/main 一致），mkdir -p .trae/logs 完成。
+- 初始化（全程复用，仅计算一次）：TODAY=2026-08-27（北京时间）/ DAY_NUM=30 / PHASE=1
+- TODAY_TS=1787788800000 / TOMORROW_TS=1787875200000 / DAY_AFTER_TS=1787961600000
+
+## 步骤 4：飞书鉴权
+- `auth status` 报"凭证由外部提供，不支持交互管理"（非认证失败，不触发 RequestAuthorization）。
+- 改用实际任务操作验证：任务清单读取、任务创建、任务评论均以 identity=user 成功，飞书可用（硬性前置满足）。
+- 清单「Java AI Agent 转型学习计划」guid=5a08bfe3-e67f-49d7-9a33-f5681f22648d（与 snapshot 一致）。
+
+## 步骤 5：更新反馈层
+- 5.1 java-ai-agent-roadmap.html today-marker：Phase 1 · 第 29/168 天 → 第 30/168 天。
+- 5.2 charts.js __RADAR_GAP__.me：[64,40,57,40,54,60,46] → [67,40,58,40,54,60,46]。
+  NEW_DONE=3（due 08-26 的混合检索/Rerank/上下文组装 3 个任务在飞书标记完成）：Java 基础 64→67、RAG 核心链路 57→58，其余维度不变。
+- 5.3 charts.js __RADAR_DAILY__：[15,18,22,13,8,2] → [55,30,32,30,15,1]。
+  计划完成率 55（08-26 的 3 个 due 任务全部完成，连续顺延链终结）/ 学习时长 30（用户完成 3 任务但仓库无对应作业产出目录，按飞书完成信号评估）/ 知识输入 32（窗口内教程 7 份无新增）/ 实战输出 30（3 个任务完成信号，无 summary.md 落盘佐证）/ 复习覆盖 15（无复习活动证据）/ 连续打卡 1（08-26 有完成信号，连续段重启）。
+
+## 步骤 6：采集飞书任务状态 + 扫描作业（不保存 snapshot）
+- 6.1/6.2 清单任务 36 个（含本运行新建）：已完成 26 / 未完成 10（其中 1 个冻结重复任务）。
+- 6.3 assignments/ 扫描：15 个日期目录（07-31 ~ 08-27）；08-27 仅含本运行生成的 3 个教程目录（无用户 summary.md/code）；08-26 无目录。
+- 6.4 diff（对比 2026-08-26 快照）：
+  - NEW_DONE=3：混合检索实战 f6068824 / Rerank 重排序实战 fe5fd757 / 上下文组装实战 ac111082（均 due 08-26，飞书已完成）
+  - VANISHED=[]（guid 对齐，无消失任务）
+  - NEW_APPEARED=[]（运行时点无外部新增）
+- 6.5 描述核验：未完成任务 description 均为五段式非空，无需补写。
+
+## 步骤 7：滑动窗口任务规划 + 路线图拆解
+- 7.1 N=10（未完成），含 1 个重复冻结任务；有效 N=9，G=max(0,9-9)=0。
+- 7.2 G=0 分支：无需从路线图拆解新任务补量（注：本轮窗口重排后已达成 9 个活跃任务）。
+- 窗口锚定（patch 无条件重写 due）：
+
+| # | 任务 | created_at(排序) | due（重写后） |
+|---|------|------------------|-----|
+| 1 | Python requests 补齐 8cd822a1 | 1787351751287 | 08-27 今天（原 08-27 保持） |
+| 2 | RAG 评测实战 fdd4fd80 | 1787265386135 | 08-27 今天（原 08-27 保持） |
+| 3 | 引用与防幻觉实战 0865c644 | 1787265377723 | 08-27 今天（原 08-27 保持） |
+| 4 | 项目工程化整理 fce2a67c | 1787351752437 | 08-28 明天（原 08-28 保持） |
+| 5 | 技术决策日志#02 8369e983 | 1787438130000 | 08-28 明天（原 08-28 保持） |
+| 6 | pandas 实战 a834f11b | 1787438130000 | 08-28 明天（原 08-28 保持） |
+| 7 | 多轮对话 RAG 实战 55303caf | 1787783753238 | 08-29 后天（新建） |
+| 8 | 知识库增量更新实战 c2d17fb1 | 1787783814857 | 08-29 后天（新建） |
+| 9 | Python transformers 补齐 aad23299 | 1787783819612 | 08-29 后天（新建） |
+
+- 复核：重新拉取清单，due 分布 08-27×3 / 08-28×3 / 08-29×3，全部生效，活跃任务 9 个。
+- 冻结：d79332fd「多轮对话 RAG 实战：查询改写 + 指代消解（Spring AI ChatMemory + RewriteQueryTransformer）」与新建 55303caf 同名重复（创建接口重复提交所致），冻结旧 guid，保留新 guid 进入窗口。
+- 7.6 excluded.json 标题无一复活。
+- 7.7 snapshot.json 已统一保存：总数 36（已完成 26 / 活跃 9 / 冻结 1）；created_at：新建任务用飞书 API 值，其余沿用旧快照值。
+
+## 步骤 8：融合教程生成
+- 8.1 待处理列表：当天 due 3 个任务（无逾期任务——08-26 due 的 3 个任务均已完成，非逾期）。
+- 8.2 幂等检查（三信号）：
+  - 0865c644 引用与防幻觉实战：①注册表无 ②文件无（assignments/*/citation-anti-hallucination 不存在）③comment_id 无 → 未命中，生成。
+  - fdd4fd80 RAG 评测实战：①②③均无 → 未命中，生成。
+  - 8cd822a1 Python requests 补齐：①②③均无 → 未命中，生成。
+- 8.3 生成 3 篇（Java 主线 + Python 辅助，均 ≤1 小时预估，含 Phase 1 标注、路线图推荐项目、术语表、教程来源）：
+  - assignments/2026-08-27/citation-anti-hallucination/tutorial.html（16322 bytes，预估 60 分钟）
+  - assignments/2026-08-27/rag-evaluation-metrics/tutorial.html（14415 bytes）
+  - assignments/2026-08-27/python-requests-llm-api/tutorial.html（14469 bytes）
+- 8.4 提交推送：eb3cd90 "feat(tutorial): 2026-08-27 生成3篇融合教程"（raw URL 由此可用）。
+- 8.5 评论（逐条单命令，均成功取得 comment_id）：
+  - 0865c644 → comment_id 7678475384349805549
+  - fdd4fd80 → comment_id 7678475425621740750
+  - 8cd822a1 → comment_id 7678475459876654025
+  - 注册表新增 3 条（entries 7→10），单独提交：82edaa4 "chore(registry): 2026-08-27 教程注册表更新"。
+  - 注：仓库为私有（visibility=private），raw.githubusercontent.com 匿名访问返回 404 属预期；评论 URL 格式沿用 2026-08-23 既有约定（GitHub API 已验证文件存在于 main 分支）。
+- 8.6 无失败任务。
+- 附：term-whitelist.md 新增 20 个待观察术语（结构化输出、原子陈述、拒答、阈值切点、Grounding、金标集、MRR、分级相关性、RAGAS、Answer Relevancy、Context Precision/Recall、自一致性、A/B 对比实验、OpenAI 兼容接口、requests/Session、iter_lines、瞬时错误/永久错误、指数退避、jitter、tenacity）。
+
+## 步骤 9：写回与兜底
+- 9.1 本日志写入 .trae/logs/2026-08-27.log。
+- 9.2 统一提交剩余变更（snapshot.json / charts.js / java-ai-agent-roadmap.html / term-whitelist.md / 本日志）：git add . && git commit -m "chore(daily): 2026-08-27 每日维护" && git push main。
+
+## 运行结果汇总
+- NEW_DONE=3，VANISHED=0，NEW_APPEARED=0，G=0，活跃任务 9，冻结 1（重复）。
+- 新建任务 3（多轮对话 RAG / 知识库增量更新 / Python transformers，due 08-29）。
+- 教程生成 3 / 跳过 0 / 失败 0；评论 3 条全部成功；注册表 +3。
+- 提交链：eb3cd90（教程）→ 82edaa4（注册表）→ 本次最终提交（chore(daily)）。

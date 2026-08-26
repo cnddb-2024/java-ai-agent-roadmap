@@ -1,7 +1,31 @@
 {
-  "snapshot_date": "2026-08-26",
+  "snapshot_date": "2026-08-27",
   "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d",
   "tasks": [
+    {
+      "guid": "aad23299-6f51-4890-a51b-536e7b2dfb54",
+      "summary": "Python 补齐：transformers 快速上手（pipeline 跑通嵌入/生成，对比 Spring AI EmbeddingModel）",
+      "due": "2026-08-29",
+      "created_at": "1787783819612",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "c2d17fb1-9d03-4e31-9e67-22451b60bf8c",
+      "summary": "知识库增量更新实战：文档变更检测 + 向量 upsert/删除策略（内容哈希幂等入库）",
+      "due": "2026-08-29",
+      "created_at": "1787783814857",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "55303caf-5780-4962-853a-cb0492af15d1",
+      "summary": "多轮对话 RAG 实战：查询改写 + 指代消解（Spring AI ChatMemory + RewriteQueryTransformer）",
+      "due": "2026-08-29",
+      "created_at": "1787783753238",
+      "completed": false,
+      "frozen": false
+    },
     {
       "guid": "8369e983-325f-4ce3-88be-d910c2f25131",
       "summary": "技术决策日志 #02：Rerank 方案选型 Cohere API vs 本地 bge-reranker（成本/延迟/中文效果权衡）",
@@ -55,7 +79,7 @@
       "summary": "上下文组装实战：检索片段排序 + Token 预算控制 + Lost-in-the-Middle 缓解（Spring AI QueryAugmenter）",
       "due": "2026-08-26",
       "created_at": "1787265370289",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -63,7 +87,7 @@
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
       "due": "2026-08-26",
       "created_at": "1786574146455",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -71,7 +95,7 @@
       "summary": "混合检索实战：向量检索 + BM25 关键词检索融合（Spring AI + Elasticsearch/PGVector）",
       "due": "2026-08-26",
       "created_at": "1786574145473",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -257,6 +281,14 @@
       "created_at": "1785400453431",
       "completed": true,
       "frozen": false
+    },
+    {
+      "guid": "d79332fd-6fbe-4dd1-85e1-e26687833262",
+      "summary": "多轮对话 RAG 实战：查询改写 + 指代消解（Spring AI ChatMemory + RewriteQueryTransformer）[误创建重复项·冻结存档]",
+      "due": "",
+      "created_at": "1787783758457",
+      "completed": false,
+      "frozen": true
     }
   ]
 }

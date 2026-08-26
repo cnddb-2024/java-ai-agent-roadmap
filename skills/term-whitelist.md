@@ -1,7 +1,7 @@
 # 专有名词白名单（融合教程术语解释控制表）
 
 > 配套 `skills/tutorial-fusion.md` 第 12 节使用。随仓库版本化，用户与 agent 均可维护。
-> 最后更新：2026-08-22
+> 最后更新：2026-08-27
 
 ## 使用规则
 
@@ -23,9 +23,10 @@ Java, Spring Boot, Spring MVC, Spring 全家桶常见注解（@Autowired/@Servic
 
 ## 待观察（解释过或即将学到，仍必须解释）
 
-BM25, RRF（倒数排序融合）, 混合检索, Rerank（重排序）, 上下文组装, Token 预算控制, Lost-in-the-Middle, 引用溯源, Faithfulness（忠实度）, 幻觉/防幻觉, Recall@K, nDCG, LLM-as-Judge, RAG 评测, Milvus, Qdrant, Elasticsearch, tsvector, 全文检索, 向量相似度（余弦/欧氏）, 温度参数（Temperature）, 微调（Fine-tuning）, Agent, ReAct, MCP, 多模态, 知识库问答, 技术决策日志（ADR）, Bi-Encoder（双编码器）, Cross-Encoder（交叉编码器）, ScoringModel（评分模型）, ReRankingContentAggregator（重排序内容聚合器）, relevance_score（相关性分数）, ONNX Runtime, QueryAugmenter（查询增强器）, ContextualQueryAugmenter, ContentInjector（内容注入器）, ContentAggregator（内容聚合器）, CompressionQueryTransformer（查询压缩器）
+BM25, RRF（倒数排序融合）, 混合检索, Rerank（重排序）, 上下文组装, Token 预算控制, Lost-in-the-Middle, 引用溯源, Faithfulness（忠实度）, 幻觉/防幻觉, Recall@K, nDCG, LLM-as-Judge, RAG 评测, Milvus, Qdrant, Elasticsearch, tsvector, 全文检索, 向量相似度（余弦/欧氏）, 温度参数（Temperature）, 微调（Fine-tuning）, Agent, ReAct, MCP, 多模态, 知识库问答, 技术决策日志（ADR）, Bi-Encoder（双编码器）, Cross-Encoder（交叉编码器）, ScoringModel（评分模型）, ReRankingContentAggregator（重排序内容聚合器）, relevance_score（相关性分数）, ONNX Runtime, QueryAugmenter（查询增强器）, ContextualQueryAugmenter, ContentInjector（内容注入器）, ContentAggregator（内容聚合器）, CompressionQueryTransformer（查询压缩器）, OpenAI 兼容接口, requests/Session（Python HTTP 客户端）, iter_lines, 瞬时错误/永久错误, 指数退避（backoff）, jitter（抖动）, tenacity, 金标集（golden set）, MRR, 分级相关性, RAGAS, Answer Relevancy, Context Precision/Recall, 自一致性（self-consistency）, A/B 对比实验, 结构化输出, 原子陈述（Atomic Statements）, 拒答（Refusal）, 阈值切点, Grounding（接地/依据约束）
 
 ## 维护记录
 
 - 2026-08-22：初始版本。后端基础按职业背景录入；AI 侧按 07-31~08-22 已完成作业录入；待观察组为 Phase1 剩余任务及 Phase2 预计涉及术语。
 - 2026-08-23：新增 Rerank / 上下文组装两篇教程解释的 12 个术语至待观察组（Bi-Encoder、Cross-Encoder、ScoringModel、ReRankingContentAggregator、relevance_score、ONNX Runtime、QueryAugmenter、ContextualQueryAugmenter、ContentInjector、ContentAggregator、CompressionQueryTransformer 等）。
+- 2026-08-27：新增当日三篇教程解释的 20 个术语至待观察组。引用与防幻觉篇：结构化输出、原子陈述、拒答、阈值切点、Grounding；RAG 评测篇：金标集、MRR、分级相关性、RAGAS、Answer Relevancy、Context Precision/Recall、自一致性、A/B 对比实验；Python requests 篇：OpenAI 兼容接口、requests/Session、iter_lines、瞬时错误/永久错误、指数退避、jitter、tenacity。
