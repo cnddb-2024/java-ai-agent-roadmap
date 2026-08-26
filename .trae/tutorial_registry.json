@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23",
+  "updated": "2026-08-27",
   "entries": {
     "fe5fd757-cd63-4848-bafb-3e39cd001cee": {
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
@@ -61,6 +61,33 @@
       "comment_id": null,
       "generated_at": "2026-08-21",
       "note": "回填记录：按 assignments/2026-08-21 目录与任务 summary 语义对应回填"
+    },
+    "0865c644-23a3-4534-9e32-570fcd652437": {
+      "summary": "引用与防幻觉实战：RAG 回答引用溯源标注 + Faithfulness 校验 + 无依据拒答",
+      "slug": "citation-anti-hallucination",
+      "tutorial_path": "assignments/2026-08-27/citation-anti-hallucination/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-27/citation-anti-hallucination/tutorial.html",
+      "comment_id": "7678475384349805549",
+      "generated_at": "2026-08-27",
+      "note": "当日新增生成并评论"
+    },
+    "fdd4fd80-178f-4a2c-8e20-28e68b1a9f1a": {
+      "summary": "RAG 评测实战：Recall@K / nDCG / LLM-as-Judge 三层指标 + 改造前后对比报告",
+      "slug": "rag-evaluation-metrics",
+      "tutorial_path": "assignments/2026-08-27/rag-evaluation-metrics/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-27/rag-evaluation-metrics/tutorial.html",
+      "comment_id": "7678475425621740750",
+      "generated_at": "2026-08-27",
+      "note": "当日新增生成并评论"
+    },
+    "8cd822a1-cdda-4f18-8fa5-f5609a62e20d": {
+      "summary": "Python 脚本级补齐：requests 调用大模型 API 实战（OpenAI 兼容接口 + 流式 SSE + 超时重试）",
+      "slug": "python-requests-llm-api",
+      "tutorial_path": "assignments/2026-08-27/python-requests-llm-api/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-08-27/python-requests-llm-api/tutorial.html",
+      "comment_id": "7678475459876654025",
+      "generated_at": "2026-08-27",
+      "note": "当日新增生成并评论"
     }
   }
 }
