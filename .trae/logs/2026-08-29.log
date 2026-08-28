@@ -1,0 +1,71 @@
+# Java AI Agent 转型学习计划 · 每日维护日志 2026-08-29
+
+## 运行环境与初始化（步骤 1-3）
+- git clone 成功（HEAD = 7637efa，与远程 origin/main 一致），mkdir -p .trae/logs 完成。
+- 初始化（全程复用，仅计算一次）：TODAY=2026-08-29（北京时间）/ DAY_NUM=32 / PHASE=1
+- TODAY_TS=1787961600000 / TOMORROW_TS=1788048000000 / DAY_AFTER_TS=1788134400000
+- 注：08-28 未运行（上次运行为 2026-08-27，日志见 .trae/logs/2026-08-27.log）。
+
+## 步骤 4：飞书鉴权
+- `auth status --as user` 报 unknown flag（该子命令不支持 --as）；`auth status --json --verify` 报"凭证由外部提供，不支持交互管理"（非认证失败，不触发 RequestAuthorization）。
+- 改用实际任务操作验证：任务清单读取、任务 due patch 均以 identity=user 成功执行，飞书可用（硬性前置满足）。
+- 清单「Java AI Agent 转型学习计划」guid=5a08bfe3-e67f-49d7-9a33-f5681f22648d（与 snapshot 一致，已缓存至 .trae/feishu_cache.json）。
+
+## 步骤 5：更新反馈层
+- 5.1 java-ai-agent-roadmap.html today-marker：Phase 1 · 第 30/168 天 → 第 32/168 天。
+- 5.2 charts.js __RADAR_GAP__.me：[67,40,58,40,54,60,46] 保持不变。
+  NEW_DONE=0（上次快照 08-27 以来无新完成任务），me 值无推进依据，按规范保持。
+- 5.3 charts.js __RADAR_DAILY__：[55,30,32,30,15,1] → [33,25,30,25,15,0]。
+  计划完成率 33（近7天已到期任务 9 个仅完成 3 个：08-23 due 的 3 个完成，08-27/08-28 due 的 6 个未完成）/ 学习时长 25（最近完成信号为 08-27，08-28/29 无活动）/ 知识输入 30（窗口内教程 5 份无新增）/ 实战输出 25（3 个完成信号无作业落盘佐证）/ 复习覆盖 15（无复习活动证据）/ 连续打卡 0（08-27 后连续段中断，今日无完成信号）。
+
+## 步骤 6：采集飞书任务状态 + 扫描作业（不保存 snapshot）
+- 6.1/6.2 清单任务 35 个：已完成 26 / 未完成 9。tasklists list 不返回 description，改用 tasks get 逐个核验。
+- 6.3 assignments/ 扫描：16 个日期目录（07-31 ~ 08-27）；近 7 天仅 08-23（2 个教程目录）与 08-27（3 个教程目录）有内容，均为教程无用户作业产出（无 summary.md/code）；08-28、08-29 无目录。
+- 6.4 diff（对比 2026-08-27 快照）：
+  - NEW_DONE=0（无新完成任务，9 个活跃任务 guid 与快照完全一致）
+  - VANISHED=1：d79332fd「多轮对话 RAG 实战：查询改写 + 指代消解（Spring AI ChatMemory + RewriteQueryTransformer）[误创建重复项·冻结存档]」（上次运行冻结的误创建重复项，已被人工从飞书删除）。其 summary 已加入 excluded.json 的 excluded_titles。
+  - NEW_APPEARED=0
+- 6.5 描述核验：9 个未完成任务 description 均为五段式（【学习目标】【知识点】【学习资源】【验收标准】【相关面试题】）非空，desc_len 369~689，无需补写。
+
+## 步骤 7：滑动窗口任务规划 + 路线图拆解
+- 7.1 N=9（未完成且未冻结），G=max(0,9-9)=0。
+- 7.2 G=0 分支：无需拆解新任务，无冻结需求（活跃任务恰好 9 个）。
+- 窗口锚定（patch 无条件重写 due，按 snapshot created_at 从旧到新排序）：
+
+| # | 任务 | created_at(排序) | due（重写后） |
+|---|------|------------------|-----|
+| 1 | 引用与防幻觉实战 0865c644 | 1787265377723 | 08-29 今天（原 08-27 顺延） |
+| 2 | RAG 评测实战 fdd4fd80 | 1787265386135 | 08-29 今天（原 08-27 顺延） |
+| 3 | Python requests 补齐 8cd822a1 | 1787351751287 | 08-29 今天（原 08-27 顺延） |
+| 4 | 生产级 RAG 工程化整理 fce2a67c | 1787351752437 | 08-30 明天（原 08-28 顺延） |
+| 5 | 技术决策日志#02 8369e983 | 1787438130000 | 08-30 明天（原 08-28 顺延） |
+| 6 | pandas 实战 a834f11b | 1787438130000 | 08-30 明天（原 08-28 顺延） |
+| 7 | 多轮对话 RAG 实战 55303caf | 1787783753238 | 08-31 后天（原 08-29 保持） |
+| 8 | 知识库增量更新实战 c2d17fb1 | 1787783814857 | 08-31 后天（原 08-29 保持） |
+| 9 | Python transformers 补齐 aad23299 | 1787783819612 | 08-31 后天（原 08-29 保持） |
+
+- 复核：重新拉取清单验证 due 分布 08-29×3 / 08-30×3 / 08-31×3，全部生效，活跃任务 9 个，无冻结。
+- 7.6 excluded.json 中的标题无一复活（本次未创建新任务；VANISHED 标题带「[误创建重复项·冻结存档]」后缀，与正常任务标题不冲突）。
+- 7.7 snapshot.json 已统一保存：总数 35（已完成 26 / 活跃 9 / 冻结 0）；created_at 全部沿用旧快照值（无缺失、无新增）。
+
+## 步骤 8：融合教程生成
+- 8.1 待处理列表：当天 due 3 个任务（0865c644 / fdd4fd80 / 8cd822a1）。逾期任务：无（窗口锚定后无 due 早于 TODAY 的任务，原 08-27/08-28 due 任务已顺延入窗口）。合并去重后共 3 个。
+- 8.2 前置：git pull --rebase origin main 完成（Already up to date）。
+  三信号幂等检查，全部命中：
+  - 0865c644 引用与防幻觉实战：①注册表命中（slug=citation-anti-hallucination，comment_id=7678475384349805549）②文件命中（assignments/2026-08-27/citation-anti-hallucination/tutorial.html）→ 跳过
+  - fdd4fd80 RAG 评测实战：①注册表命中（slug=rag-evaluation-metrics，comment_id=7678475425621740750）②文件命中（assignments/2026-08-27/rag-evaluation-metrics/tutorial.html）→ 跳过
+  - 8cd822a1 Python requests 补齐：①注册表命中（slug=python-requests-llm-api，comment_id=7678475459876654025）②文件命中（assignments/2026-08-27/python-requests-llm-api/tutorial.html）→ 跳过
+  说明：3 个任务教程已于 2026-08-27 生成，本次 due 顺延（08-27→08-29）不触发重新生成（规范明确）。
+- 8.3 无需生成（全部跳过）。8.4 无教程提交。8.5 已跳过任务一律不评论，注册表无变更。8.6 无失败任务。
+
+## 步骤 9：写回与兜底
+- 9.1 本日志写入 .trae/logs/2026-08-29.log。
+- 9.2 统一提交剩余变更（snapshot.json / excluded.json / feishu_cache.json / charts.js / java-ai-agent-roadmap.html / 本日志）：git add . && git commit -m "chore(daily): 2026-08-29 每日维护" && git push main。
+- 时序说明：8.4 教程 push 先于 8.5 评论（本次无教程生成，无此时序依赖）；9.2 push 最后执行覆盖全部变更。
+
+## 运行结果汇总
+- NEW_DONE=0，VANISHED=1（误创建重复项已入 excluded），NEW_APPEARED=0，G=0，活跃任务 9，冻结 0。
+- 窗口滚动：08-27×3/08-28×3/08-29×3 → 08-29×3/08-30×3/08-31×3（due 无条件重写生效）。
+- 教程生成 0 / 跳过 3（幂等命中：注册表+文件）/ 失败 0；评论 0 条（跳过任务不评论）；注册表无变更。
+- 提交链：本次仅 1 个最终提交（chore(daily): 2026-08-29 每日维护）。
+- 风险提示：3 个今日任务连续第 2~3 天顺延（原 08-27 due），近 7 天计划完成率下滑（55→33），建议优先完成今日 3 任务终结顺延链。

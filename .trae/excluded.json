@@ -1,4 +1,6 @@
 {
-  "excluded_titles": [],
-  "updated": "2026-07-30"
+  "excluded_titles": [
+    "多轮对话 RAG 实战：查询改写 + 指代消解（Spring AI ChatMemory + RewriteQueryTransformer）[误创建重复项·冻结存档]"
+  ],
+  "updated": "2026-08-29"
 }
