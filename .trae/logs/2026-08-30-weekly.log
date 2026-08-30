@@ -1,0 +1,70 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-08-30 (北京时间, 周日)
+当前Phase: Phase 1 · 第 33/168 天 (RAG全链路 + 生产级项目1, 项目期)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定), 本次维持20条 (高匹配16 / 中匹配4)
+- 淘汰: 6条 (时效过期, 均为最旧批次08-17~08-18, 距今12-13天)
+  * 宁波全拓海伦数智科技·Java Agent开发工程师 (2026-08-18)
+  * 中电信人工智能公司·AI应用研发工程师 (2026-08-18)
+  * 天宇股份·AI Agent应用开发工程师 (2026-08-18)
+  * 北京某互联网公司·Java + Agent研发工程师 (2026-08-18)
+  * 辉瑞制药·大模型应用开发工程师 (2026-08-18)
+  * 某大型国有计算机软件公司·AI后端工程Java(上海) (2026-08-17)
+- 刷新: 1条 (本轮检索确认同岗仍在招, 更新日期)
+  * 上海某大型移动互联网公司·AI Agent开发专家 (08-22 → 08-29, Boss直聘)
+- 新增: 6条 (WebSearch检索, Boss直聘5条 + 今日招聘1条)
+  * 某知名互联网公司·Java开发(Agent) (2026-08-29, 高) — Java构建高性能高可用Agent运行时, 统一模型网关+Token成本管控, LangChain4j/Spring AI, ReAct/Plan-and-Execute
+  * 某人工智能公司·AI Agent工程师 (2026-08-29, 高) — Java后端/RN二选一, Agent任务编排/工具调用/上下文管理/自动化工作流
+  * 科大讯飞·高级Java开发工程师(AI Agent智能体方向) (2026-08-28, 高) — LangChain4j/Spring AI工业场景Agent, RAG检索增强系统设计, 统一LLM接入层, SpringCloud+K8s
+  * 某中型人工智能研究公司·Java开发工程师(Agent方向) (2026-08-28, 高) — 3年+Java, LLM Agent系统设计, 多轮对话/工具调用/工作流编排
+  * 中恒信工程造价咨询·AI集成与平台开发工程师(Java/AI方向) (2026-08-28, 中) — Java为主+Python联调加分岗, Spring AI/LangChain任一框架, 向量库与知识库构建
+  * 法本·Java开发工程师(AI智能体) (2026-08-27, 高) — Java搭建Agent后端核心系统, 任务规划/记忆管理/多智能体协作, LangChain/LangGraph/Dify/Coze, RAG优化
+- 弃选: 2条 (爱化身·Java+AI Agent智能体开发高级工程师: 页面更新时间2026-08-01, 时效不足9条在学容量; 恒热(四川)热水器·AI开发工程师: 发布日期未确认且Python/Java/Go任一弱匹配)
+- 当前总数: 20条 (高16 / 中4), 时效分布: 08-27~08-29共7条, 08-19~08-23共13条
+
+【区块2 实战项目】
+- 动态上限: 5条在学 (Phase 1 项目期, base 3升至4-5)
+- 淘汰/降级: 2条
+  * spring-al-alibaba-customer (在学→参考) — snapshot显示核心学习重点"混合检索实战(08-26完成)/Rerank重排序实战(08-26完成)"均已掌握, 意图识别路由属Phase2内容, 学习目标达成移入参考池
+  * springai-knowledge-server (在学→参考) — 核心学习重点"混合检索→RRF→bge-reranker完整链路"对应实战已于08-26全部完成, 移入参考池
+- 新增: 3条
+  * spring-ai-alibaba-examples (在学) — 官方evaluation-example(Relevancy/FactChecking/AnswerRelevancy/AnswerCorrectness/AnswerFaithfulness五类评估接口)+chat-memory-example+observability-example, 直接对应08-30待办"RAG评测实战(Recall@K/nDCG/LLM-as-Judge)"
+    GitHub: github.com/spring-ai-alibaba/examples
+  * agentic-rag (在学) — Spring Boot 3.2+pgvector+OpenSearch+Testcontainers; Planning Agent→多源检索→验证修正→Replan迭代闭环+三层记忆+Testcontainers CI评测, 对应"RAG评测实战/生产级RAG工程化(08-31)"待办
+    GitHub: github.com/hkevin01/agentic-rag
+  * egovframe-ai-rag (参考) — Spring AI 1.0.1/LangChain4j 1.8双模块平行实现+社区re-index/stale chunk清理议题(向量增量更新反面案例)+本地Ollama闭源网部署, 对应09-01待办"知识库增量更新实战"
+    GitHub: github.com/eGovFramework/egovframe-ai-rag
+- 弃选: 2条 (rag-study-helper已在参考池重复命中不追加; LangChain4j官方RAG文档为文档非工程项目)
+- 当前总数: 17条 (在学5 / 参考12)
+  * 在学: knowledgeops-agent, rag-knowledge-system, cryptocopilot, spring-ai-alibaba-examples, agentic-rag
+  * 参考: spring-al-alibaba-customer, springai-knowledge-server, springboot-ai-rag-tutorial, Java-LLM-integration, Spring AI Alibaba官方生态, java-ai-labs, ai-code-helper, spring-ai-ragas, rag-study-helper, spring-ai-alibaba-playground, spring-ai-crossborder-customer-service, egovframe-ai-rag
+
+【区块3 面试题】
+- 动态上限: 10题T1 (Phase 1非冲刺期, 维持5-10)
+- 淘汰: 1条T1
+  * "混合检索 + Rerank原理" — snapshot对应任务"混合检索实战(08-26完成)/Rerank重排序实战(08-26完成)"均已done, 考察内容(稠密稀疏互补+RRF融合+Cross-Encoder精排)已掌握, 移出第一梯队并降级为T2巩固题点
+- 新增: 1条T1
+  * "RAG召回效果排查与调优路径" (牛客2026-08 AI Agent岗面经) — 五维排查(Query改写质量/切块粒度/Embedding领域适配/索引参数与过滤/数据覆盖度)+分层调优策略, 整合已掌握的改写/切块/Embedding/混合检索/Rerank为诊断框架, 恰为Phase 1收官整合能力
+- T2增量: 移出1条, 新增2条
+  * 移出: "上下文组装与Lost-in-the-Middle缓解" — 对应任务"上下文组装实战(08-26完成)"已掌握, 移出第二梯队
+  * 新增: "知识库增量更新与向量数据一致性" (小米真题) — content_hash/mtime粗筛+hash精筛变更检测、先删后增原子更新、chunk ID带doc_id前缀批量清理、双索引/namespace版本化切换、Webhook/MQ事件驱动入库; 对应09-01待办
+  * 新增: "混合检索与Rerank原理表达巩固" (从T1降级) — RRF排名融合+Cross-Encoder精排延迟代价+黄金组合, 两项实战已完成, 重点练面试口述表达
+- T3增量: 新增1条
+  * "RAG vs 微调选型与组合" (牛客Agent面试-RAG篇) — 知识频繁变化需溯源选RAG、风格适配与深层领域内化选微调、生产组合"微调定怎么说/RAG管说什么"
+- 当前总数: T1=10题 / T2净+1题点 / T3+1题点, 三梯队分级结构保持
+
+【其他维护】
+- today-marker: 已为第33/168天(Phase 1), 与北京时间2026-08-30一致(起始2026-07-29), 无需变更
+- 页脚时效日期: 2026-08-23 → 2026-08-30
+- HTML结构校验: JD tbody=20行(高16/中4), 项目17行(在学5/参考12), T1=10行, tr/td/table/tbody/section/div/p/span标签全部闭合无误
+
+【运行状态】
+- 搜索来源: WebSearch (Boss直聘/前程无忧/今日招聘/GitHub/牛客网/CSDN/掘金)
+- 搜索方式: 3个Explore子代理并行检索(JD/项目/面试题各1个)
+- snapshot掌握度: 读取.trae/snapshot.json (snapshot_date=2026-08-30)
+  - 已完成任务26个 (Phase 0全部 + Phase 1文档解析/智能切分/向量库选型/Embedding选型/混合检索/Rerank/上下文组装等)
+  - 未完成任务9个 (引用防幻觉/RAG评测/requests脚本/RAG工程化/决策日志#02/pandas/多轮对话RAG/知识库增量更新/transformers)
+- 运行结果: 成功
