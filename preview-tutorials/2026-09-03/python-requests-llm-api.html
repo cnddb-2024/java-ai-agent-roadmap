@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 脚本级补齐：requests 调用大模型 API 实战（OpenAI 兼容接口 + 流式 SSE + 超时重试） | Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+  display: block;
+}
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+th { background: var(--bg2); font-weight: 600; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · Python 贯穿线（辅助线） · 第 30/168 天</div>
+  <h1>Python 脚本级补齐：requests 调用大模型 API 实战（OpenAI 兼容接口 + 流式 SSE + 超时重试）</h1>
+  <div class="meta">总预估时长：<strong>约 55 分钟</strong>（requests 与 Session 连接池 10min / OpenAI 兼容接口调用 12min / 流式 SSE 解析 15min / 超时与指数退避重试 12min / 完整脚本与对比 Spring AI 6min）。Python 为主线任务，Java 对照帮助锚定（你是 8 年 Java 后端）。</div>
+</div>
+
+<h2>一、requests 是什么：Python 世界的 HTTP 客户端（10min）</h2>
+<p><strong>requests</strong>：Python 最常用的 HTTP 客户端库（对标 Java 的 OkHttp / Apache HttpClient / Spring 的 RestTemplate），一句 <code>requests.post(url, json=payload)</code> 完成请求，自动处理 JSON 序列化、连接复用。安装：<code>pip install requests</code>。</p>
+<p><strong>Session（会话对象）</strong>：requests 的连接池封装——同一个 Session 复用底层 TCP 连接（keep-alive），相当于 OkHttp 的连接池 + 拦截器挂载点（可统一加 header）。批量调 API 时务必用 Session，别每次裸调 <code>requests.post</code>（每次新建连接，慢且费端口）。</p>
+<pre><code>import requests
+
+session = requests.Session()
+session.headers.update({
+    "Authorization": "Bearer " + os.environ["LLM_API_KEY"],  # 密钥走环境变量
+    "Content-Type": "application/json",
+})
+# 之后所有请求复用连接池，类似 OkHttp 单例 client
+resp = session.post(LLM_URL, json=payload, timeout=(5, 60))
+print(resp.status_code, resp.json()["choices"][0]["message"]["content"])</code></pre>
+<div class="tip"><strong>Java 直觉映射</strong>：<code>requests.Session()</code> ≈ OkHttp 的 <code>OkHttpClient</code> 单例；<code>session.headers.update(...)</code> ≈ 添加全局拦截器统一塞 header；<code>timeout=(5, 60)</code> ≈ OkHttp 的 <code>connectTimeout/readTimeout</code> 分离设置。</div>
+
+<h2>二、OpenAI 兼容接口：一套协议打天下（12min）</h2>
+<p><strong>OpenAI 兼容接口（OpenAI-compatible API）</strong>：业界事实标准——各厂商（DeepSeek、通义、Ollama 本地、vLLM 私有化部署）都提供与 OpenAI <code>/v1/chat/completions</code> 相同格式的接口，换 provider 只改 base_url + api_key + model 三要素。这意味着写一次脚本，可以无缝切换云端/本地模型。</p>
+<pre><code>import os
+import requests
+
+BASE_URL = os.environ["LLM_BASE_URL"]   # 如 https://api.deepseek.com/v1 或 http://localhost:11434/v1
+API_KEY  = os.environ["LLM_API_KEY"]
+MODEL    = os.environ["LLM_MODEL"]
+
+payload = {
+    "model": MODEL,
+    "messages": [
+        {"role": "system", "content": "你是严谨的技术助手，只依据给定资料回答。"},
+        {"role": "user", "content": "用一句话解释什么是 RAG。"},
+    ],
+    "temperature": 0.2,     # 越低越确定（0 = 近似确定性输出）
+    "max_tokens": 512,
+}
+
+resp = session.post(BASE_URL + "/chat/completions", json=payload, timeout=(5, 60))
+resp.raise_for_status()     # 4xx/5xx 直接抛异常，类似 RestTemplate 的错误处理
+data = resp.json()
+print(data["choices"][0]["message"]["content"])</code></pre>
+<p>字段对照 Java：<code>messages</code> 就是 Spring AI 里 <code>Prompt</code> 的 SystemMessage/UserMessage 列表；<code>temperature</code>/<code>max_tokens</code> 与 ChatOptions 一一对应；返回的 <code>choices[0].message.content</code> 即 ChatResponse 的 generation 内容。</p>
+
+<h2>三、流式 SSE：逐 token 打印（15min）</h2>
+<p><strong>SSE（Server-Sent Events）</strong>：服务端单向推送协议——响应头 <code>Content-Type: text/event-stream</code>，正文按 <code>data: {...}\n\n</code> 分帧，每帧一个 JSON 增量。大模型接口用它把生成过程边算边发（你已经熟悉概念，这里补 Python 解析细节）。</p>
+<p>关键三点：<code>stream=True</code> 开流式；<code>iter_lines()</code> 逐行迭代（像 BufferedReader.readLine）；帧以 <code>data: </code> 前缀开头，<code>[DONE]</code> 是结束哨兵：</p>
+<pre><code>def stream_chat(session, payload):
+    payload = dict(payload, stream=True)   # 开启流式
+    with session.post(BASE_URL + "/chat/completions",
+                      json=payload, stream=True, timeout=(5, 120)) as resp:
+        resp.raise_for_status()
+        for line in resp.iter_lines(decode_unicode=True):
+            if not line or not line.startswith("data: "):
+                continue                    # 跳过空行与注释行
+            chunk = line[len("data: "):]
+            if chunk == "[DONE]":           # 结束哨兵
+                break
+            delta = json.loads(chunk)["choices"][0]["delta"]
+            piece = delta.get("content")
+            if piece:
+                print(piece, end="", flush=True)   # 逐 token 打印
+
+stream_chat(session, payload)</code></pre>
+<div class="tip"><strong>坑位</strong>：①流式请求的 read timeout 要放宽（生成全程算 read 阶段，120s 起步）；②<code>flush=True</code> 别忘，否则 token 攒在缓冲区看不到"打字机效果"；③delta 里首帧可能有 role、末帧可能是 finish_reason，都要判空。Java 对照：Spring AI 的 <code>.stream()</code> 返回 Flux，底层就是解析同样的 SSE 帧——你写的这个解析器就是 Flux 版的手动展开。</div>
+
+<h2>四、超时与指数退避重试（12min）</h2>
+<p>线上脚本必须处理两类失败：<strong>瞬时错误</strong>（429 限流 / 500 / 网络抖动——值得重试）与<strong>永久错误</strong>（401 认证错 / 400 参数错——重试无意义）。策略：指数退避重试瞬时错误，永久错误立即报错。</p>
+<p><strong>指数退避（Exponential Backoff）</strong>：每次重试等待时间翻倍（1s→2s→4s），给服务恢复时间；加<strong>抖动（jitter，随机扰动）</strong>防止所有客户端同一时刻集体重试造成二次冲击（惊群效应）——对应 Java 里 Resilience4j 的 retry + randomizedDelay 思路。</p>
+<pre><code>RETRYABLE = {429, 500, 502, 503, 504}   # 瞬时错误：限流与网关类
+MAX_ATTEMPTS = 4
+
+def chat_with_retry(session, payload):
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            resp = session.post(BASE_URL + "/chat/completions",
+                                json=payload, timeout=(5, 60))
+            if resp.status_code in RETRYABLE:
+                raise requests.HTTPError(f"retryable {resp.status_code}")
+            resp.raise_for_status()          # 401/400 在这里直接抛出，不重试
+            return resp.json()
+        except (requests.ConnectionError, requests.Timeout, requests.HTTPError) as e:
+            if attempt == MAX_ATTEMPTS:
+                raise                        # 重试耗尽，向上抛
+            backoff = min(2 ** attempt, 30)  # 2s, 4s, 8s ... 封顶 30s
+            sleep = backoff * (0.5 + random.random() * 0.5)  # 加 jitter
+            print(f"[retry {attempt}/{MAX_ATTEMPTS-1}] {e} -> sleep {sleep:.1f}s")
+            time.sleep(sleep)</code></pre>
+<p>进阶可用 <strong>tenacity</strong>（Python 重试库，声明式装饰器 <code>@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=60))</code>——对标 Spring Retry 的 <code>@Retryable</code>），OpenAI 官方文档也推荐它处理 429。</p>
+
+<h2>五、完整脚本 + 与 Spring AI 对比（6min）</h2>
+<p>把四节拼成可复用脚本 <code>llm_client.py</code>（环境变量配置 / Session 连接池 / 流式 / 重试），它将直接服务于明天的 pandas 数据处理与后续评测脚本。</p>
+<table>
+<thead><tr><th>维度</th><th>Python requests</th><th>Spring AI ChatClient</th></tr></thead>
+<tbody>
+<tr><td>调用形态</td><td>裸 HTTP + 手动拼 JSON，全部细节可见</td><td>Builder 链式 API，Prompt/Options/Advisor 全封装</td></tr>
+<tr><td>流式</td><td>iter_lines 手动解析 SSE 帧</td><td>.stream() 返回 Flux，背压自动处理</td></tr>
+<tr><td>重试/弹性</td><td>手写退避或 tenacity 装饰器</td><td>Spring Retry / Resilience4j 注解，与微服务体系集成</td></tr>
+<tr><td>适用场景</td><td>评测脚本、数据处理、快速验证</td><td>生产服务、企业级工程、可观测体系</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>面试一句话</strong>：两语言调同一个 OpenAI 兼容协议，Java 胜在工程化封装（Advisor/可观测/弹性），Python 胜在脚本效率（评测与数据处理零样板）——这正是路线图"Java 主线 + Python 辅助"分工的原因。</div>
+
+<h2>📝 术语表</h2>
+<table>
+<thead><tr><th>术语</th><th>一句话解释（锚定已有知识）</th></tr></thead>
+<tbody>
+<tr><td>requests</td><td>Python 的 HTTP 客户端库，对标 Java 的 OkHttp / RestTemplate</td></tr>
+<tr><td>Session（requests）</td><td>带连接池的会话对象，复用 TCP keep-alive 连接，对标 OkHttpClient 单例</td></tr>
+<tr><td>OpenAI 兼容接口</td><td>业界事实标准的 /v1/chat/completions 协议格式，换厂商只改 base_url/key/model</td></tr>
+<tr><td>SSE 帧（data: 前缀）</td><td>流式响应按 "data: {json}\n\n" 分帧推送，[DONE] 是结束哨兵</td></tr>
+<tr><td>iter_lines</td><td>响应体逐行迭代器，类似 BufferedReader.readLine，用于解析 SSE</td></tr>
+<tr><td>瞬时错误 / 永久错误</td><td>429/5xx/超时值得重试；401/400 参数错重试无意义，直接报错</td></tr>
+<tr><td>指数退避（backoff）</td><td>重试等待时间逐次翻倍（1s→2s→4s），给下游恢复时间</td></tr>
+<tr><td>jitter（抖动）</td><td>退避时长上加随机扰动，防止所有客户端同一秒集体重试（惊群）</td></tr>
+<tr><td>tenacity</td><td>Python 声明式重试库，@retry 装饰器对标 Spring Retry 的 @Retryable</td></tr>
+</tbody>
+</table>
+
+<h2>教程来源</h2>
+<ol class="src">
+<li>requests 官方文档（Session、超时、流式响应）: <a href="https://requests.readthedocs.io/">https://requests.readthedocs.io/</a></li>
+<li>OpenAI API 参考·Chat Completions（请求体字段与流式协议）: <a href="https://platform.openai.com/docs/api-reference/chat">https://platform.openai.com/docs/api-reference/chat</a></li>
+<li>Python 第一次调用 OpenAI 格式兼容 API：环境变量、超时与脱敏报错: <a href="https://juejin.cn/post/7671102062592065570">https://juejin.cn/post/7671102062592065570</a></li>
+<li>OpenAI Rate limits 官方指南（tenacity 指数退避示例）: <a href="https://developers.openai.com/api/docs/guides/rate-limits">https://developers.openai.com/api/docs/guides/rate-limits</a></li>
+<li>Resilient LLM services with Tenacity and fallback models（瞬时/永久错误区分）: <a href="https://www.learnwithparam.com/blog/resilient-llm-services-tenacity-fallback-models">https://www.learnwithparam.com/blog/resilient-llm-services-tenacity-fallback-models</a></li>
+<li>Python 大模型 API 错误重试实战指南（退避策略与雪崩防护）: <a href="https://blog.csdn.net/VarLens/article/details/152934843">https://blog.csdn.net/VarLens/article/details/152934843</a></li>
+<li>Ollama 官方仓库（本地 OpenAI 兼容接口，base_url 指向本地）: <a href="https://github.com/ollama/ollama">https://github.com/ollama/ollama</a></li>
+<li>Spring AI 官方文档（ChatClient/流式对照参考，路线图推荐项目）: <a href="https://docs.spring.io/spring-ai/reference/">https://docs.spring.io/spring-ai/reference/</a></li>
+</ol>
+
+<footer>Java AI Agent 转型学习计划 · Phase 1 Python 贯穿线 · 专属融合教程 · 2026-08-27</footer>
+</div>
+</body>
+</html>
