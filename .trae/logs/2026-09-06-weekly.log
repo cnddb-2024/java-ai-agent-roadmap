@@ -1,0 +1,77 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-09-06 (北京时间, 周日)
+当前Phase: Phase 1 · 第 40/168 天 (RAG全链路 + 生产级项目1, 项目期)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定), 本次维持20条 (高19 / 中1)
+- 淘汰: 6条
+  * 科大讯飞·高级Java开发工程师(AI Agent智能体方向) (2026-08-28) — 本轮检索确认职位已关闭, 失效移除
+  * 博彦科技·Java开发工程师(AI项目) (2026-08-19) — 时效过期, 距今18天
+  * 中数智汇·Java开发工程师(AI应用/C端方向) (2026-08-19) — 时效过期
+  * 深圳创见网络·Java开发工程师(AI应用方向) (2026-08-19, 中) — 时效过期
+  * 杭州某大型计算机软件上市公司·大模型后端开发 (2026-08-19, 中) — 时效过期
+  * 文慧通智能·AI应用开发/大模型智能体开发工程师 (2026-08-19, 中) — 时效过期
+- 刷新: 2条 (本轮检索确认同岗仍在招, 更新日期)
+  * 某中型人工智能研究公司·Java开发工程师(Agent方向) (08-28 → 09-05, Boss直聘)
+  * 某大型半导体公司(深圳)·Java Agent开发 (08-21 → 09-04, Boss直聘)
+- 新增: 6条 (WebSearch检索, 智联招聘3条 + Boss直聘2条 + 猎聘1条)
+  * 南京众信慧德网络科技·Java AI智能体开发工程师 (2026-09-05, 高) — Java硬性+Agent架构/RAG/Function Calling全对口, Python/Go仅加分, 门槛适中
+  * 天宇股份·AI Agent应用开发工程师 (2026-09-05, 高) — 08-18批次淘汰后确认重新在招, 重新收录
+  * 胥瓷信息科技·政务AI应用开发工程师(Java/智能体方向) (2026-09-05, 高) — Spring AI/LangChain4j流程编排+RAG+混合检索+GraphRAG, 要求8年+Java资历门槛高
+  * 中电信人工智能科技·AI应用研发工程师 (2026-09-04, 高) — 08-18批次淘汰后确认重新在招, 重新收录
+  * 蚂蚁消金·Java高级AI工程师/专家 (2026-08-31, 高) — 生产级Agent工程化(Token经济性/模型路由/评测可观测/安全护栏), 冲刺型岗位
+  * 成都图巧科技·高级Agent开发工程师 (2026-08-26, 高) — LangChain4j/Spring AI/Strands接入LLM, 执行引擎/工具调用框架/对话记忆, Python仅加分
+- 弃选: 冰兰智能 (08-20时效不足且智能语音为优先方向非核心目标)、重庆泓创智诚 (发布日期未确认+要求1年带团队经验)、郑州韬正人力/恒达智控 (发布日期未确认)、商越网络 (职友集聚合页非JD详情页)、北京凡尔康猎头保险岗 (08-17过旧+8年Java+硕士优先)、云图天下/量之智能 (Java/Python双硬性, 暂避)
+- 当前总数: 20条 (高19 / 中1), 时效分布: 09-04~09-05共6条, 08-26~08-31共3条, 08-21~08-29共11条
+
+【区块2 实战项目】
+- 动态上限: 5条在学 (Phase 1 项目期, base 3升至4-5)
+- 淘汰/降级: 4条
+  * knowledgeops-agent (在学→参考) — 可观测三件套对应Micrometer实战已于08-20完成, 多租户/RBAC/审计属Phase 2工程化内容, 定位"demo→生产差距参照"移入参考池, 腾出在学空位
+  * rag-study-helper (参考→移除) — LangChain4j 0.35版本过旧, 多向量库对比场景已由egovframe-ai-rag与rag-knowledge-system覆盖
+  * java-ai-labs (参考→移除) — Lab01-04内容(流式/结构化输出/RAG基础/Function Calling)对应实战任务已全部掌握, 双框架选型对比为Phase 0验收项已完成
+  * spring-ai-alibaba-playground (参考→移除) — 与在学spring-ai-alibaba-examples官方示例集高度重叠, 抗堆叠去重
+- 新增: 5条 (WebSearch/GitHub检索)
+  * rag-agent-orchestrator (在学) — QueryRewriteAgent查询改写+judge→rewrite→retrieve有界重试循环; 3个并行Retriever(k=6/10/14)召回对照; 文档版本化(logicalId/version/is_latest)+re-embedding API增量更新, 直接对应09-06两个待办(多轮对话RAG查询改写/知识库增量更新)
+    GitHub: github.com/ksktechai/rag-agent-orchestrator
+  * spring-ai-examples (参考) — Spring官方示例集: evaluation-recursive-advisor-demo评测Advisor示范+ollama-flow-judge本地LLM-as-Judge+integration-testing, Spring AI 2.0新API权威写法来源
+    GitHub: github.com/spring-projects/spring-ai-examples
+  * langchain4j-examples (参考) — LangChain4j官方示例集: rag-examples按easy→naive→advanced→low-level分层(advanced含查询压缩/元数据过滤/重排), customer-support-agent-example记忆+工具+RAG完整范例, 2026-09仍活跃
+    GitHub: github.com/langchain4j/langchain4j-examples
+  * JavaDocRAG (参考) — Python transformers三件套(嵌入/重排/多模态)上手即视即用; 答案带[n]内联引用直达Javadoc锚点; 金标准回归评测套件, 对应09-06 transformers待办
+    GitHub: github.com/sririthishpalani-max/JavaDocRAG
+  * canary (参考) — Java编排层+Python检索层真实混合架构; 流式回答带[Page N]页级引用+Citation Inspector逐条核对; docs/下7份决策文档(含RAG管线LLD与混合打分公式), 对应生产级工程化整理待办
+    GitHub: github.com/hanessn1/canary
+- 弃选: 3条 (kedajava/spring-ai-rag-pipeline: 三种查询模式与在学spring-ai-alibaba-examples+cryptocopilot功能重叠; rogervinas/spring-boot-ai-langfuse-evaluations: 评测维度本周已有官方示例+T2题点覆盖, 留待下轮评估; rage4j: 与spring-ai-ragas评测断言能力重叠)
+- 当前总数: 19条 (在学5 / 参考14)
+  * 在学: rag-knowledge-system, cryptocopilot, spring-ai-alibaba-examples, agentic-rag, rag-agent-orchestrator
+  * 参考: knowledgeops-agent, spring-al-alibaba-customer, springai-knowledge-server, springboot-ai-rag-tutorial, Java-LLM-integration, Spring AI Alibaba官方生态, ai-code-helper, spring-ai-ragas, spring-ai-crossborder-customer-service, egovframe-ai-rag, spring-ai-examples, langchain4j-examples, JavaDocRAG, canary
+
+【区块3 面试题】
+- 动态上限: 10题T1 (Phase 1非冲刺期, 维持5-10)
+- 淘汰: 0条T1 — snapshot显示08-30周报以来无新完成任务(已完成26个与上周一致), T1各题对应实战/原理深度均未完全掌握, 无淘汰依据
+- 新增: 0条T1 (T1已满10题无空位, 遵循"仅补空位"原则)
+- T2增量: 新增5题点 (按最弱维度挑选: 评测体系/上下文工程/结构化输出/应用安全)
+  * "LLM-as-Judge可靠性与偏差校准" (犬小哈/CSDN 2026) — 位置偏差(交换顺序跑两遍)/自偏好(不得自评自)/长度偏差; rubric化+CoT后输出JSON一致性显著提升; Fleiss' Kappa人工对齐; 裁判降级省10倍成本; Java侧Spring AI RelevancyEvaluator/FactCheckingEvaluator
+  * "RAG离线评测与线上体验对齐及评估闭环" (小林/牛客 2026) — 线上指标(点踩率/追问率/转人工率/空回答率/会话解决率); 离线高分线上翻车根因(测试集分布失真/指标优化过头反噬体验); CI/CD质量门禁+bad case从trace回流评测集, Agent侧评测集防过拟合不与向量样本库重合
+  * "上下文工程Context Engineering" (掘金 2025热点) — 上下文五要素; 超限四策略(滑动窗口/摘要/选择性检索/结构化分区); 软压缩LLMLingua vs 硬压缩AutoCompressors; Loop跑久上下文衰减需在Harness层做压缩与状态持久化
+  * "LLM结构化输出稳定性工程治理" (掘金 2025) — 事前Schema+few-shot+JSON Mode → 事中约束解码逐token屏蔽合规率40%→近100% → 事后校验+错误回喂重试2-3次+JSON修复器兜底; 语法合法≠语义正确
+  * "Prompt注入防护与LLM数据安全" (牛客 2026) — 直接注入/间接注入(RAG检索文档与工具返回藏指令是重灾区); 输入-架构-输出三层防护(指令数据隔离/Allow-Deny-Ask/PII脱敏); Giskard红队扫描纳入回归; MCP三层安全
+- T3增量: 新增1题点
+  * "Pre-Norm+RMSNorm+SwiGLU现代架构组件" (CSDN 2026大模型面试圣经, 字节/DeepSeek真题向) — Pre-Norm恒等梯度通路稳定易收敛vs Post-Norm上限高难训; RMSNorm去均值少参数快10-15%; SwiGLU三分支门控与2/3·4d维度补偿
+- 当前总数: T1=10题(不变) / T2净+5题点 / T3净+1题点, 三梯队分级结构保持
+
+【其他维护】
+- today-marker: 第38/168天 → 第40/168天 (起始2026-07-29, 与北京时间2026-09-06一致, 仍为Phase 1项目期)
+- 页脚时效日期: 2026-08-30 → 2026-09-06
+- HTML结构校验: JD tbody=20行(高19/中1, 日期严格降序), 项目19行(在学5/参考14), T1=10行, 全文件标签闭合无误; 本轮修复JD区块一处</tbody>闭合标签(脚本切片越界所致, 已验证修复)
+
+【运行状态】
+- 搜索来源: WebSearch (Boss直聘/智联招聘/猎聘/前程无忧/今日招聘/GitHub/牛客网/CSDN/掘金/小林coding/犬小哈)
+- 搜索方式: 3个检索子代理并行(JD/项目/面试题各1个), 均逐一核验链接真实性与活跃时间
+- snapshot掌握度: 读取.trae/snapshot.json (snapshot_date=2026-09-04)
+  - 已完成任务26个 (与08-30周报一致, 本周无新增完成)
+  - 未完成任务9个 (transformers/知识库增量更新/多轮对话RAG/决策日志#02/pandas/生产级RAG工程化/requests调用LLM API/RAG评测/引用防幻觉)
+- 运行结果: 成功
