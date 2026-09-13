@@ -1,0 +1,69 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-09-13 (北京时间, 周日)
+当前Phase: Phase 1 · 第 47/168 天 (RAG全链路 + 生产级项目1, 项目期, 09-22收官)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定), 本次维持20条 (高18 / 中2)
+- 淘汰: 5条 (本轮WebFetch逐一核验, 确认失效/变岗)
+  * 成都某大型互联网招聘平台公司·Agent开发工程师 (2026-08-22) — 职位已关闭(09-10核验)
+  * 北京某人工智能公司·Java开发工程师(Agent) (2026-08-22) — 猎聘链接已变更为测试开发岗, 不再属于目标岗位方向
+  * 上海数珩信息科技·Java高级开发(AI应用) (2026-08-22) — 职位已关闭(09-07核验)
+  * 北京某中型人工智能公司·大模型应用高级Java工程师 (2026-08-22) — 职位已关闭(09-03核验)
+  * 悦智人工智能(深圳)·Java开发(大模型应用开发) (2026-08-21) — 职位已关闭(09-02核验)
+- 刷新: 3条 (本轮核验同岗仍在招, 更新日期)
+  * 天宇股份·AI Agent应用开发工程师 (09-05 → 09-06, Boss直聘)
+  * LinkDoc·大模型应用开发工程师 (08-23 → 09-03, Boss直聘)
+  * 某知名互联网公司·Java开发(Agent) (08-29 → 08-30, Boss直聘)
+- 新增: 5条 (WebSearch检索, 猎聘1 + Boss直聘2 + 网易社招1 + 鱼泡网1)
+  * 某宁波大型基金/证券/期货公司·大模型应用开发工程师 (2026-09-12, 高, 猎聘) — Java 3年+硬性, Spring Boot/Cloud + Spring AI + LangChain4j + RAG + 生产上线经验全对口
+  * 杭州某大型互联网电商平台上市公司·Java开发工程师-AI Agent方向 (2026-09-11, 高, Boss直聘) — 企业级Agent平台服务端 + Multi Agent运行时 + LLM上下文工程 + Agent深度记忆/行动系统
+  * 网易(效率工程部)·AI Agent开发工程师 (2026-09-07, 高, 网易社招) — Java/Python一种以上即可(Java可投), ReAct/Plan-and-Execute/Multi-Agent + 上下文工程 + 效果评测, 大厂Agent工具产品
+  * 互呈信息·全栈开发(Java/JS/AI) (2026-09-07, 中, Boss直聘) — Java+LangChain4j+Spring AI对口, Python属全栈硬性故按"Java+Python加分"档标中, 方向偏全栈
+  * 杭州云审中软信息技术·Java软件开发工程师(LangChain4j) (2026-09-05, 高, 鱼泡网) — LangChain4j核心组件 + RAG + Milvus/PgVector + 本地模型部署, 门槛适中
+- 弃选: 重庆小易智联(Java+Python双硬性, 暂避)、科大讯飞AI Agent智能体方向(09-06核验职位已关闭)、在秀网络(远程兼职+发布日期未确认)
+- 当前总数: 20条 (高18 / 中2), 时效分布: 09-03~09-12共12条, 08-23~08-31共8条, 日期严格降序
+
+【区块2 实战项目】
+- 动态上限: 5条在学 (Phase 1 项目期, base 3升至4-5)
+- 淘汰: 1条参考移除
+  * springboot-ai-rag-tutorial (参考→移除) — 与新增rag-spring-ai(Spring AI 1.1.4, 13模块+4场景, 核验活跃)定位重叠且技术栈更新, 抗堆叠替换; 同步移除孤儿引用cite-18
+- 在学状态: 5条维持无变化 (rag-knowledge-system, cryptocopilot, spring-ai-alibaba-examples, agentic-rag, rag-agent-orchestrator), 无"已完成"需降级
+  * 核验: rag-agent-orchestrator可访问(Spring Boot 4 + Java 25 + pgvector + Ollama qwen2.5:7b); spring-ai-alibaba-examples确认为官方仓库(2.9k stars, 正确地址github.com/spring-ai-alibaba/examples, 行内已补cite-27链接)
+- 更新: 1条
+  * knowledgeops-agent (参考, 内容刷新) — 本轮核验README新增细节: RAG Evaluation Studio(recall@k/MRR/faithfulness回归评测) + EvidenceJudge三维评分(相关性/权威性/时效性) + Citation编号引用 + Agent工作流状态机(Planning→Searching→Retrieving→Judging→Reflecting→Writing) + Redis Stream/RabbitMQ异步入库(幂等键+重试+DLQ) + 7-job CI门禁, 与Phase 1收官待办(评测/引用溯源/工程化)直接对应
+- 新增: 2条参考
+  * rag-spring-ai (参考) — Java 25 + Spring Boot 3.5 + Spring AI 1.1.4 + pgvector(HNSW/COSINE) + Ollama(qwen3:4b + nomic-embed-text); 13能力模块+4真实场景(基础/高级RAG、grounded回答、多轮Memory、向量库操作); Spring AI 1.1.x新API写法参照
+    GitHub: github.com/gdunhao/rag-spring-ai
+  * spring-ai-tutorial (参考) — Spring AI/Alibaba中文全模块教程: advisor/tool-calling/structured-output/vector/rag/rag-evaluation/mcp/observation/graph/agent; rag-evaluation模块直接对应评测待办
+    GitHub: github.com/GTyingzi/spring-ai-tutorial
+- 当前总数: 20条 (在学5 / 参考15)
+
+【区块3 面试题】
+- 动态上限: 10题T1 (Phase 1非冲刺期, 维持5-10)
+- 淘汰: 0条T1 — snapshot(2026-09-04)显示已完成任务仍为26个(与09-06周报一致, 本周无新增完成), T1各题对应深度均未掌握, 无淘汰依据
+- 新增: 0条T1 (T1已满10题无空位, 遵循"仅补空位"原则)
+- T1内容深化: 1题
+  * "RAG幻觉分层治理+引用溯源与拒答" 由两层拆解升级为三层拆解 — 新增数据层"忠实但错误"(上下文本身错误/过时: 来源可信度与知识截止日期元数据、时间敏感查询日期过滤、多文档交叉校验), 依据Velocode 2026-05真题与小林面试笔记
+- T2增量: 新增3题点 + 1题点增强 (按最弱维度挑选: RAG评测/引用溯源/知识库增量更新)
+  * "Faithfulness指标悖论与数据层幻觉归因" (Velocode 2026-05真题) — Faithfulness只衡量答案对检索上下文的忠实度而非真实正确性, 上下文本身错误/过时即"忠实但错误"; 先三层归因再治理: 来源元数据/时间敏感查询日期过滤/多文档交叉校验
+  * "知识库灰度发布与回滚" (小林面试笔记) — 新版chunk打version标签与旧版并行→测试问题双跑验证无退化→切版本过滤条件→清理旧chunk; 回滚即切回旧版本过滤; 并行期用隔离namespace保证检索一致性
+  * "引用溯源结构化输出设计" (小林面试笔记) — 输出JSON: answer+statements[](claim/source_ids/confidence); 系统校验source_ids存在性与结论-来源相关性、低置信度规则复核; 比[N]内联编号更可机检
+  * 增强: "RAG评测集构造与baseline设计"补充牛客2026-09二面实录追问角度(数据集来源/格式/评测维度与指标逐层深挖)
+- T3增量: 0题点 (本轮检索无新增概念级考点, AI Coding占比类追问已被现有"Vibe Coding工程化"覆盖)
+- 当前总数: T1=10题(不变, 1题内容深化) / T2净+3题点+1处增强 / T3不变, 三梯队分级结构保持
+
+【其他维护】
+- today-marker: 第40/168天 → 第47/168天 (起始2026-07-29, 与北京时间2026-09-13一致, 仍为Phase 1项目期, 09-22收官)
+- 页脚时效日期: 2026-09-06 → 2026-09-13
+- 引用区: 移除cite-18(springboot-ai-rag-tutorial, 所属行已删); 新增cite-25~31 (rag-spring-ai / spring-ai-tutorial / spring-ai-alibaba官方示例仓库 / 小林面试笔记·幻觉治理 / 小林面试笔记·动态更新 / Velocode RAG面试题 / 牛客AI面试话题)
+- HTML结构校验: JD tbody=20行(高18/中2, 日期严格降序2026-09-12~08-23), 项目tbody=20行(在学5/参考15), T1=10行, tr/tbody/li标签闭合均衡, 全部替换步骤均命中唯一目标后写入
+
+【运行状态】
+- 搜索来源: WebSearch+WebFetch (Boss直聘/智联招聘/猎聘/前程无忧/鱼泡网/网易社招/GitHub/牛客网/CSDN/51CTO/小林面试笔记/Velocode/JavaGuide)
+- 搜索方式: 3个检索子代理并行(JD/项目/面试题各1个, 未超3个上限) + 主流程补充检索2次(补足第20条JD网易岗与面试题增量), 关键链接逐一核验
+- snapshot掌握度: 读取.trae/snapshot.json (snapshot_date=2026-09-04)
+  - 已完成任务26个 (与09-06周报一致, 本周无新增完成)
+  - 未完成任务9个 (transformers/知识库增量更新/多轮对话RAG/决策日志#02/pandas/生产级RAG工程化/requests调用LLM API/RAG评测/引用防幻觉, 均为Phase 1收官核心)
+- 运行结果: 成功
