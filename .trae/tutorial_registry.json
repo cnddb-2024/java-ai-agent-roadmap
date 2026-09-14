@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-27",
+  "updated": "2026-09-15",
   "entries": {
     "fe5fd757-cd63-4848-bafb-3e39cd001cee": {
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
@@ -88,6 +88,33 @@
       "comment_id": "7678475459876654025",
       "generated_at": "2026-08-27",
       "note": "当日新增生成并评论"
+    },
+    "fce2a67c-fbca-4236-8e8f-380727de6c00": {
+      "guid": "fce2a67c-fbca-4236-8e8f-380727de6c00",
+      "summary": "生产级 RAG 项目工程化整理：GitHub 完整工程结构 + README + 决策文档归档（Phase1验收项）",
+      "slug": "production-rag-project-engineering",
+      "tutorial_path": "assignments/2026-09-15/production-rag-project-engineering/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-15/production-rag-project-engineering/tutorial.html",
+      "comment_id": "7685525658604162234",
+      "generated_at": "2026-09-15"
+    },
+    "a834f11b-54be-4c8c-98cd-a99ba13a583e": {
+      "guid": "a834f11b-54be-4c8c-98cd-a99ba13a583e",
+      "summary": "Python 数据处理补齐：pandas DataFrame 读写/清洗/分组聚合实战（对比 Java Stream）",
+      "slug": "pandas-dataframe-practice",
+      "tutorial_path": "assignments/2026-09-15/pandas-dataframe-practice/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-15/pandas-dataframe-practice/tutorial.html",
+      "comment_id": "7685525683841273022",
+      "generated_at": "2026-09-15"
+    },
+    "8369e983-325f-4ce3-88be-d910c2f25131": {
+      "guid": "8369e983-325f-4ce3-88be-d910c2f25131",
+      "summary": "技术决策日志 #02：Rerank 方案选型 Cohere API vs 本地 bge-reranker（成本/延迟/质量三权衡）",
+      "slug": "tech-decision-log-02-rerank",
+      "tutorial_path": "assignments/2026-09-15/tech-decision-log-02-rerank/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-15/tech-decision-log-02-rerank/tutorial.html",
+      "comment_id": "7685525710257016034",
+      "generated_at": "2026-09-15"
     }
   }
 }
