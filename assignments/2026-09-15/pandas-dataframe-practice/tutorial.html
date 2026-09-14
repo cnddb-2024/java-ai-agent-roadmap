@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 数据处理补齐：pandas DataFrame 读写/清洗/分组聚合实战（对比 Java Stream） | Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+  display: block;
+}
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+th { background: var(--bg2); font-weight: 600; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · RAG 刚需闭环 · Python 贯穿线 · 第 49/168 天</div>
+  <h1>Python 数据处理补齐：pandas DataFrame 读写/清洗/分组聚合实战（对比 Java Stream）</h1>
+  <div class="meta">总预估时长：<strong>约 50 分钟</strong>（DataFrame 心智模型 8min / 读写 CSV/JSON 8min / 数据清洗 12min / 分组聚合 split-apply-combine 14min / RAG 场景实战 6min / 总结 2min）。主线为 Python 辅助技能（对比 Java Stream 视角讲解），服务于 RAG 评测脚本与语料处理。</div>
+</div>
+
+<h2>一、DataFrame 心智模型：一张带索引的数据库表（8min）</h2>
+<p><strong>DataFrame</strong>：pandas 的核心数据结构，一张二维表——每一列有名字、有类型（类似数据库表的列），每一行有个行号索引。对 8 年 Java 后端的你，最贴切的类比是：<strong>List&lt;Map&lt;String, Object&gt;&gt; 加上了列元信息和向量化操作</strong>；用起来更像"内存里的 MySQL 表"或"一张 Excel"。<strong>Series</strong> 则是单列（List + 名称 + 索引），DataFrame 就是若干 Series 拼起来的。</p>
+<table>
+<thead><tr><th>概念</th><th>MySQL 世界</th><th>Java 世界</th><th>pandas 写法</th></tr></thead>
+<tbody>
+<tr><td>建表</td><td>CREATE TABLE</td><td>List&lt;User&gt; + DTO</td><td>pd.DataFrame(rows)</td></tr>
+<tr><td>选列</td><td>SELECT name, score</td><td>stream.map(u -&gt; u.getName())</td><td>df[["name", "score"]]</td></tr>
+<tr><td>过滤</td><td>WHERE score &gt; 60</td><td>stream.filter(...)</td><td>df[df.score &gt; 60]</td></tr>
+<tr><td>分组聚合</td><td>GROUP BY city</td><td>Collectors.groupingBy + averaging</td><td>df.groupby("city")["score"].mean()</td></tr>
+<tr><td>排序</td><td>ORDER BY score DESC</td><td>sorted(comparator)</td><td>df.sort_values("score", ascending=False)</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>为什么 Java 工程师学 pandas 特别快</strong>：你脑中已有的 SQL + Stream 双模型几乎一一对应。pandas 的优势是<strong>向量化（Vectorization）</strong>——对整列做运算时底层是 C 循环而不是 Python for 循环，相当于把 Java 里的手写循环换成数据库引擎替你算。</div>
+
+<h2>二、读写：CSV / JSON 一次到位（8min）</h2>
+<p>评测脚本最常见的活：把检索日志、金标集、模型输出读进来算指标，再把结果表写出去。这就是 pandas 的主场：</p>
+<pre><code>import pandas as pd
+
+# 读 CSV（评测输出日志）
+df = pd.read_csv("eval_log.csv", parse_dates=["ts"])
+# 读 JSONL（每行一个 JSON：金标集常用格式）
+golden = pd.read_json("golden_set.jsonl", lines=True)
+# 读 Excel / 写出
+df.to_csv("result.csv", index=False)
+df.to_json("result.jsonl", orient="records", lines=True, force_ascii=False)</code></pre>
+<p><code>read_csv</code> 的 <code>parse_dates</code> 参数类似 MyBatis 的 TypeHandler：读的时候就把字符串转成时间类型，省得后面再转。写 JSON 时 <code>force_ascii=False</code> 保证中文不变成 <code>\u4e2d\u6587</code> 转义串（默认会 ASCII 化，这是爬中文数据的人最常踩的坑）。</p>
+
+<h2>三、数据清洗：缺失值 / 去重 / 类型（12min）</h2>
+<p><strong>NaN（Not a Number，缺失值标记）</strong>：pandas 用它表示"这一格没数据"，类似 Java 的 null，但行为更细：NaN 参与数值运算会传染（结果也是 NaN），所以要先处理。清洗三板斧：</p>
+<pre><code># 1. 缺失值：先诊断再处理（isna() 返回布尔列，sum() 数每列缺失数）
+df.isna().sum()
+# 填充：分数缺失按组均值填（fillna 类似 SQL 的 COALESCE）
+df["score"] = df["score"].fillna(df.groupby("city")["score"].transform("mean"))
+# 或整行丢弃（像 SQL 的 WHERE score IS NOT NULL）
+df = df.dropna(subset=["score"])
+
+# 2. 去重：评测日志里重复请求会虚高指标
+df = df.drop_duplicates(subset=["query", "model"])
+
+# 3. 类型转换：read_csv 常把 ID 读成数字（丢失前导零）
+df["doc_id"] = df["doc_id"].astype(str)
+# 字符串规范化：去首尾空格 + 统一小写
+df["query"] = df["query"].str.strip().str.lower()</code></pre>
+<div class="tip"><strong>桥接 Stream</strong>：Java 里 <code>list.stream().filter(Objects::nonNull).distinct()</code> 对应 pandas 的 <code>dropna() + drop_duplicates()</code>；区别是 pandas 按列批量操作且不重新分配对象链（<code>inplace</code> 或重新赋值）。</div>
+
+<h2>四、分组聚合：split-apply-combine（14min）</h2>
+<p><strong>groupby 的 split-apply-combine 三步</strong>：先按键把表拆成若干子表（split，等价 SQL 的 GROUP BY 分组），对每个子表算统计量（apply，等价聚合函数），再把结果拼回一张表（combine）。这是数据分析的核心操作，也是你后面写评测报告按维度切片统计的基础。</p>
+<pre><code># 基础：按城市分组求平均分 —— 等价 SELECT city, AVG(score) FROM t GROUP BY city
+df.groupby("city")["score"].mean()
+
+# agg：一次多指标 —— 等价 AVG + MAX + COUNT 同查
+df.groupby("city").agg(
+    avg_score=("score", "mean"),
+    max_score=("score", "max"),
+    n=("score", "count"),
+)
+
+# 多级分组：城市 × 题型两个维度
+df.groupby(["city", "type"])["score"].mean()
+
+# transform：把聚合结果广播回每一行（给"组均值填充"用，类似 SQL 窗口函数 OVER(PARTITION BY)）
+df["city_avg"] = df.groupby("city")["score"].transform("mean")
+
+# filter：整组过滤——只保留均分及格的城市（SQL 里要 HAVING 子查询，这里一行）
+df.groupby("city").filter(lambda g: g["score"].mean() &gt;= 60)
+
+# apply：每组跑任意函数（组内 Top1：每组挑最高分那条）
+df.sort_values("score", ascending=False).groupby("city").head(1)</code></pre>
+<table>
+<thead><tr><th>pandas 写法</th><th>等价 Java Stream</th><th>等价 SQL</th></tr></thead>
+<tbody>
+<tr><td>df.groupby("city")["score"].mean()</td><td>Collectors.groupingBy(User::getCity, averagingDouble(User::getScore))</td><td>GROUP BY city + AVG(score)</td></tr>
+<tr><td>transform("mean")</td><td>（Stream 无直接对应，需两次遍历）</td><td>AVG(score) OVER (PARTITION BY city)</td></tr>
+<tr><td>filter(lambda g: ...)</td><td>无（需预聚合后过滤）</td><td>HAVING AVG(score) &gt;= 60</td></tr>
+</tbody>
+</table>
+<div class="tip"><strong>面试视角</strong>：投 Java AI 岗被问"Python 会到什么程度"，你可以说"pandas 的 groupby/merge 我按 SQL 的 GROUP BY/JOIN 心智用，能独立写评测统计脚本"——这正是路线图贯穿线的目标：不被 Python 要求卡掉初筛。</div>
+
+<h2>五、RAG 场景实战：评测结果按维度切片（6min）</h2>
+<p>把前三节的技能串起来，做一个真实任务：统计 20 个评测问题在两种切分策略下的 Recall@5 差异，按问题类型分组：</p>
+<pre><code>import pandas as pd
+
+log = pd.read_json("eval_log.jsonl", lines=True)
+# 列：question_id, q_type, strategy, recall_at_5
+
+# 透视表：一行一个问题类型，一列一个策略（Excel 数据透视表）
+pivot = log.pivot_table(
+    index="q_type", columns="strategy", values="recall_at_5", aggfunc="mean"
+)
+pivot["delta"] = pivot["semantic_512"] - pivot["fixed_256"]
+print(pivot.sort_values("delta", ascending=False).round(3))
+
+# 输出（delta &gt; 0 表示语义切分更好）：
+# strategy    fixed_256  semantic_512  delta
+# q_type
+# 多跳推理     0.52        0.81        0.29
+# 事实查询     0.71        0.85        0.14
+# 长文档汇总   0.43        0.47        0.04</code></pre>
+<p><strong>pivot_table（数据透视表）</strong>：按两个维度交叉聚合的利器，Excel 透视表的代码版。五行代码完成"哪种问题类型从语义切分受益最大"的分析，写进评测报告就是差异化细节。对照路线图推荐项目 <strong>JavaDocRAG</strong>（Python 检索管线 + 金标准回归评测套件）——评测统计这一层它就是用这套工具做的。</p>
+
+<h2>六、总结与验收（2min）</h2>
+<ul>
+<li>能独立完成：CSV/JSONL 读写 → 清洗（缺失/去重/类型）→ groupby 分组聚合 → pivot_table 切片报告；</li>
+<li>每个操作都能说出对应的 SQL / Java Stream 心智映射；</li>
+<li>今天产出的统计脚本可直接用于 RAG 评测报告（衔接 09-13 完成的 RAG 评测实战任务）。</li>
+</ul>
+
+<h2>教程来源</h2>
+<ol class="src">
+<li>10 分钟上手 pandas（pandas 中文官方文档，读写/选择/groupby 快速上手）: https://pandas.ac.cn/docs/user_guide/10min.html</li>
+<li>Group by: split-apply-combine（pandas 官方英文文档，分组聚合权威解释）: https://pandas.pydata.org/pandas-docs/version/2.1/user_guide/groupby.html</li>
+<li>Pandas 数据分析核心技能总结：缺失值处理、apply 函数与分组聚合: https://blog.csdn.net/m0_67391870/article/details/157297586</li>
+<li>【Pandas 从入门到精通知识总结】（agg 多级聚合语法速查）: https://blog.csdn.net/qq_33764107/article/details/165243479</li>
+<li>从 0 到 1 掌握 Pandas：Python 数据分析必备库（全代码示例，中文列名示例贴近国内场景）: https://blog.csdn.net/weixin_60925698/article/details/160059208</li>
+<li>路线图推荐项目：JavaDocRAG（Python 检索管线对照标杆、金标准回归评测套件）——见路线图"七、生产级项目实战清单"</li>
+</ol>
+
+<h2>📝 术语表</h2>
+<table>
+<thead><tr><th>术语</th><th>一句话解释</th></tr></thead>
+<tbody>
+<tr><td>DataFrame</td><td>pandas 的二维表结构，等于 List&lt;Map&gt; 加列元信息，用起来像内存里的 MySQL 表</td></tr>
+<tr><td>Series</td><td>单列数据结构（带名称与索引），DataFrame 的组成单元</td></tr>
+<tr><td>NaN（缺失值）</td><td>pandas 的 null 标记，数值运算会传染，清洗第一步就是处理它</td></tr>
+<tr><td>向量化（Vectorization）</td><td>对整列批量运算时底层走 C 实现，等价于把 Java 手写 for 循环交给引擎算</td></tr>
+<tr><td>split-apply-combine</td><td>groupby 的三步机制：拆组→计算→拼表，对应 SQL 的 GROUP BY 聚合心智</td></tr>
+<tr><td>transform</td><td>把分组统计结果广播回每一行，对应 SQL 窗口函数 OVER(PARTITION BY)</td></tr>
+<tr><td>pivot_table（数据透视表）</td><td>按两个维度交叉聚合的表格视图，Excel 透视表的代码版</td></tr>
+</tbody>
+</table>
+
+<footer>Phase 1 · 第 49/168 天 · 专属融合教程 · 2026-09-15 生成 · Python 贯穿线（Java 视角对照）</footer>
+</div>
+</body>
+</html>
