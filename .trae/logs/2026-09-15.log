@@ -1,0 +1,87 @@
+# 2026-09-15 每日维护运行日志
+
+## 初始化
+- TODAY=2026-09-15（北京时间），DAY_NUM=49，PHASE=1（第15-56天）
+- TODAY_TS=1789430400000，TOMORROW_TS=1789516800000，DAY_AFTER_TS=1789603200000
+
+## 步骤执行结果
+
+### 1. 拉取仓库
+- ✅ git clone 成功（基线 commit 17505f2，chore(weekly): 2026-09-13 内容刷新）
+
+### 2. 创建日志目录
+- ✅ mkdir -p .trae/logs
+
+### 3. 初始化时间与阶段
+- ✅ 仅计算一次，全程复用
+
+### 4. 飞书鉴权
+- ✅ lark-cli 凭证由外部提供（auth 子命令不支持交互管理，直接验证实际命令可用）
+- ✅ tasklists list 成功，找到清单「Java AI Agent 转型学习计划」guid=5a08bfe3-e67f-49d7-9a33-f5681f22648d
+
+### 5. 更新反馈层
+- ✅ 5.1 today-marker：第 47/168 天 → 第 49/168 天（Phase 1）
+- ✅ 5.2 __RADAR_GAP__.me：[67,40,58,40,54,60,46] → [69,40,58,40,54,61,48]
+  - 推进依据（09-13 新完成任务 3 个）：RAG 评测实战→RAG全链路+面试；引用与防幻觉实战→RAG全链路+面试；requests 调用大模型→Python
+- ✅ 5.3 __RADAR_DAILY__：[0,1,1,1,1,0] → [0,3,3,3,3,0]
+  - 最近7天（09-08~09-15）完成任务 3 个；无当天按时完成（均逾期完成）；assignments 无新提交；连续打卡中断为 0
+
+### 6. 采集飞书任务状态 + 扫描作业
+- ✅ 6.1 清单 guid：5a08bfe3-e67f-49d7-9a33-f5681f22648d（名称查找命中）
+- ✅ 6.2 任务总数 35（未完成 6 / 已完成 29）
+- ✅ 6.3 assignments/ 扫描：最新目录 2026-08-27（citation-anti-hallucination、rag-evaluation-metrics、python-requests-llm-api，均仅含 tutorial.html）
+- ✅ 6.4 diff 结果：
+  - NEW_DONE（3 个）：8cd822a1 requests 调用大模型、fdd4fd80 RAG 评测实战、0865c644 引用与防幻觉实战（均于 2026-09-13 完成）
+  - VANISHED（0 个）：无 → excluded.json 无变更
+  - NEW_APPEARED（0 个）：无
+- ✅ 6.5 描述补写：6 个未完成任务 description 均非空，无需补写
+
+### 7. 滑动窗口任务规划 + 路线图自动拆解
+- N=6（活跃未完成且未冻结），G=max(0,9-6)=3，冻结任务 0 个（无需解冻，G'=3）
+- Phase 1 核心内容已全部拆解（文档解析/切分/Embedding/混合检索/Rerank/上下文组装/引用防幻觉/RAG 评测均已有任务），按 7.3.6 从 Phase 1 收官角度（对应面试第二梯队未覆盖条目）拆解 3 个新任务：
+  - 7.3 拆解并创建（guid / created_at=当前时间戳）：
+    1. ca306ed3：RAG 线上体验对齐实战：点踩率/空回答率埋点 + bad case 回流评测集 + CI 质量门禁（Phase1 评测闭环收官）
+    2. 8e565e94：知识库灰度发布实战：chunk version 标签 + 双 namespace 并行双跑验证 + 一键回滚（Phase1 工程化收官）
+    3. 1fa0b16b：Prompt 注入防护实战：RAG 间接注入检测 + 输入-架构-输出三层防护 Allow-Deny-Ask（Phase1 安全收官）
+  - 贯穿线检查：窗口内已有 3 个贯穿线任务（transformers/pandas/决策日志#02），新增 3 个均为 Phase 核心收官任务，比例符合"每3-4个核心任务穿插1个贯穿线"
+  - description 均按【描述规范】编写（学习目标/知识点/学习资源/验收标准/相关面试题），面试题从第二梯队匹配
+- ✅ 窗口锚定（TODAY/TOMORROW/DAY_AFTER，无条件 patch 重写 due）：
+  - 今天 09-15：fce2a67c 生产级工程化整理、a834f11b pandas、8369e983 决策日志#02
+  - 明天 09-16：55303caf 多轮对话 RAG、c2d17fb1 知识库增量更新、aad23299 transformers
+  - 后天 09-17：1fa0b16b Prompt 注入防护、8e565e94 知识库灰度发布、ca306ed3 RAG 线上体验对齐
+- ✅ 7.6 excluded.json 标题未复活（无 VANISHED）
+- ✅ 7.7 snapshot.json 已统一保存：38 个任务（29 完成 + 9 窗口内活跃 + 0 冻结），created_at 按"旧快照优先/新任务用当前时间戳"规则写入
+- 新增/冻结/顺延明细：新增 3（见上）；冻结 0；无第10+任务；6 个旧任务的 due 从 09-05/09-06 顺延重锚
+
+### 8. 融合教程生成
+- 前置：✅ git pull --rebase origin main（stash 后同步，Already up to date）
+- 8.1 待处理任务（合并去重）：当天 due 3 个（fce2a67c/a834f11b/8369e983）；逾期未完成 0 个（窗口锚定后无 due<TODAY 的未完成任务）
+- 8.2 幂等三信号检查：
+  - 信号①注册表：3 个 guid 均不在 .trae/tutorial_registry.json（未命中）
+  - 信号②文件：assignments/*/<slug>/tutorial.html 无 production-rag-project-engineering / pandas-dataframe-practice / tech-decision-log-02-rerank（未命中）
+  - 信号③评论状态：注册表无 comment_id 记录（未命中）
+  - 三信号皆未命中 → 全部生成
+- 8.3 生成（均通过 11 节自动化校验：代码块无 span/实体转义正确/标签平衡/来源≥5/术语表存在）：
+  1. assignments/2026-09-15/production-rag-project-engineering/tutorial.html（55min，DDD 分层/README 评测数字/ADR 归档/CI 门禁，来源 9 个）
+  2. assignments/2026-09-15/pandas-dataframe-practice/tutorial.html（50min，DataFrame 心智模型/清洗/groupby/透视表，Java Stream 对照，来源 6 个）
+  3. assignments/2026-09-15/tech-decision-log-02-rerank/tutorial.html（45min，决策矩阵/MRR 数据/Java 双路径接入/口述模板，来源 9 个）
+- 8.4 ✅ 教程提交推送（commit f3e0b85 "feat(tutorial): 2026-09-15 生成3篇融合教程"，含 term-whitelist.md 待观察组新增 17 个术语）
+  - raw URL 404 为沙箱网络缓存延迟；GitHub API 确认文件已在远程 main（HTTP 200）
+- 8.5 ✅ 评论（单任务单命令，逐条执行，全部取得 comment_id）：
+  - fce2a67c → 7685525658604162234
+  - a834f11b → 7685525683841273022
+  - 8369e983 → 7685525710257016034
+  - ✅ 注册表写入 3 条新记录（条目总数 10→13）并单独提交推送（commit c96d226 "chore(registry): 2026-09-15 教程注册表更新"）
+- 8.6 无失败任务
+
+### 9. 写回与兜底
+- ✅ 本日志写入 .trae/logs/2026-09-15.log
+- 统一提交：snapshot.json、charts.js、java-ai-agent-roadmap.html、日志（excluded.json 无变更）
+- git push 使用用户指定 URL 推送 main
+
+## 汇总
+- 运行结果：全部 9 步成功，无降级步骤
+- N=6，G=3（解冻 0，新拆解 3）
+- 教程：生成 3 / 跳过 0 / 失败 0（幂等命中 0）
+- 注册表：+3 条（含 comment_id）
+- 仓库提交：3 次（feat(tutorial) f3e0b85 → chore(registry) c96d226 → chore(daily) 本次）
