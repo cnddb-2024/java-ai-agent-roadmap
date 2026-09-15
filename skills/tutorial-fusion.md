@@ -46,10 +46,13 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 
 ### 5. 飞书跳转
 
-- 生成后将 GitHub raw URL 写入飞书任务的评论中
-- 用户正常路线：飞书任务 → 学习链接 → 生成的专属融合教程
+- 生成后将 **飞书云盘 URL**（非 GitHub raw URL）写入飞书任务的评论中
+  - 背景：GitHub 仓库不可访问（私有/不存在/未 push）曾导致 raw URL 全部 404，已废弃此路径
+  - 现方案：教程 HTML 上传到飞书云盘 `assignments/<due日期>/<slug>/tutorial.html`，与 GitHub 仓库目录结构保持一致便于溯源
+- 用户正常路线：飞书任务 → 评论中的飞书云盘 URL → 点击预览/在浏览器中打开 → 完美渲染（HTML 原生执行环境）
 - 不在 HTML 内写 GUID 或"作业二"这类模糊标识
 - HTML 顶部标注当前 Phase 和任务全称（与飞书一致）
+- 飞书云盘预览卡片为基础结构视图，点击「在浏览器中打开」可看完整效果（自定义字体/Mermaid/ECharts/CSS 全保留）
 
 ### 6. 教程来源
 
@@ -145,7 +148,7 @@ pre code {
 - **三信号检查，任一命中即跳过**：
   1. **注册表（权威）**：读取 `.trae/tutorial_registry.json`，按**任务 guid 精确匹配**（guid 全局唯一且稳定，优先于 slug 模糊匹配）。命中即跳过，不生成、不覆盖、不追加评论，记录日志"已有教程（注册表），跳过"。文件不存在视为空注册表（首次运行自动创建）。
   2. **文件扫描**：计算该任务的 slug，扫描 `assignments/` 下**所有日期子目录**，查找是否存在 `<slug>/tutorial.html`。命中即跳过，记录日志"已有教程（文件），跳过"。
-  3. **评论状态**：lark-cli task 当前仅有 `+comment` 写入、无评论读取命令（已实测确认，勿猜测子命令）。"是否已评论"以注册表中 `comment_id` 字段为等价记录；若未来 CLI 支持读评论，可增加"任意评论含「专属融合教程已生成」或 tutorial.html 链接即命中"的直查。
+  3. **评论状态**：lark-cli task 当前仅有 `+comment` 写入、无评论读取命令（已实测确认，勿猜测子命令）。"是否已评论"以注册表中 `feishu_comment_id` 字段（飞书云盘 URL 评论）为等价记录；旧 `comment_id` 字段为废弃的 raw URL 评论历史值，**不再作为幂等依据**（同一任务允许同时存在旧 raw URL 评论 + 新飞书云盘评论，不再追加新评论以 `feishu_comment_id` 是否存在为准）。
 - **slug 匹配优先级**：guid 优先；无 guid 场景（对话中手动触发）先用 summary 的 kebab-case 匹配，再按 summary 关键词模糊匹配已有目录名，视为同一任务。
 - **存放路径**：新教程存入 `assignments/<当前due日期>/<slug>/tutorial.html`（用任务当前的 due 日期，不是今天日期）。
 - **幂等规则总结**：同一任务（同 guid，或同 slug/summary 关键词兜底）的教程与评论**全局只产生一次**；due 顺延不触发重新生成。
@@ -298,17 +301,36 @@ else:
    - 校验失败 -> 修复问题，重新校验（最多重试 2 次）
    - 仍失败 -> 记录错误日志，标记"生成失败"，跳过该任务
 8. 存入 assignments/<due日期>/<slug>/tutorial.html（due日期≠当天时为逾期任务）
-9. git add + commit + push 到路线图仓库
-10. 【评论·防重】确认注册表中该任务 guid 无 comment_id 后，单任务单命令执行
-    lark-cli task +comment 写入 raw URL（禁止 && 批量链，禁止盲目重发）；
-    成功取得 comment_id 后立即写入 .trae/tutorial_registry.json 并单独
-    commit + push（"chore(registry): <日期>"）
-11. 将本篇新解释术语写入 skills/term-whitelist.md「待观察」组，随仓库提交
+9. git add + commit + push 到路线图仓库（保留 git 流程，仓库不可访问时也不阻塞，
+   写本地 commit 即可，远程 push 失败仅记录日志，不影响后续步骤 10/11）
+10. 【上传飞书云盘·与 GitHub 同构】按 assignments/<due日期>/<slug>/tutorial.html
+    的路径，在飞书云盘根目录创建同名层级目录：
+    - 用 lark-cli drive +create-folder 逐级创建（assignments → <due日期> → <slug>）；
+    - 已存在的目录跳过（可先 lark-cli drive +search --query <目录名> --doc-types folder
+      或用 .trae/feishu_drive_cache.json 缓存 folder_token 复用，避免重复创建）
+    - 用 lark-cli drive +upload --file <本地 tutorial.html> --name "tutorial.html"
+      --folder-token <slug 目录的 folder_token> 上传
+    - 返回结果中拿到 file_token 和 url（即 https://my.feishu.cn/file/<file_token>），
+      立即写入 .trae/tutorial_registry.json 该 guid 条目：
+      feishu_url / feishu_file_token / feishu_folder_path / raw_url_status="unavailable_github_repo_404"
+11. 【评论·防重】确认注册表中该任务 guid 无 feishu_comment_id 后，单任务单命令执行
+    lark-cli task +comment --task-id <guid> --content
+    "📚 专属融合教程已生成（飞书云盘，可点击预览/下载）:
+    <feishu_url>
+    目录: assignments/<due日期>/<slug>/tutorial.html"
+    （禁止 && 批量链；成功取得 comment_id 后写入注册表 feishu_comment_id 字段）
+12. 【本地预览·可选，会话内可访问】集中复制今日 N 篇 HTML 到
+    /workspace/今日作业教程_<TODAY>/<slug>.html，启动 nohup python3 -m http.server 8765
+    & 后用 OpenPreview 工具传 command_id 和 http://localhost:8765/ 给用户；
+    会话历史保留在 Trae 自动化执行历史中（以启动时间命名），会话内 URL 可长期访问
+13. 将本篇新解释术语写入 skills/term-whitelist.md「待观察」组，随仓库提交
 ```
 
 ## 输出
 
 | 产出 | 位置 |
 |------|------|
-| tutorial.html | assignments/YYYY-MM-DD/<slug>/tutorial.html |
-| 飞书任务评论 | 包含 GitHub raw URL，可直接点击查看 |
+| tutorial.html（本地） | assignments/YYYY-MM-DD/<slug>/tutorial.html |
+| tutorial.html（飞书云盘） | 飞书云盘根 → assignments → YYYY-MM-DD → <slug> → tutorial.html，URL 形如 https://my.feishu.cn/file/<file_token> |
+| 飞书任务评论 | 包含飞书云盘 URL，可直接点击预览/在浏览器中打开 |
+| 本地预览（会话内） | http://localhost:8765/ 由 OpenPreview 暴露，会话历史保留可回看 |
