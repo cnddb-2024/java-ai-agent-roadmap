@@ -61,9 +61,11 @@ pre code {
   white-space: pre;
   display: block;
 }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
-th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+table { border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; white-space: nowrap; }
 th { background: var(--bg2); font-weight: 600; }
+.table-wrap { overflow-x: auto; margin: 16px 0; -webkit-overflow-scrolling: touch; }
+.table-wrap table { margin: 0; min-width: max-content; }
 .tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
 .src li { margin: 8px 0; font-size: 0.9rem; }
 .src a { color: var(--accent2); word-break: break-all; }
@@ -81,6 +83,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 
 <h2>一、DataFrame 心智模型：一张带索引的数据库表（8min）</h2>
 <p><strong>DataFrame</strong>：pandas 的核心数据结构，一张二维表——每一列有名字、有类型（类似数据库表的列），每一行有个行号索引。对 8 年 Java 后端的你，最贴切的类比是：<strong>List&lt;Map&lt;String, Object&gt;&gt; 加上了列元信息和向量化操作</strong>；用起来更像"内存里的 MySQL 表"或"一张 Excel"。<strong>Series</strong> 则是单列（List + 名称 + 索引），DataFrame 就是若干 Series 拼起来的。</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th>概念</th><th>MySQL 世界</th><th>Java 世界</th><th>pandas 写法</th></tr></thead>
 <tbody>
@@ -91,6 +94,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 <tr><td>排序</td><td>ORDER BY score DESC</td><td>sorted(comparator)</td><td>df.sort_values("score", ascending=False)</td></tr>
 </tbody>
 </table>
+</div>
 <div class="tip"><strong>为什么 Java 工程师学 pandas 特别快</strong>：你脑中已有的 SQL + Stream 双模型几乎一一对应。pandas 的优势是<strong>向量化（Vectorization）</strong>——对整列做运算时底层是 C 循环而不是 Python for 循环，相当于把 Java 里的手写循环换成数据库引擎替你算。</div>
 
 <h2>二、读写：CSV / JSON 一次到位（8min）</h2>
@@ -147,6 +151,7 @@ df.groupby("city").filter(lambda g: g["score"].mean() &gt;= 60)
 
 # apply：每组跑任意函数（组内 Top1：每组挑最高分那条）
 df.sort_values("score", ascending=False).groupby("city").head(1)</code></pre>
+<div class="table-wrap">
 <table>
 <thead><tr><th>pandas 写法</th><th>等价 Java Stream</th><th>等价 SQL</th></tr></thead>
 <tbody>
@@ -155,6 +160,7 @@ df.sort_values("score", ascending=False).groupby("city").head(1)</code></pre>
 <tr><td>filter(lambda g: ...)</td><td>无（需预聚合后过滤）</td><td>HAVING AVG(score) &gt;= 60</td></tr>
 </tbody>
 </table>
+</div>
 <div class="tip"><strong>面试视角</strong>：投 Java AI 岗被问"Python 会到什么程度"，你可以说"pandas 的 groupby/merge 我按 SQL 的 GROUP BY/JOIN 心智用，能独立写评测统计脚本"——这正是路线图贯穿线的目标：不被 Python 要求卡掉初筛。</div>
 
 <h2>五、RAG 场景实战：评测结果按维度切片（6min）</h2>
@@ -197,6 +203,7 @@ print(pivot.sort_values("delta", ascending=False).round(3))
 </ol>
 
 <h2>📝 术语表</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>术语</th><th>一句话解释</th></tr></thead>
 <tbody>
@@ -209,6 +216,7 @@ print(pivot.sort_values("delta", ascending=False).round(3))
 <tr><td>pivot_table（数据透视表）</td><td>按两个维度交叉聚合的表格视图，Excel 透视表的代码版</td></tr>
 </tbody>
 </table>
+</div>
 
 <footer>Phase 1 · 第 49/168 天 · 专属融合教程 · 2026-09-15 生成 · Python 贯穿线（Java 视角对照）</footer>
 </div>

@@ -61,9 +61,11 @@ pre code {
   white-space: pre;
   display: block;
 }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
-th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+table { border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; white-space: nowrap; }
 th { background: var(--bg2); font-weight: 600; }
+.table-wrap { overflow-x: auto; margin: 16px 0; -webkit-overflow-scrolling: touch; }
+.table-wrap table { margin: 0; min-width: max-content; }
 .tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
 .warn { background: #fdf3e7; border-left: 3px solid #c0392b; padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
 .src li { margin: 8px 0; font-size: 0.9rem; }
@@ -82,6 +84,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 
 <h2>一、先对齐：demo 与生产级差在哪（8min）</h2>
 <p>你已经跑通了 RAG 全链路：文档解析、智能切分、Embedding、混合检索、Rerank、上下文组装、引用防幻觉、评测。但"能跑的 demo"和"能写进简历的生产级项目"之间隔着一条工程化鸿沟。生产级意味着：分层清晰、配置外置、可观测、可回归、决策可追溯——就像你写了 8 年的 Spring 项目，从不把数据库密码硬编码在 Controller 里。</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th>维度</th><th>demo 常见做法</th><th>生产级做法</th><th>类比 Java 世界</th></tr></thead>
 <tbody>
@@ -92,6 +95,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 <tr><td>可观测</td><td>System.out.println</td><td>Micrometer 指标 + 日志规范</td><td>SLF4J + Actuator + Prometheus</td></tr>
 </tbody>
 </table>
+</div>
 <div class="tip"><strong>验收标准原文</strong>：GitHub 项目含完整工程结构 + README + 决策文档；评测报告有改切分 / 加 rerank 前后的真实对比数字。你前几天的 RAG 评测作业已经产出了对比数字，今天的工作是把整个工程"包装"到位。</div>
 
 <h2>二、工程结构：DDD 分包 + Maven 多模块（15min）</h2>
@@ -263,6 +267,7 @@ python3 eval/check_threshold.py --min-recall 0.85   # CI 门禁阈值</code></pr
 </ol>
 
 <h2>📝 术语表</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>术语</th><th>一句话解释</th></tr></thead>
 <tbody>
@@ -275,6 +280,7 @@ python3 eval/check_threshold.py --min-recall 0.85   # CI 门禁阈值</code></pr
 <tr><td>Profile 分层</td><td>Spring 的多环境配置（dev/prod），一份代码多套配置，API Key 环境变量注入不落库</td></tr>
 </tbody>
 </table>
+</div>
 
 <footer>Phase 1 · 第 49/168 天 · 专属融合教程 · 2026-09-15 生成 · 主线 Java（Spring AI 1.1.x + LangChain4j 1.x）</footer>
 </div>

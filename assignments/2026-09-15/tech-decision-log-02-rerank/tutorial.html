@@ -61,9 +61,11 @@ pre code {
   white-space: pre;
   display: block;
 }
-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; }
-th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; }
+table { border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; white-space: nowrap; }
 th { background: var(--bg2); font-weight: 600; }
+.table-wrap { overflow-x: auto; margin: 16px 0; -webkit-overflow-scrolling: touch; }
+.table-wrap table { margin: 0; min-width: max-content; }
 .tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
 .src li { margin: 8px 0; font-size: 0.9rem; }
 .src a { color: var(--accent2); word-break: break-all; }
@@ -82,6 +84,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 <h2>一、决策框架：先定评估维度，再看方案（8min）</h2>
 <p>你已经完成 Rerank 重排序实战（Cohere / bge-reranker 都接过了）和 RAG 评测实战（有 MRR@10 等指标）。今天的任务不是学新技术，而是把"选哪个"落成一份<strong>可追溯、可复盘、可面试复述</strong>的决策日志——这是路线图贯穿线"每个技术选型记为什么选它/放弃了什么/代价是什么"的第二次实战。</p>
 <p><strong>ADR（Architecture Decision Record，架构决策记录）</strong>复盘：一份一页纸的文档，结构为 背景 → 决策 → 理由 → 放弃的方案 → 撤销条件。两个模板流派：</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th>模板</th><th>适用</th><th>本决策该用哪个</th></tr></thead>
 <tbody>
@@ -89,12 +92,14 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 <tr><td>MADR 4.0（结构化）</td><td>多选项、难逆转、跨团队</td><td>留给未来"MCP vs Function Call"这类多方案权衡</td></tr>
 </tbody>
 </table>
+</div>
 <div class="tip"><strong>先定维度再找数据</strong>：生产级选型的顺序是——先写下评估维度（质量/延迟/成本/合规/运维），再去每个维度找数据。反过来"先有结论再凑数据"是面试官一眼能看穿的减分项。本决策的五个维度，数据来源全部可追溯。</div>
 
 <h2>二、数据收集：三维度实测对比（12min）</h2>
 <p><strong>Cross-Encoder（交叉编码器）</strong>召回一下：Rerank 用的模型把"问题+文档片段"拼在一起整体打分，精度高但慢——这正是两个方案都要付的"精排税"，选型之争本质是这笔税交给谁（云端 API vs 本地算力）。</p>
 <h3>2.1 质量维度（金标集 MRR@10）</h3>
 <p>社区在中文知识库场景的实测数据（Dify 环境脱敏实测）：</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th>方案</th><th>MRR@10</th><th>说明</th></tr></thead>
 <tbody>
@@ -103,8 +108,10 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 <tr><td>Jina Reranker v2（API）</td><td>0.698</td><td>长文本敏感场景</td></tr>
 </tbody>
 </table>
+</div>
 <p>质量差 <strong>3.9 个百分点</strong>——是"可感知但非碾压"的差距，不足以单独决定，进入下两个维度。</p>
 <h3>2.2 延迟维度（每查询）</h3>
+<div class="table-wrap">
 <table>
 <thead><tr><th>方案</th><th>延迟</th><th>波动来源</th></tr></thead>
 <tbody>
@@ -113,6 +120,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
 <tr><td>Cohere Rerank 4 Pro（API）</td><td>~614ms</td><td>更强模型，长文档场景</td></tr>
 </tbody>
 </table>
+</div>
 <p>本地方案延迟约 2.5 倍优势且<strong>无网络抖动尾部</strong>——对内网 P95 SLA 友好。你的项目 P95 延迟预算（评测报告里写的 680ms 全链路）里，Rerank 占比必须可控。</p>
 <h3>2.3 成本维度（规模敏感）</h3>
 <p><strong>成本红线（Cost Threshold）</strong>概念：选型前先算"日查询量 × 单次成本"到多少时方案优劣反转。Cohere 按检索 token 计费（商业计价约 $2.00/1k searches 量级），bge 自托管近乎零边际成本但要付 3.2GB 显存/内存常驻。按个人项目与中小团队日万级查询估算：</p>
@@ -123,6 +131,7 @@ bge 本地:     一台 4GB 内存节点，摊销后 ≈ 固定 $30-50/月
 
 <h2>三、决策矩阵与结论（10min）</h3>
 <p>五个维度汇总（质量/延迟/成本/合规/运维），用加权打分（权重按你项目上下文定：内网部署 + 成本敏感 + 个人运维）：</p>
+<div class="table-wrap">
 <table>
 <thead><tr><th>维度</th><th>权重</th><th>Cohere API</th><th>本地 bge-reranker</th><th>胜者</th></tr></thead>
 <tbody>
@@ -134,6 +143,7 @@ bge 本地:     一台 4GB 内存节点，摊销后 ≈ 固定 $30-50/月
 <tr><td><strong>加权总分</strong></td><td>—</td><td>3.55</td><td><strong>4.05</strong></td><td><strong>bge-reranker</strong></td></tr>
 </tbody>
 </table>
+</div>
 <p><strong>结论：选本地 bge-reranker-v2-m3，放弃 Cohere API。</strong>代价明确：占 ~3GB 内存、模型迭代要自己跟、质量让出 3.9 个 MRR 点。撤销条件：若日查询量跌回百级、或延迟预算放宽至 500ms+、或企业采购了 Cohere 企业协议，则重评。</p>
 <div class="tip"><strong>口述模板（面试直接用）</strong>："Rerank 选型我做过完整决策：质量上 Cohere 高 3.9 个 MRR 点，但本地 bge 在延迟（86ms vs 215ms，且无网络尾部）、成本（固定 vs 线性）、合规（数据不出域）三项占优，加权后选本地。代价是 3GB 内存和自运维，撤销条件写进了 ADR。"——这就是"讲清 why"的完整弹药。</div>
 
@@ -182,6 +192,7 @@ ScoringModel localBge = XinferenceScoringModel.builder()
 </ol>
 
 <h2>📝 术语表</h2>
+<div class="table-wrap">
 <table>
 <thead><tr><th>术语</th><th>一句话解释</th></tr></thead>
 <tbody>
@@ -195,6 +206,7 @@ ScoringModel localBge = XinferenceScoringModel.builder()
 <tr><td>撤销条件</td><td>写进 ADR 的"什么情况下重评此决策"，让决策可逆、条件化</td></tr>
 </tbody>
 </table>
+</div>
 
 <footer>Phase 1 · 第 49/168 天 · 专属融合教程 · 2026-09-15 生成 · 技术决策日志贯穿线</footer>
 </div>

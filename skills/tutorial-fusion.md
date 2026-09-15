@@ -78,6 +78,42 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 - 图表/图示用 Mermaid 或 ECharts
 - 底部含"教程来源"章节，使用 `<ol>` 有序列表
 
+### 8.0 表格滚动规范（极其重要 -- 防表格撑爆横向布局）
+
+**问题背景**：表格内容若较长（如多列对比表、命令参数表），会撑爆整个文件的横向宽度，导致正文段落也被拉宽，阅读体验极差。代码块用 `pre { overflow-x: auto }` 已解决此问题，表格必须对齐这套行为。
+
+**强制规则（禁止违反）**：
+
+1. **CSS 必须包含以下表格样式**（直接复制到 `<style>` 中）：
+```css
+table { border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; white-space: nowrap; }
+th { background: var(--bg2); font-weight: 600; }
+.table-wrap { overflow-x: auto; margin: 16px 0; -webkit-overflow-scrolling: touch; }
+.table-wrap table { margin: 0; min-width: max-content; }
+```
+
+2. **所有 `<table>` 必须用 `<div class="table-wrap">` 包裹**，禁止裸写 `<table>`：
+```html
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>...</th></tr></thead>
+    <tbody><tr><td>...</td></tr></tbody>
+  </table>
+</div>
+```
+
+3. **关键原理**：
+   - `.table-wrap` 设 `overflow-x: auto`，超出宽度的表格在容器内横向滚动，不撑爆父级
+   - `th, td` 的 `white-space: nowrap` 让单元格不主动换行，保留内容自然宽度
+   - `.table-wrap table` 的 `min-width: max-content` 让表格至少按内容自然宽度展开，避免被父级压扁
+   - 移动端用 `-webkit-overflow-scrolling: touch` 启用惯性滚动
+
+4. **禁止出现的模式**（生成后必须检查）：
+   - 裸 `<table>` 未包裹在 `<div class="table-wrap">` 内
+   - `table { width: 100% }` 但没有 `.table-wrap { overflow-x: auto }` 配套（旧问题根因）
+   - 表格设 `width: 100%` 但内容超过视口宽度时未限制溢出
+
 ### 8.1 代码块规范（极其重要 -- 防高亮标签泄漏）
 
 **问题背景**：此前生成的教程使用手动 `<span class="tok-xxx">` 标签包裹代码 token 实现语法高亮。这种方式存在严重缺陷：
@@ -167,6 +203,47 @@ pre code {
 **原则**：每个 `tutorial.html` 生成后，在写入文件之前，必须经过校验。校验不通过则修复后重新校验，最多重试 2 次。仍不通过则记录错误日志，该教程标记为"生成失败"。
 
 **校验流程**（按顺序执行，任一项失败则整体不通过）：
+
+#### 11.0 表格包裹校验（防表格撑爆横向布局，第 8.0 节配套）
+
+对文件中所有 `<table>` 标签执行以下检查：
+
+- **所有 `<table>` 都被 `<div class="table-wrap">` 包裹**：用正则 `<table\b[^>]*>[\s\S]*?</table>` 提取所有表格块，逐个检查是否被 `<div class="table-wrap">` 包裹。若有裸 `<table>` 未包裹则不通过。
+- **CSS 中定义了 `.table-wrap { overflow-x: auto }`**：检查 `<style>` 内是否包含 `.table-wrap` 选择器和 `overflow-x: auto` 声明。缺失则不通过。
+- **CSS 中定义了 `th, td { white-space: nowrap }` 或等效保护**：缺失则不通过（否则单元格换行会撑高表格，破坏滚动效果）。
+- **修复方式**：在 `<style>` 中补全第 8.0 节规定的 CSS 片段；用 `<div class="table-wrap">...</div>` 包裹所有裸 `<table>`。
+
+校验脚本示例：
+```bash
+python3 -c "
+import re, sys
+html = open(sys.argv[1]).read()
+issues = []
+# 检查 CSS
+if '.table-wrap' not in html or 'overflow-x: auto' not in html:
+    issues.append('CSS 缺失 .table-wrap { overflow-x: auto }')
+if 'white-space: nowrap' not in html:
+    issues.append('CSS 缺失 th,td 的 white-space: nowrap')
+# 提取所有 table 块,检查是否被包裹
+tables = re.findall(r'<table\b[^>]*>[\s\S]*?</table>', html)
+for i, t in enumerate(tables):
+    # 找该 table 在 html 中的位置,向前找最近的开始标签
+    pos = html.find(t)
+    if pos == -1: continue
+    pre = html[max(0,pos-50):pos]
+    if 'class=\"table-wrap\"' not in pre and '<div class=\"table-wrap\">' not in pre:
+        # 容忍前 50 字符内可能跨行,放宽到 200 字符内含 table-wrap 开标签
+        pre2 = html[max(0,pos-200):pos]
+        if '<div class=\"table-wrap\">' not in pre2:
+            issues.append(f'表格 {i+1} 未被 <div class=table-wrap> 包裹')
+if issues:
+    print('表格校验失败:')
+    for issue in issues: print(f'  - {issue}')
+    sys.exit(1)
+else:
+    print('表格包裹校验通过')
+" <tutorial.html路径>
+```
 
 #### 11.1 代码块完整性校验
 
