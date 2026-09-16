@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-15",
+  "updated": "2026-09-16",
   "tasks": [
     {
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
@@ -238,7 +238,7 @@
       "summary": "生产级 RAG 项目工程化整理：GitHub 完整工程结构 + README + 决策文档归档（Phase1验收项）",
       "due": "2026-09-15",
       "created_at": "1787351752437",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -246,7 +246,7 @@
       "summary": "技术决策日志 #02：Rerank 方案选型 Cohere API vs 本地 bge-reranker（成本/延迟/中文效果权衡）",
       "due": "2026-09-15",
       "created_at": "1787438130000",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -254,7 +254,7 @@
       "summary": "Python 数据处理补齐：pandas DataFrame 读写/清洗/分组聚合实战（对比 Java Stream API，产出评测数据统计脚本）",
       "due": "2026-09-15",
       "created_at": "1787438130000",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -302,6 +302,30 @@
       "summary": "RAG 线上体验对齐实战：点踩率/空回答率埋点 + bad case 回流评测集 + CI 质量门禁（Phase1 评测闭环收官）",
       "due": "2026-09-17",
       "created_at": 1789425503940,
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "4ea89bc3-4d74-4b79-b9c0-03e4aaefa03c",
+      "summary": "RAG 召回效果排查与调优整合复盘：五维排查 + 分层策略（Phase1 收官整合题）",
+      "due": "2026-09-18",
+      "created_at": "1789511827911",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "d7d589de-f4b5-46c2-b435-c2c26f3cb66f",
+      "summary": "RAG 幻觉分层治理口述整合：检索层/生成层/数据层三层拆解与拒答设计（Phase1 收官必问）",
+      "due": "2026-09-18",
+      "created_at": "1789511834983",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "b89ed6b7-b4cb-4872-83f8-379b4b9e329b",
+      "summary": "技术决策日志 #03：项目1 生产级五层升级路径评估（可靠性/可观测/安全/评测/成本现状盘点与补齐决策）",
+      "due": "2026-09-18",
+      "created_at": "1789511839576",
       "completed": false,
       "frozen": false
     }
