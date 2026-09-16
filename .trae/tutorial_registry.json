@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-15",
+  "updated": "2026-09-16",
   "entries": {
     "fe5fd757-cd63-4848-bafb-3e39cd001cee": {
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
@@ -115,6 +115,33 @@
       "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-15/tech-decision-log-02-rerank/tutorial.html",
       "comment_id": "7685525710257016034",
       "generated_at": "2026-09-15"
+    },
+    "55303caf-5780-4962-853a-cb0492af15d1": {
+      "guid": "55303caf-5780-4962-853a-cb0492af15d1",
+      "summary": "多轮对话 RAG 实战：查询改写 + 指代消解（Spring AI ChatMemory + RewriteQueryTransformer）",
+      "slug": "multi-turn-dialogue-rag",
+      "tutorial_path": "assignments/2026-09-16/multi-turn-dialogue-rag/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-16/multi-turn-dialogue-rag/tutorial.html",
+      "comment_id": "7685947821060557752",
+      "generated_at": "2026-09-16"
+    },
+    "c2d17fb1-9d03-4e31-9e67-22451b60bf8c": {
+      "guid": "c2d17fb1-9d03-4e31-9e67-22451b60bf8c",
+      "summary": "知识库增量更新实战：文档变更检测 + 向量 upsert/删除策略（内容哈希幂等入库）",
+      "slug": "knowledge-base-incremental-update",
+      "tutorial_path": "assignments/2026-09-16/knowledge-base-incremental-update/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-16/knowledge-base-incremental-update/tutorial.html",
+      "comment_id": "7685947850529705243",
+      "generated_at": "2026-09-16"
+    },
+    "aad23299-6f51-4890-a51b-536e7b2dfb54": {
+      "guid": "aad23299-6f51-4890-a51b-536e7b2dfb54",
+      "summary": "Python 补齐：transformers 快速上手（pipeline 跑通嵌入/生成，对比 Spring AI EmbeddingModel）",
+      "slug": "python-transformers-quickstart",
+      "tutorial_path": "assignments/2026-09-16/python-transformers-quickstart/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-16/python-transformers-quickstart/tutorial.html",
+      "comment_id": "7685947903289920450",
+      "generated_at": "2026-09-16"
     }
   }
 }
