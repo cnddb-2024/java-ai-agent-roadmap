@@ -78,6 +78,110 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 - 图表/图示用 Mermaid 或 ECharts
 - 底部含"教程来源"章节，使用 `<ol>` 有序列表
 
+### 8.3 固定视觉模板（必选，强制复用 glm-5.3 标准模板 -- 视觉层任模型不可自由发挥）
+
+**背景**：此前视觉主题未固化，产物完全取决于模型的隐式模板。换模型（glm-5.3 → TRAE auto）后，同一套 skill 产出了三种互不相关的主题（浅底+深色渐变 hero、GitHub 深色 `#0d1117`、Python/Spring 主题色卡片），格式失控。为让格式"可迁移到任意模型"，从 2026-09-15 的稳定模板提炼出**唯一合法**的视觉模板如下。
+
+**硬性规则（禁止违反）**：
+
+1. **CSS 必须逐字复用 8.3.1 的 `<style>` 块**（复制到 `<head>`），禁止增删变量/规则。
+2. **页面结构必须遵循 8.3.2 骨架**（`.container` / `.hero` / `.tip` / `.table-wrap` / `.src` / `footer` 的 class 与顺序）。
+3. **禁止出现 8.3.3 元素**：渐变背景、`box-shadow` 卡片、深色页面背景（如 `#0d1117`）、hero 徽章（`phase-badge`）、TOC 目录卡片、额外彩色强调体系、夸张圆角 hero。这些都不是模板的一部分。
+4. 校验见 11.7；任一禁止元素出现或变量与模板不符，即判不通过。
+
+#### 8.3.1 唯一合法的 `<style>` 块（逐字复制，禁止增删）
+
+以下 CSS 变量与规则正是 2026-09-15 那套纸感模板（浅米白 `--bg:#fafaf7` + 暗金 `--accent:#b8860b` + 深藏青 `--accent2:#2c3e50`，无渐变无阴影）：
+
+```css
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+  display: block;
+}
+table { border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; white-space: nowrap; }
+th { background: var(--bg2); font-weight: 600; }
+.table-wrap { overflow-x: auto; margin: 16px 0; -webkit-overflow-scrolling: touch; }
+.table-wrap table { margin: 0; min-width: max-content; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+```
+
+#### 8.3.2 唯一合法的页面骨架（body 结构与 class 约定，遵循此顺序）
+
+- `.container`：`max-width:880px; margin:0 auto; padding:48px 32px 80px;`，包住全部正文。
+- `.hero`：左竖线样式。内含 `.phase`（强调色小字，如 `Phase 1 · 第 49/168 天 · <贯穿线>`）、`h1`（任务全称，与飞书 summary 一致）、`.meta`（总预估时长，含 `min` 分段）。
+- 正文标题：`h2` 用于大节，章节用中文数字序号（一、二、三…）；`h3` 用于小节。
+- 提示框：`<div class="tip">…</div>`（浅底 + 左侧强调色竖线）。
+- 表格：一律 `<div class="table-wrap">` 包裹（见 8.0）。
+- 代码：`<pre><code>` 纯文本，禁 span（见 8.1 / 8.2）。
+- 教程来源：`<h2>教程来源</h2>` + `<ol class="src">`，每条 `<li>` 形如「标题: 完整URL」。
+- 术语表：`<h2>📝 术语表</h2>` + 包裹表格。
+- 底部：`<footer>Phase X · 第 N/168 天 · 专属融合教程 · YYYY-MM-DD 生成 · <贯穿线标注></footer>`。
+
+#### 8.3.3 禁止元素（出现即校验失败）
+
+- `linear-gradient` 渐变背景、`box-shadow` 卡片容器。
+- 深色页面背景（如 `#0d1117`、GitHub dark 系）。
+- hero 徽章（`phase-badge`）、TOC 目录卡片（`box-shadow` 圆角卡片）。
+- 除模板外的额外彩色强调体系（如彩虹彩虹强调色变量）。
+- `border-radius` 夸张圆角 hero / 强调视觉。
+- 模板未定义的自造 class（如 `hero-content`、`hero-meta`、`.dot` 等）。
+
 ### 8.0 表格滚动规范（极其重要 -- 防表格撑爆横向布局）
 
 **问题背景**：表格内容若较长（如多列对比表、命令参数表），会撑爆整个文件的横向宽度，导致正文段落也被拉宽，阅读体验极差。代码块用 `pre { overflow-x: auto }` 已解决此问题，表格必须对齐这套行为。
@@ -323,6 +427,37 @@ else:
   - 解释是否含桥接类比（锚定 Java/Spring/MySQL/Redis 等已有知识，或按 Python 入门者深度展开）。
 - 任一抽查术语首次出现处无解释或无桥接 -> 校验不通过，按第 12 节规范补写后重新校验。
 - 校验通过的同时，确认教程底部「📝 术语表」小节存在且覆盖本篇解释过的非白名单术语。
+
+#### 11.7 视觉模板一致性校验（8.3 配套，禁止跳过）
+
+**目标**：确保产物套用了 8.3 固定视觉模板，防止模型自由发挥导致格式漂移（9.16 事故）。
+
+对生成的 HTML 执行以下检查，任一不通过则整体不通过：
+
+- **CSS 变量锚点匹配**：`<style>` 内必须同时含 `--bg: #fafaf7` 与 `--accent: #b8860b` 与 `--accent2: #2c3e50`（可容忍缩进/空格差异，但色值必须一致）。若整片 `<style>` 采用了完全不同的配色体系，判不通过。
+- **禁止元素检测**：全文不得出现 `linear-gradient`、`#0d1117`、`phase-badge`、`box-shadow`（`box-shadow: 0 1px 3px rgba(0,0,0,0.08)` 这类卡片阴影判不通过）。
+- **必用 class 检测**：必须出现 `.hero`、`.container`、`.table-wrap`、`.src`。
+
+校验脚本（可直接套用，返回非零即失败）：
+
+```bash
+python3 -c "
+import sys, re
+html = open(sys.argv[1]).read()
+issues = []
+for token in ['--accent: #b8860b', '--accent2: #2c3e50', '--bg: #fafaf7']:
+    if token not in html: issues.append('CSS 缺模板锚点: ' + token)
+for bad in ['linear-gradient', '#0d1117', 'phase-badge', 'box-shadow']:
+    if bad in html: issues.append('禁止元素出现: ' + bad)
+for need in ['.hero', '.container', '.table-wrap', '.src']:
+    if need not in html: issues.append('必用 class 缺失: ' + need)
+if issues:
+    print('视觉模板校验失败:'); [print('  - '+i) for i in issues]; sys.exit(1)
+print('视觉模板校验通过')
+" <tutorial.html路径>
+```
+
+**修复方式**：用 8.3.1 的 `<style>` 块整体替换生成的 `<style>`；删除 8.3.3 的禁止元素；按 8.3.2 骨架调整 class 与结构。修复后重新校验，最多重试 2 次。
 
 ### 12. 专有名词解释规范（新手友好，硬性要求）
 
