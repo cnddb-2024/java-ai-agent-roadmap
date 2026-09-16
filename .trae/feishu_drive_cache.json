@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-15",
+  "updated": "2026-09-17",
   "note": "飞书云盘目录 token 缓存。每次 lark-cli drive +create-folder 成功后立即把 folder_token 写入此文件,下次运行优先读此缓存避免重复创建。结构与 GitHub 仓库 assignments 目录树一致便于溯源。",
   "root": {
     "assignments": {
@@ -21,6 +21,24 @@
             "tech-decision-log-02-rerank": {
               "folder_token": "I5TQfNojMlY2RtdAy9Rc6xtMnY3",
               "url": "https://my.feishu.cn/drive/folder/I5TQfNojMlY2RtdAy9Rc6xtMnY3"
+            }
+          }
+        },
+        "2026-09-17": {
+          "folder_token": "Bd1dfq0sgleIPzd8IoAceTwnnxg",
+          "url": "https://my.feishu.cn/drive/folder/Bd1dfq0sgleIPzd8IoAceTwnnxg",
+          "slug_dirs": {
+            "prompt-injection-protection": {
+              "folder_token": "ZCaFfJBT3l2az0dQCQ5c8bI1nZf",
+              "url": "https://my.feishu.cn/drive/folder/ZCaFfJBT3l2az0dQCQ5c8bI1nZf"
+            },
+            "knowledge-base-gray-release": {
+              "folder_token": "TbFvfgjNWlUKm1dMJJFcaoKgnng",
+              "url": "https://my.feishu.cn/drive/folder/TbFvfgjNWlUKm1dMJJFcaoKgnng"
+            },
+            "rag-online-experience-alignment": {
+              "folder_token": "Xyh6fV6EhlQr1Zd5F2zcENG7nse",
+              "url": "https://my.feishu.cn/drive/folder/Xyh6fV6EhlQr1Zd5F2zcENG7nse"
             }
           }
         }

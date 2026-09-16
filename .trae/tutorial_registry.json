@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-16",
+  "updated": "2026-09-17",
   "entries": {
     "fe5fd757-cd63-4848-bafb-3e39cd001cee": {
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
@@ -160,6 +160,42 @@
       "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-16/python-transformers-quickstart/tutorial.html",
       "comment_id": "7685947903289920450",
       "generated_at": "2026-09-16"
+    },
+    "1fa0b16b-e6bc-4c22-bffb-2526027e4654": {
+      "guid": "1fa0b16b-e6bc-4c22-bffb-2526027e4654",
+      "summary": "Prompt 注入防护实战：RAG 间接注入检测 + 输入-架构-输出三层防护 Allow-Deny-Ask（Phase1 安全收官）",
+      "slug": "prompt-injection-protection",
+      "tutorial_path": "assignments/2026-09-17/prompt-injection-protection/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-17/prompt-injection-protection/tutorial.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/R8W1bTYLZoCKYLxzXZWc1y74nyb",
+      "feishu_file_token": "R8W1bTYLZoCKYLxzXZWc1y74nyb",
+      "feishu_folder_path": "assignments/2026-09-17/prompt-injection-protection/",
+      "generated_at": "2026-09-17"
+    },
+    "8e565e94-f4b5-4de8-b753-2f7182e9a6d4": {
+      "guid": "8e565e94-f4b5-4de8-b753-2f7182e9a6d4",
+      "summary": "知识库灰度发布实战：chunk version 标签 + 双 namespace 并行双跑验证 + 一键回滚（Phase1 工程化收官）",
+      "slug": "knowledge-base-gray-release",
+      "tutorial_path": "assignments/2026-09-17/knowledge-base-gray-release/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-17/knowledge-base-gray-release/tutorial.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/Ata1bmBqSoiVwsxvPFEcvzHMnIg",
+      "feishu_file_token": "Ata1bmBqSoiVwsxvPFEcvzHMnIg",
+      "feishu_folder_path": "assignments/2026-09-17/knowledge-base-gray-release/",
+      "generated_at": "2026-09-17"
+    },
+    "ca306ed3-c066-4046-952f-a4d650a513cb": {
+      "guid": "ca306ed3-c066-4046-952f-a4d650a513cb",
+      "summary": "RAG 线上体验对齐实战：点踩率/空回答率埋点 + bad case 回流评测集 + CI 质量门禁（Phase1 评测闭环收官）",
+      "slug": "rag-online-experience-alignment",
+      "tutorial_path": "assignments/2026-09-17/rag-online-experience-alignment/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-17/rag-online-experience-alignment/tutorial.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/JfpabpZQfo8m8tx8J65c2KGgnMg",
+      "feishu_file_token": "JfpabpZQfo8m8tx8J65c2KGgnMg",
+      "feishu_folder_path": "assignments/2026-09-17/rag-online-experience-alignment/",
+      "generated_at": "2026-09-17"
     }
   }
 }
