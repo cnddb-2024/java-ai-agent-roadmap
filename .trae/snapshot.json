@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-16",
+  "updated": "2026-09-17",
   "tasks": [
     {
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
@@ -262,7 +262,7 @@
       "summary": "多轮对话 RAG 实战：查询改写 + 指代消解（Spring AI ChatMemory + RewriteQueryTransformer）",
       "due": "2026-09-16",
       "created_at": "1787783753238",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -270,7 +270,7 @@
       "summary": "知识库增量更新实战：文档变更检测 + 向量 upsert/删除策略（内容哈希幂等入库）",
       "due": "2026-09-16",
       "created_at": "1787783814857",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -278,7 +278,7 @@
       "summary": "Python 补齐：transformers 快速上手（pipeline 跑通嵌入/生成，对比 Spring AI EmbeddingModel）",
       "due": "2026-09-16",
       "created_at": "1787783819612",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -326,6 +326,30 @@
       "summary": "技术决策日志 #03：项目1 生产级五层升级路径评估（可靠性/可观测/安全/评测/成本现状盘点与补齐决策）",
       "due": "2026-09-18",
       "created_at": "1789511839576",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "c3902111-50e5-4a05-ab72-5e61677649a4",
+      "summary": "RabbitMQ 异步文档入库实战：消息队列解耦文档解析与向量入库 + 幂等消费 + 失败重试（Phase2 中间件补齐）",
+      "due": "2026-09-19",
+      "created_at": "1789598123265",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "4642a9f0-4892-4664-bcd3-db6c9edc5980",
+      "summary": "Redis 会话记忆与缓存实战：Spring AI ChatMemory 持久化到 Redis + 会话状态缓存（Phase2 中间件补齐）",
+      "due": "2026-09-19",
+      "created_at": "1789598123265",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "0fa7ef57-dfb0-4fee-bc92-e707e741d3a4",
+      "summary": "SpringCloud 微服务基础实战：Nacos 注册中心 + Gateway 网关 + OpenFeign 声明式调用（项目1 微服务化第一步，Phase2 工程化补齐）",
+      "due": "2026-09-19",
+      "created_at": "1789598123265",
       "completed": false,
       "frozen": false
     }

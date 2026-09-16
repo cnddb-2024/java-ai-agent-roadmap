@@ -1,0 +1,124 @@
+# 2026-09-17 每日维护日志
+
+## 基本信息
+- 日期: 2026-09-17 (北京时间)
+- DAY_NUM: 51
+- PHASE: 1 (第15-56天)
+- TODAY_TS: 1789603200000 (2026-09-17)
+- TOMORROW_TS: 1789689600000 (2026-09-18)
+- DAY_AFTER_TS: 1789776000000 (2026-09-19)
+
+## 步骤执行记录
+
+### 步骤1: 拉取仓库
+- 状态: 成功
+- git clone 成功，远程同步后无新变更
+
+### 步骤2: 创建日志目录
+- 状态: 成功
+- .trae/logs/ 目录已存在
+
+### 步骤3: 初始化时间与阶段
+- 状态: 成功
+- TODAY=2026-09-17, DAY_NUM=51, PHASE=1
+
+### 步骤4: 飞书鉴权
+- 状态: 成功（凭据外部提供，auth status 不支持交互管理，task 命令正常工作）
+- 注意：新版 lark-cli (1.0.90) 已移除 `--as user` 参数，改用默认 user 身份
+- 清单 GUID: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+
+### 步骤5: 更新反馈层
+- 5.1 HTML today-marker: Phase 1 · 第 50/168 天 → 第 51/168 天 ✓
+- 5.2 __RADAR_GAP__.me: [71,40,58,40,55,62,49] → [73,40,58,40,55,63,49] ✓
+  - 新完成任务知识维度递增: RAG全链路+2(多轮对话RAG+知识库增量更新), Python+1(transformers)
+- 5.3 __RADAR_DAILY__: [50,30,40,40,20,30] → [70,50,60,60,40,40] ✓
+  - 最近7天: 9月15日/16日各完成3个作业，今日进行中
+
+### 步骤6: 采集飞书任务状态 + 扫描作业
+- 6.1 飞书清单查找: 成功
+- 6.2 飞书任务列表: 41个任务（含已完成和未完成）
+- 6.3 作业扫描: assignments/ 最新为 2026-09-16 (3个教程)
+- 6.4 Diff结果:
+  - NEW_DONE (3个):
+    1. 55303caf - 多轮对话 RAG 实战 (completed_at: 1789568507929)
+    2. aad23299 - Python 补齐：transformers 快速上手 (completed_at: 1789568506929)
+    3. c2d17fb1 - 知识库增量更新实战 (completed_at: 1789568507444)
+  - VANISHED: 无
+  - NEW_APPEARED: 无
+- 6.5 描述补写: 所有9个活跃未完成任务均已有描述，无需补写
+
+### 步骤7: 滑动窗口任务规划
+- N = 6 (活跃未完成任务)
+- G = max(0, 9-6) = 3 → 走7.3路径（需要拆解3个新任务）
+- 无冻结任务可解冻，G'=3
+- Phase1 验收标准已满足（混合检索/Rerank/评测/工程化任务均已完成），从 Phase2 拆解
+- 新拆解任务 (3个, created_at=1789598123265, due=后天 2026-09-19):
+  1. 0fa7ef57 - SpringCloud 微服务基础实战（Nacos+Gateway+OpenFeign）
+  2. 4642a9f0 - Redis 会话记忆与缓存实战（ChatMemory 持久化）
+  3. c3902111 - RabbitMQ 异步文档入库实战（幂等+DLQ）
+- 窗口锚定（9个任务，按created_at排序）:
+  - 前3个 (due=今天 2026-09-17):
+    1. 1fa0b16b - Prompt 注入防护实战
+    2. 8e565e94 - 知识库灰度发布实战
+    3. ca306ed3 - RAG 线上体验对齐实战
+  - 中3个 (due=明天 2026-09-18):
+    4. 4ea89bc3 - RAG 召回效果排查与调优整合复盘
+    5. d7d589de - RAG 幻觉分层治理口述整合
+    6. b89ed6b7 - 技术决策日志 #03
+  - 后3个 (due=后天 2026-09-19):
+    7. 0fa7ef57 - SpringCloud 微服务基础实战
+    8. 4642a9f0 - Redis 会话记忆与缓存实战
+    9. c3902111 - RabbitMQ 异步文档入库实战
+- 9个任务全部patch due（无条件重写）: 全部成功
+- 冻结任务: 无（恰好9个活跃未完成任务）
+- excluded.json: 无命中
+
+### 步骤7.7: 保存snapshot.json
+- 状态: 成功
+- 总任务: 44 (已完成:35, 活跃:9, 冻结:0)
+- 3个NEW_DONE标记为completed=true
+- 3个新拆解任务已添加
+
+### 步骤8: 融合教程生成
+- 8.1 待处理任务列表: 3个 (当天due任务，无逾期任务)
+  1. 1fa0b16b - Prompt 注入防护实战
+  2. 8e565e94 - 知识库灰度发布实战
+  3. ca306ed3 - RAG 线上体验对齐实战
+- 8.2 幂等检查 (git pull 已同步):
+  - 1fa0b16b: 注册表未命中、文件未命中 → 需要生成
+  - 8e565e94: 注册表未命中、文件未命中 → 需要生成
+  - ca306ed3: 注册表未命中、文件未命中 → 需要生成
+- 8.3 教程生成 (全部通过 Agent 校验):
+  1. prompt-injection-protection/tutorial.html → 校验通过 (4表格/7代码块/10来源)
+  2. knowledge-base-gray-release/tutorial.html → 校验通过 (5表格/5代码块/10来源)
+  3. rag-online-experience-alignment/tutorial.html → 校验通过 (4表格/4代码块/10来源)
+- 8.4 教程提交推送: 成功 (commit: 2a8d5fb)
+- 8.5 飞书云盘上传:
+  - 创建目录 assignments/2026-09-17/{slug}
+  - 1fa0b16b → https://my.feishu.cn/file/R8W1bTYLZoCKYLxzXZWc1y74nyb ✓
+  - 8e565e94 → https://my.feishu.cn/file/Ata1bmBqSoiVwsxvPFEcvzHMnIg ✓
+  - ca306ed3 → https://my.feishu.cn/file/JfpabpZQfo8m8tx8J65c2KGgnMg ✓
+  - 注册表更新: 成功 (commit: 32d510f)
+- 8.6 飞书评论 (单任务单命令):
+  - 1fa0b16b → comment_id: 7686269029358504920 ✓
+  - 8e565e94 → comment_id: 7686269046035090415 ✓
+  - ca306ed3 → comment_id: 7686269061990190259 ✓
+  - 注册表回填: 成功 (commit: 1513353)
+- 8.7 本地预览: http://localhost:8765/ 已启动 (今日作业教程_2026-09-17)
+- 8.8 教程失败: 无
+
+### 步骤9: 写回与兜底
+- 9.1 日志写入: 本文件
+- 9.2 最终提交: snapshot.json, excluded.json, 日志, HTML/JS, term-whitelist.md
+- 9.3 汇报: 见下
+
+## 汇总
+- 新完成任务(NEW_DONE): 3个
+- 新出现任务(NEW_APPEARED): 0个
+- 消失任务(VANISHED): 0个
+- 新拆解任务: 3个 (G=3, Phase2 开头: SpringCloud/Redis/RabbitMQ)
+- 冻结任务: 0个
+- 窗口锚定: 9个任务patch due成功
+- 教程生成: 3篇生成, 0篇跳过, 0篇失败
+- 注册表新增: 3条
+- 术语表新增: 30个待观察术语
