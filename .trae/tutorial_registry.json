@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-17",
+  "updated": "2026-09-18",
   "entries": {
     "fe5fd757-cd63-4848-bafb-3e39cd001cee": {
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
@@ -199,6 +199,42 @@
       "feishu_folder_path": "assignments/2026-09-17/rag-online-experience-alignment/",
       "feishu_comment_id": "7686269061990190259",
       "generated_at": "2026-09-17"
+    },
+    "4ea89bc3-4d74-4b79-b9c0-03e4aaefa03c": {
+      "summary": "RAG 召回效果排查与调优整合复盘：五维排查 + 分层策略（Phase1 收官整合题）",
+      "slug": "rag-recall-troubleshooting",
+      "tutorial_path": "assignments/2026-09-18/rag-recall-troubleshooting/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-18/rag-recall-troubleshooting/tutorial.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/FrlKbwcJBoVFPrxz9vBcUmOwnOh",
+      "feishu_file_token": "FrlKbwcJBoVFPrxz9vBcUmOwnOh",
+      "feishu_folder_path": "assignments/2026-09-18/rag-recall-troubleshooting/",
+      "feishu_comment_id": null,
+      "generated_at": "2026-09-18"
+    },
+    "d7d589de-f4b5-46c2-b435-c2c26f3cb66f": {
+      "summary": "RAG 幻觉分层治理口述整合：检索层/生成层/数据层三层拆解与拒答设计（Phase1 收官必问）",
+      "slug": "rag-hallucination-governance",
+      "tutorial_path": "assignments/2026-09-18/rag-hallucination-governance/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-18/rag-hallucination-governance/tutorial.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/BoWMbmfZyoZvZOxltiPcgttdnch",
+      "feishu_file_token": "BoWMbmfZyoZvZOxltiPcgttdnch",
+      "feishu_folder_path": "assignments/2026-09-18/rag-hallucination-governance/",
+      "feishu_comment_id": null,
+      "generated_at": "2026-09-18"
+    },
+    "b89ed6b7-b4cb-4872-83f8-379b4b9e329b": {
+      "summary": "技术决策日志 #03：项目1 生产级五层升级路径评估（可靠性/可观测/安全/评测/成本现状盘点与补齐决策）",
+      "slug": "tech-decision-log-03-production-upgrade",
+      "tutorial_path": "assignments/2026-09-18/tech-decision-log-03-production-upgrade/tutorial.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-09-18/tech-decision-log-03-production-upgrade/tutorial.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/YO13b8Cphoyx2xx5nR5cOuuznDb",
+      "feishu_file_token": "YO13b8Cphoyx2xx5nR5cOuuznDb",
+      "feishu_folder_path": "assignments/2026-09-18/tech-decision-log-03-production-upgrade/",
+      "feishu_comment_id": null,
+      "generated_at": "2026-09-18"
     }
   }
 }
