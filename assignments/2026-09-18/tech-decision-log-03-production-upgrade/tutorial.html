@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技术决策日志 #03：项目1 生产级五层升级路径评估（可靠性/可观测/安全/评测/成本现状盘点与补齐决策）</title>
+<style>
+:root{
+  --bg:#fafaf8; --bg2:#f0efeb; --ink:#1a1a18; --sub:#6b6a66;
+  --accent:#b45309; --accent2:#0e7490; --rule:#e2e0da; --code-bg:#1c2128; --code-ink:#e6edf3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Instrument Sans',-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px}
+.wrap{max-width:860px;margin:0 auto;padding:32px 24px 64px}
+.hero{border-bottom:3px solid var(--ink);padding:28px 0 20px;margin-bottom:8px}
+.hero .phase{display:inline-block;background:var(--ink);color:#fff;font-size:.78rem;padding:3px 12px;border-radius:999px;letter-spacing:.05em;margin-bottom:12px}
+.hero h1{font-size:1.5rem;line-height:1.4;margin-bottom:10px}
+.hero .meta{color:var(--sub);font-size:.9rem}
+.hero .time-total{display:inline-block;background:var(--accent);color:#fff;font-weight:600;padding:2px 12px;border-radius:6px;margin-right:8px}
+.stage-tags{margin:14px 0 4px;display:flex;flex-wrap:wrap;gap:8px}
+.stage-tags span{background:var(--bg2);border:1px solid var(--rule);border-radius:999px;font-size:.8rem;padding:3px 10px;color:var(--sub)}
+h2{font-size:1.25rem;margin:34px 0 6px;padding-left:12px;border-left:4px solid var(--accent)}
+h3{font-size:1.05rem;margin:22px 0 6px}
+p{margin:10px 0}
+.note{background:var(--bg2);border-left:3px solid var(--accent2);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.93rem}
+.warnbox{background:#fef3c7;border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.93rem}
+code{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;background:var(--bg2);padding:1px 6px;border-radius:4px;font-size:.88em}
+pre code{display:block;background:var(--code-bg);color:var(--code-ink);padding:16px;border-radius:10px;white-space:pre;overflow-x:auto;font-size:.85rem;line-height:1.6}
+pre{margin:14px 0}
+table{border-collapse:collapse;margin:16px 0;font-size:.92rem;width:100%}
+th,td{border:1px solid var(--rule);padding:10px 12px;text-align:left;white-space: nowrap}
+th{background:var(--bg2);font-weight:600}
+.table-wrap{overflow-x: auto;margin:16px 0;-webkit-overflow-scrolling:touch}
+.table-wrap table{margin:0;min-width:max-content}
+.term{border-bottom:2px dotted var(--accent);font-weight:600}
+.glossary li{margin:6px 0}
+.glossary b{color:var(--accent)}
+ol.src{margin:10px 0 0 22px}
+ol.src li{margin:8px 0;font-size:.92rem;word-break:break-all}
+.src-note{color:var(--sub);font-size:.85rem}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);color:var(--sub);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <span class="phase">Phase 1 · 贯穿线 · 收官决策</span>
+  <h1>技术决策日志 #03：项目1 生产级五层升级路径评估</h1>
+  <div class="meta">
+    <span class="time-total">总预估时长：45 分钟</span>
+    可靠性 / 可观测 / 安全 / 评测 / 成本 五层现状盘点与补齐决策 · 面试"为什么这样升级"的叙事弹药
+  </div>
+  <div class="stage-tags">
+    <span>① 什么是决策日志 5min</span><span>② 五层逐层评估 25min</span><span>③ 优先级排序 8min</span><span>④ 产出与口述 7min</span>
+  </div>
+</div>
+
+<h2>一、什么是技术决策日志，为什么收官阶段写它（5min）</h2>
+<p><span class="term">技术决策日志（ADR，Architecture Decision Record）</span>——用固定模板把"当时为什么这么选、放弃了什么、什么条件下撤销"写成短文档，类似数据库的 binlog：不只记录结果，更记录"怎么走到这一步"。你已写过 #01（向量库选型 pgvector vs Qdrant）与 #02（Rerank 方案选型），本次 #03 升格为<b>全景盘点</b>：对照路线图"Demo → 生产级五层升级路径"逐层评估项目 1 现状，产出"先补哪层"的决策。</p>
+<p>这篇决策日志的产出物是一张"四栏表格 × 5 层"：<b>现状 / 缺口 / 补齐动作 / 代价</b>，外加优先级排序理由。它是 Phase2 工程化补齐的路线依据，也是面试里"demo 和生产差在哪"的答案素材库。</p>
+
+<h2>二、五层逐层评估（25min，每层 5min）</h2>
+
+<h3>① 可靠性：失败是常态，先接住再说</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>栏</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>现状</td><td>同步调用主链路跑通；LLM 网络抖动无重试；无超时统一配置</td></tr>
+<tr><td>缺口</td><td>无端到端超时与<span class="term">指数退避（backoff）</span>——失败后按 1s、2s、4s 递增间隔重试，避免瞬时故障被放大成雪崩；无<span class="term">熔断</span>——错误率超阈值后快速失败一段时间，像家里跳闸保护电器，Java 侧即 Sentinel/Resilience4j 的断路器概念</td></tr>
+<tr><td>补齐动作</td><td>Spring Retry（@Retryable）做指数退避重试；Resilience4j CircuitBreaker 按错误率熔断；容量按峰值 QPS 而非平均规划</td></tr>
+<tr><td>代价</td><td>重试放大流量（需配重试上限）；熔断窗口内牺牲部分可用性；开发+配置约 1-2 天</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>② 可观测性：没有度量就没有优化</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>栏</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>现状</td><td>Micrometer + Actuator 已接（9-05 实战）；日志为非结构化 println 风格；无分布式追踪</td></tr>
+<tr><td>缺口</td><td>结构化 JSON 日志；p50/<span class="term">P95 延迟</span>——把全部请求耗时排序，第 95 百分位的值，比平均值更能暴露长尾卡顿——分位统计；错误率分类（超时/限流/模型失败分开数）；每请求 token 成本；跨 HTTP→DB→LLM 的调用链</td></tr>
+<tr><td>补齐动作</td><td>logback JSON encoder；Micrometer Tracing（开箱，自动在 HTTP 头传播 trace 上下文）；MeterRegistry 自定义 token 计数指标（线上体验对齐实战已埋部分埋点）</td></tr>
+<tr><td>代价</td><td>日志量增大需配滚动策略；追踪引入轻微开销（采样率控制）；约 2-3 天</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>③ 安全合规：Phase1 已练一半，差工程化收口</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>栏</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>现状</td><td>Prompt 注入三层防护已做（输入-架构-输出，9-17 实战）；无权限体系；无审计日志</td></tr>
+<tr><td>缺口</td><td><span class="term">RBAC（基于角色的访问控制）</span>——按角色决定"谁能调这个接口、能查哪个命名空间"，类似 Spring Security 的角色权限；多租户数据隔离（检索前按租户过滤）；操作审计留痕</td></tr>
+<tr><td>补齐动作</td><td>Spring Security + 方法级 @PreAuthorize；检索 FilterExpression 加租户条件（灰度发布实战同款机制复用）；审计切面记录 who/when/query</td></tr>
+<tr><td>代价</td><td>权限模型设计 2-3 天；过滤条件增加检索开销；多租户改造涉及数据结构</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>④ 质量评测：回归防线，Phase1 已有雏形</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>栏</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>现状</td><td>RAGAS 三指标评测已跑（9-08）；线上点踩/空回答埋点已接（9-17）；评测集与线上 bad case 回流未成闭环</td></tr>
+<tr><td>缺口</td><td><span class="term">黄金测试集（golden set）</span>——人工确认过的标准问答对集合，类似回归测试用例库——版本化固定；每次改动的自动回归；A/B 对比实验（新旧版本各接一半流量比指标，避免"自我感觉良好"）</td></tr>
+<tr><td>补齐动作</td><td>评测集入库版本管理；CI 里跑 Recall@K/Faithfulness 回归门禁（低于基线即失败）；bad case 从 trace 回流评测集（线上体验对齐篇已设计）</td></tr>
+<tr><td>代价</td><td>评测集建设持续投入；CI 时长增加；LLM 裁判调用成本（可用小模型降级省 10 倍）</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>⑤ 成本与规模化：demo 不花钱，生产处处是钱</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>栏</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td>现状</td><td>无 token 预算控制；无缓存；单实例部署</td></tr>
+<tr><td>缺口</td><td>token 预算与<span class="term">成本红线（Cost Threshold）</span>——单日花费上限，超出后降级或拒量，类似限流但对"钱"限流；每日上限告警；非实时任务（全量重嵌入）转后台队列；prompt 缓存（相同前缀复用计费与计算）</td></tr>
+<tr><td>补齐动作</td><td>bucket4j（令牌桶限流库，按预算当令牌发放）；嵌入与 prompt 缓存（Redis，已熟）；批任务转 RabbitMQ 异步（RabbitMQ 实战直接复用）</td></tr>
+<tr><td>代价</td><td>限流影响峰值体验；缓存失效策略要设计；后台化增加架构复杂度</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>三、优先级排序：为什么先补可靠性 + 可观测（8min）</h2>
+<p>用简化版<span class="term">加权决策矩阵</span>——给每个候选打"收益×紧急度"的加权总分，代替拍脑袋排序：</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>候选层</th><th>面试叙事价值</th><th>线上风险敞口</th><th>补齐成本</th><th>加权结论</th></tr></thead>
+<tbody>
+<tr><td>① 可靠性</td><td>高（Agent Loop 治理同源）</td><td>高（LLM 抖动必现）</td><td>低（1-2 天）</td><td><b>P0 先做</b></td></tr>
+<tr><td>② 可观测</td><td>高（p95/成本数据是后面所有决策的依据）</td><td>中</td><td>低-中</td><td><b>P0 与①并行</b></td></tr>
+<tr><td>④ 质量评测</td><td>高（第一梯队 RAG 评测题）</td><td>中</td><td>中（评测集持续建设）</td><td>P1 Phase2 前期</td></tr>
+<tr><td>③ 安全合规</td><td>中（注入防护已讲过，增量是 RBAC）</td><td>中（演示项目租户场景弱）</td><td>中</td><td>P1 与④并行</td></tr>
+<tr><td>⑤ 成本规模化</td><td>中（口述清楚即可，动手可后置）</td><td>低（个人项目调用量小）</td><td>中</td><td>P2 记录方案即可</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note">排序逻辑一句话：可靠性是"别挂"，可观测是"看得见"，两者是其他三层的地基且成本低；评测与安全是"做得好"；成本在个人项目量级下风险最低。<span class="term">撤销条件</span>——预先写明"什么信号出现时推翻本决策"（如：线上出现一次因无熔断引发的雪崩 → ⑤⑤成本层立即提级）——是 ADR 防腐的关键栏位。</div>
+
+<h2>四、产出物模板 + 面试口述（7min）</h2>
+<p>把上述内容落成 decisions/2026-09-18-prod-upgrade-path.md（Simple/MADR 模板已在决策日志 #02 用过），核心段落骨架：</p>
+<pre><code># 决策日志 #03：项目1 生产级五层升级路径评估
+日期: 2026-09-18  状态: 已采纳
+## 背景
+项目1 完成 Phase1 RAG 闭环，准备 Phase2 工程化补齐，需确定层级优先级。
+## 评估结论（四栏表 x5 层，见正文）
+## 决策
+P0 可靠性+可观测（1 周内）；P1 评测+安全（Phase2 前期）；P2 成本（方案记录）。
+## 放弃的方案
+五层齐头并进：资源不允许且无数据支撑每层效果，先用可观测层拿到数据再迭代。
+## 撤销条件
+线上出现熔断缺失级联故障 / 面试目标公司 JD 显式要求 RBAC 实操经验时，对应层提级。</code></pre>
+<div class="warnbox"><b>面试 60 秒口述</b>："我按五层路径盘点过项目：可靠性只有同步调用没有重试熔断，可观测只有基础指标没有 p95 和成本归因，安全做了注入防护但缺 RBAC 和审计，评测有 RAGAS 但没回归门禁，成本完全没管。我决策先补可靠性加可观测——它们是地基、成本低、还是后续所有优化决策的数据来源；评测和安全放 Phase2 前期并行；成本层记录方案暂不实施。每层放弃的方案和撤销条件都写在决策日志里。"</div>
+
+<h2>📝 术语表（本篇解释过的非白名单术语）</h2>
+<ul class="glossary">
+<li><b>ADR（技术决策日志）</b>：记录"为什么这么选、放弃了什么、何时撤销"的短文档，类似 binlog 记录过程而非仅结果。</li>
+<li><b>指数退避（backoff）</b>：失败重试间隔按 1s/2s/4s 递增，防止把瞬时故障打成雪崩。</li>
+<li><b>熔断</b>：错误率超阈值后快速失败一段时间，像跳闸保护；Resilience4j 断路器即此概念。</li>
+<li><b>P95 延迟</b>：耗时排序后第 95 百分位的值，暴露平均值掩盖的长尾卡顿。</li>
+<li><b>RBAC</b>：按角色控制接口与数据访问，类似 Spring Security 角色权限。</li>
+<li><b>黄金测试集（golden set）</b>：人工确认的标准问答对集合，相当于回归测试用例库。</li>
+<li><b>A/B 对比实验</b>：新旧版本各接一半流量比指标，避免主观判断。</li>
+<li><b>成本红线（Cost Threshold）</b>：单日花费上限，超出即降级或拒量，"对钱限流"。</li>
+<li><b>加权决策矩阵</b>：多维度加权打分替代拍脑袋排序。</li>
+<li><b>撤销条件</b>：预先写明的"出现什么信号就推翻本决策"。</li>
+<li><b>bucket4j</b>：Java 令牌桶限流库，可把预算当令牌发放实现成本限流。</li>
+</ul>
+
+<h2>教程来源</h2>
+<ol class="src">
+<li>企业级 AI 大模型后端基础设施管理（CSDN）— <a href="https://blog.csdn.net/hyc010110/article/details/150267887">https://blog.csdn.net/hyc010110/article/details/150267887</a></li>
+<li>LiteLLM 生产级部署与成本优化（CSDN）— <a href="https://blog.csdn.net/qq_73472828/article/details/160699220">https://blog.csdn.net/qq_73472828/article/details/160699220</a></li>
+<li>大模型服务熔断限流计费联动（腾讯云）— <a href="https://cloud.tencent.com/developer/article/2709199">https://cloud.tencent.com/developer/article/2709199</a></li>
+<li>企业接入大模型 API 五个治理盲区（华为云）— <a href="https://bbs.huaweicloud.com/blogs/ffa01a2cf0f94c5e8784cbbe4db2ba5a">https://bbs.huaweicloud.com/blogs/ffa01a2cf0f94c5e8784cbbe4db2ba5a</a></li>
+<li>knowledgeops-agent 生产级参照（GitHub，多租户/RBAC/可观测/7-job CI 门禁）— <a href="https://github.com/however-yir/knowledgeops-agent">https://github.com/however-yir/knowledgeops-agent</a></li>
+<li>Spring AI 官方仓库（Micrometer Tracing / Actuator 可观测开箱实现）— <a href="https://github.com/spring-projects/spring-ai">https://github.com/spring-projects/spring-ai</a></li>
+<li>Resilience4j 官方文档（重试/熔断开箱实现）— <a href="https://resilience4j.readme.io/docs/getting-started">https://resilience4j.readme.io/docs/getting-started</a></li>
+</ol>
+
+<footer>Phase 1 贯穿线 · 技术决策日志 #03 · 生成于 2026-09-18 每日维护</footer>
+</div>
+</body>
+</html>
