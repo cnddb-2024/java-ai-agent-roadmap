@@ -210,7 +210,8 @@
       "feishu_file_token": "FrlKbwcJBoVFPrxz9vBcUmOwnOh",
       "feishu_folder_path": "assignments/2026-09-18/rag-recall-troubleshooting/",
       "feishu_comment_id": null,
-      "generated_at": "2026-09-18"
+      "generated_at": "2026-09-18",
+      "note": "评论已发送成功(响应 ok:true)；comment_id 未随 +comment 响应返回且 task 域无评论查询命令，防重依赖注册表 guid 记录"
     },
     "d7d589de-f4b5-46c2-b435-c2c26f3cb66f": {
       "summary": "RAG 幻觉分层治理口述整合：检索层/生成层/数据层三层拆解与拒答设计（Phase1 收官必问）",
@@ -222,7 +223,8 @@
       "feishu_file_token": "BoWMbmfZyoZvZOxltiPcgttdnch",
       "feishu_folder_path": "assignments/2026-09-18/rag-hallucination-governance/",
       "feishu_comment_id": null,
-      "generated_at": "2026-09-18"
+      "generated_at": "2026-09-18",
+      "note": "评论已发送成功(响应 ok:true)；comment_id 未随 +comment 响应返回且 task 域无评论查询命令，防重依赖注册表 guid 记录"
     },
     "b89ed6b7-b4cb-4872-83f8-379b4b9e329b": {
       "summary": "技术决策日志 #03：项目1 生产级五层升级路径评估（可靠性/可观测/安全/评测/成本现状盘点与补齐决策）",
@@ -234,7 +236,8 @@
       "feishu_file_token": "YO13b8Cphoyx2xx5nR5cOuuznDb",
       "feishu_folder_path": "assignments/2026-09-18/tech-decision-log-03-production-upgrade/",
       "feishu_comment_id": null,
-      "generated_at": "2026-09-18"
+      "generated_at": "2026-09-18",
+      "note": "评论已发送成功(响应 ok:true)；comment_id 未随 +comment 响应返回且 task 域无评论查询命令，防重依赖注册表 guid 记录"
     }
   }
 }

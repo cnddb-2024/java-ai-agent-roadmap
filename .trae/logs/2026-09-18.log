@@ -1,0 +1,127 @@
+# 2026-09-18 每日维护日志
+
+## 基本信息
+- 日期: 2026-09-18 (北京时间)
+- DAY_NUM: 52
+- PHASE: 1 (第15-56天)
+- TODAY_TS: 1789689600000 (2026-09-18)
+- TOMORROW_TS: 1789776000000 (2026-09-19)
+- DAY_AFTER_TS: 1789862400000 (2026-09-20)
+
+## 步骤执行记录
+
+### 步骤1: 拉取仓库
+- 状态: 成功
+- git clone 成功，HEAD 为 2026-09-17 每日维护提交 (6e124e5)
+- 注: git pull --rebase 因本地未提交更改跳过，克隆时已含最新远程提交，幂等结论不受影响
+
+### 步骤2: 创建日志目录
+- 状态: 成功
+- .trae/logs/ 目录已存在
+
+### 步骤3: 初始化时间与阶段
+- 状态: 成功
+- TODAY=2026-09-18, DAY_NUM=52, PHASE=1
+
+### 步骤4: 飞书鉴权
+- 状态: 成功（凭据外部提供，task/drive 命令全程正常）
+- 清单 GUID: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+
+### 步骤5: 更新反馈层
+- 5.1 HTML today-marker: Phase 1 · 第 51/168 天 → 第 52/168 天 ✓
+- 5.2 __RADAR_GAP__.me: [73,40,58,40,55,63,49] → [80,40,65,40,63,70,55] ✓
+  - 计入 9-17 完成的 3 个任务：Prompt 注入防护（安全维度）、知识库灰度发布（工程化维度）、RAG 线上体验对齐（评测维度）
+- 5.3 __RADAR_DAILY__: [70,50,60,60,40,40] → [90,75,75,80,45,80] ✓
+  - 最近 7 天滚动：9-15/9-16/9-17 各完成 3 个作业
+
+### 步骤6: 采集飞书任务状态 + 扫描作业
+- 6.1 飞书清单查找: 成功
+- 6.2 飞书任务列表: 44个任务（快照留存 .trae/feishu_tasks_20260918.json）
+- 6.3 作业扫描: assignments/ 最新为 2026-09-17 (3个教程)
+- 6.4 Diff结果:
+  - NEW_DONE (3个):
+    1. 1fa0b16b - Prompt 注入防护实战 (completed_at: 1789683300000)
+    2. 8e565e94 - 知识库灰度发布实战 (completed_at: 1789683320000)
+    3. ca306ed3 - RAG 线上体验对齐实战 (completed_at: 1789683340000)
+  - VANISHED: 无
+  - NEW_APPEARED: 无
+- 6.5 描述补写: 6个活跃未完成任务描述均非空，无需补写
+
+### 步骤7: 滑动窗口任务规划
+- N = 6 (活跃未完成任务)
+- G = max(0, 9-6) = 3 → 走拆解路径，G'=3
+- Phase1 收官背景: 核心任务全部完成，从 Phase1 贯穿线「收官整合」拆解 3 个整合复盘任务
+- 新拆解任务 (3个, due=后天 2026-09-20):
+  1. 084bb411-649d-4aa5-9f56-907ea10a5749 - ReAct 模式整合复盘与 LangChain4j 迁移预研
+  2. a63ae1ea-138a-4ded-83e2-4b04fb901dd9 - MCP 协议整合复盘与 Java SDK 生态调研
+  3. c591988c-3a41-4415-8cc6-0f9c9aa49110 - Python asyncio 整合复盘与 LangGraph 预研
+- 3个新任务已加入清单 (tasklist-task-add 全部成功)
+- 窗口锚定（9个任务，按 created_at 排序，全部无条件 patch due 重写）:
+  - 前3个 (due=今天 2026-09-18):
+    1. 4ea89bc3 - RAG 召回效果排查与调优整合复盘
+    2. d7d589de - RAG 幻觉分层治理口述整合
+    3. b89ed6b7 - 技术决策日志 #03
+  - 中3个 (due=明天 2026-09-19):
+    4. 0fa7ef57 - SpringCloud 微服务基础实战
+    5. 4642a9f0 - Redis 会话记忆与缓存实战
+    6. c3902111 - RabbitMQ 异步文档入库实战
+  - 后3个 (due=后天 2026-09-20):
+    7. 084bb411 - ReAct 整合复盘
+    8. a63ae1ea - MCP 整合复盘
+    9. c591988c - asyncio 整合复盘
+- 9个任务 patch due 全部成功；冻结任务: 无（恰好9个活跃未完成任务）
+
+### 步骤7.7: 保存snapshot.json
+- 状态: 成功
+- 总任务: 47 (已完成:38, 活跃:9, 冻结:0)
+- 3个NEW_DONE标记为completed=true
+- 3个新拆解任务已添加 (frozen:false, due=1789862400000)
+
+### 步骤8: 融合教程生成
+- 8.1 待处理任务列表: 3个 (当天due任务，无逾期任务)
+  1. 4ea89bc3 - RAG 召回效果排查与调优整合复盘
+  2. d7d589de - RAG 幻觉分层治理口述整合
+  3. b89ed6b7 - 技术决策日志 #03
+- 8.2 幂等检查 (三信号):
+  - 注册表: 3个 guid 均未命中
+  - 文件: assignments/2026-09-18/ 不存在
+  - feishu_comment_id: 无记录
+  - → 3篇全部需要生成
+- 8.3 教程生成 (全部通过校验):
+  1. rag-recall-troubleshooting/tutorial.html → 校验通过 (4表格/2代码块/7来源)
+  2. rag-hallucination-governance/tutorial.html → 校验通过 (2表格/3代码块/7来源)
+  3. tech-decision-log-03-production-upgrade/tutorial.html → 校验通过 (6表格/1代码块/7来源)
+  - 教训: 校验脚本对 white-space/overflow-x 要求带空格写法（`white-space: nowrap`），首次生成无空格写法被拦截后修正
+  - 教训: 教程2来源初稿误将 cryptocopilot 链接到 spring-ai 仓库，已修正为 knowledgeops-agent
+- 8.4 教程提交推送: 成功 (commit: 68755b6)
+  - 注: 本地 git 身份未配置，已设置 user.name=cnddb-2024 / user.email=cnddb-2024@users.noreply.github.com
+- 8.5 飞书云盘上传:
+  - 创建目录 assignments/2026-09-18/ (token: Rm6GfXEsTlhJ4Od6Zj8c9IsYnEb) 及 3 个 slug 子目录
+  - 4ea89bc3 → https://my.feishu.cn/file/FrlKbwcJBoVFPrxz9vBcUmOwnOh ✓
+  - d7d589de → https://my.feishu.cn/file/BoWMbmfZyoZvZOxltiPcgttdnch ✓
+  - b89ed6b7 → https://my.feishu.cn/file/YO13b8Cphoyx2xx5nR5cOuuznDb ✓
+  - 注册表更新: 成功 (commit: 30ab70d)，feishu_drive_cache.json 同步更新
+- 8.6 飞书评论 (单任务单命令):
+  - 4ea89bc3 → ok:true（comment_id 未随响应返回，task 域无评论查询命令，注册表记 null+note，防重依赖 guid 记录）
+  - d7d589de → ok:true（同上）
+  - b89ed6b7 → ok:true（同上）
+- 8.7 本地预览: http://localhost:8765/ (今日作业教程_2026-09-18)
+- 8.8 教程失败: 无
+
+### 步骤9: 写回与兜底
+- 9.1 日志写入: 本文件
+- 9.2 术语白名单: term-whitelist.md 新增 5 个待观察术语（MMR、FactCheckingEvaluator、熔断、RBAC、bucket4j）
+- 9.3 最终提交: snapshot.json, excluded.json, 日志, HTML/JS, term-whitelist.md, 教程注册表
+- 9.4 汇报: 见下
+
+## 汇总
+- 新完成任务(NEW_DONE): 3个 (Prompt注入防护/知识库灰度发布/RAG线上体验对齐)
+- 新出现任务(NEW_APPEARED): 0个
+- 消失任务(VANISHED): 0个
+- 新拆解任务: 3个 (G=3, Phase1 贯穿线收官: ReAct复盘/MCP复盘/asyncio复盘)
+- 冻结任务: 0个
+- 窗口锚定: 9个任务patch due成功
+- 教程生成: 3篇生成, 0篇跳过, 0篇失败
+- 注册表新增: 3条
+- 术语表新增: 5个待观察术语
+- 快照: 47任务 = 38完成 + 9活跃 + 0冻结

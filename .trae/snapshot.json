@@ -1,5 +1,4 @@
 {
-  "updated": "2026-09-17",
   "tasks": [
     {
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
@@ -286,7 +285,7 @@
       "summary": "Prompt 注入防护实战：RAG 间接注入检测 + 输入-架构-输出三层防护 Allow-Deny-Ask（Phase1 安全收官）",
       "due": "2026-09-17",
       "created_at": 1789425503940,
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -294,7 +293,7 @@
       "summary": "知识库灰度发布实战：chunk version 标签 + 双 namespace 并行双跑验证 + 一键回滚（Phase1 工程化收官）",
       "due": "2026-09-17",
       "created_at": 1789425503940,
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -302,7 +301,7 @@
       "summary": "RAG 线上体验对齐实战：点踩率/空回答率埋点 + bad case 回流评测集 + CI 质量门禁（Phase1 评测闭环收官）",
       "due": "2026-09-17",
       "created_at": 1789425503940,
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -352,6 +351,31 @@
       "created_at": "1789598123265",
       "completed": false,
       "frozen": false
+    },
+    {
+      "guid": "084bb411-649d-4aa5-9f56-907ea10a5749",
+      "summary": "ReAct Agent 实战：Spring AI Tool-Calling Loop 实现 思考-行动-观察 循环 + 死循环防护（Phase2 Agent 进阶）",
+      "due": 1789862400000,
+      "created_at": 1789684756834,
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "a63ae1ea-138a-4ded-83e2-4b04fb901dd9",
+      "summary": "MCP 协议实战：Spring AI 1.1.x 写一个能被任意客户端调用的 MCP Server（Phase2 差异化筹码）",
+      "due": 1789862400000,
+      "created_at": 1789684757530,
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "c591988c-3a41-4415-8cc6-0f9c9aa49110",
+      "summary": "Python 补齐：asyncio 异步并发实战（对比 Java CompletableFuture/虚拟线程，跑通 LLM 多工具并发调用）",
+      "due": 1789862400000,
+      "created_at": 1789684758440,
+      "completed": false,
+      "frozen": false
     }
-  ]
+  ],
+  "updated": "2026-09-18"
 }
