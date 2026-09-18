@@ -1,0 +1,18 @@
+# ─────────────────────────────────────────────
+# 方案 B：教程生成产物不再纳入版本管理
+# 这些文件由自动化流程（roadmap-daily-maintainer / tutorial-fusion）
+# 每次 git add 卷入，属于生成物而非源码，应排除。
+# ─────────────────────────────────────────────
+
+# zip 压缩副本（飞书云盘分享 / 下载产物）
+*.zip
+
+# html-share 打包目录（内含 zip 对应的原始 html 副本）
+.trae-html-share-packages/
+
+# 临时「今日作业教程」导出目录
+今日作业教程_*/
+
+# assignments 下自动生成的教程 HTML
+# （兼容历史 tutorial.html 与现行「标题即文件名」命名）
+assignments/**/*.html
