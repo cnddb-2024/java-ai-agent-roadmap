@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本地 Ollama 部署 Qwen + Spring AI 接入 | Phase 1 融合教程</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero {
+  border-left: 4px solid var(--accent);
+  padding: 8px 0 8px 20px;
+  margin-bottom: 40px;
+}
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 {
+  font-size: 1.3rem;
+  margin-top: 44px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 0.92rem;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: var(--bg2); font-weight: 600; }
+.callout {
+  background: var(--bg2);
+  border-left: 4px solid var(--accent2);
+  padding: 14px 18px;
+  margin: 20px 0;
+  border-radius: 0 6px 6px 0;
+}
+.callout-title { font-weight: 600; margin-bottom: 6px; color: var(--accent2); }
+.timeline { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+.timeline .step {
+  flex: 1;
+  min-width: 140px;
+  background: var(--bg2);
+  padding: 14px;
+  border-radius: 8px;
+  border-top: 3px solid var(--accent);
+}
+.timeline .step .time { font-size: 0.82rem; color: var(--muted); }
+.timeline .step .label { font-weight: 600; margin-top: 4px; }
+.sources { font-size: 0.92rem; }
+.sources li { margin: 8px 0; word-break: break-all; }
+.sources a { color: var(--accent); text-decoration: none; }
+.sources a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 1 · RAG 刚需闭环 + 生产级项目 1</div>
+  <h1>本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理</h1>
+  <div class="meta">
+    总预估时长：<strong>55 分钟</strong>（Ollama 安装 10min / 模型拉取 15min / Spring AI 接入 20min / 验收 10min）<br>
+    任务全称：本地 Ollama 部署 Qwen 大模型 + Spring AI 接入本地推理
+  </div>
+</div>
+
+<p>把大模型从云端拉到本地，是 Phase 1 做"能跑、能改、能评测"的 RAG 项目的前提。本教程完成两件事：(1) 在本机用 Ollama 跑起 Qwen2.5（或 Qwen3）；(2) Spring AI 通过 <code>spring-ai-starter-model-ollama</code> 调本地模型，跑通一次 ChatClient 调用，并记录显存占用与首 token 延迟。</p>
+
+<div class="timeline">
+  <div class="step"><div class="time">0-10 min</div><div class="label">装 Ollama</div></div>
+  <div class="step"><div class="time">10-25 min</div><div class="label">拉 Qwen 模型</div></div>
+  <div class="step"><div class="time">25-45 min</div><div class="label">Spring AI 接入</div></div>
+  <div class="step"><div class="time">45-55 min</div><div class="label">指标记录与验收</div></div>
+</div>
+
+<h2>一、硬件与模型选择</h2>
+
+<table>
+<thead><tr><th>显存</th><th>推荐模型</th><th>预期速度</th></tr></thead>
+<tbody>
+<tr><td>4-6 GB</td><td>qwen2.5:3b / qwen3:1.7b</td><td>10-20 tokens/s</td></tr>
+<tr><td>8 GB</td><td>qwen2.5:7b / qwen3:4b</td><td>15-30 tokens/s</td></tr>
+<tr><td>16 GB+</td><td>qwen2.5:14b / qwen3:8b</td><td>20-40 tokens/s</td></tr>
+<tr><td>纯 CPU</td><td>qwen2.5:1.5b</td><td>3-8 tokens/s（可做功能验证）</td></tr>
+</tbody>
+</table>
+
+<p>本教程以 <code>qwen2.5:7b</code> 为基线；显存不够请降级到 <code>qwen2.5:3b</code>，API 完全一致。</p>
+
+<h2>二、安装 Ollama 并拉取模型</h2>
+
+<p>Linux / macOS：</p>
+
+<pre><code># Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# macOS 直接下载 https://ollama.com/download
+
+# 验证
+ollama --version
+
+# 拉取并运行（首次会下载约 4.7GB）
+ollama run qwen2.5:7b
+
+# 在交互界面输入测试
+&gt;&gt;&gt; 用一句话解释 RAG
+RAG（检索增强生成）是在生成回答前先从外部知识库检索相关片段，再交给大模型生成答案的技术。
+
+# 退出交互（/bye），但服务仍在后台运行
+ollama list          # 查看已下载模型
+ollama ps            # 查看当前加载中的模型</code></pre>
+
+<p>Ollama 默认监听 <code>http://localhost:11434</code>，直接 curl 验证：</p>
+
+<pre><code>curl http://localhost:11434/api/generate -d '{
+  "model": "qwen2.5:7b",
+  "prompt": "你是谁",
+  "stream": false
+}'</code></pre>
+
+<div class="callout">
+  <div class="callout-title">生产环境提示</div>
+  部署到服务器时设置 <code>OLLAMA_HOST=0.0.0.0:11434</code> 并配合防火墙白名单；不要把 11434 直接暴露公网。Linux 上 Ollama 以 systemd 服务运行，日志用 <code>journalctl -u ollama -f</code> 查看。
+</div>
+
+<h2>三、Spring AI 接入</h2>
+
+<h3>3.1 Maven 依赖</h3>
+
+<pre><code>&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+      &lt;artifactId&gt;spring-ai-bom&lt;/artifactId&gt;
+      &lt;version&gt;1.0.3&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+
+&lt;dependencies&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.ai&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-ai-starter-model-ollama&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+
+<h3>3.2 application.yml</h3>
+
+<pre><code>server:
+  port: 8080
+
+spring:
+  application:
+    name: ollama-demo
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: qwen2.5:7b
+          temperature: 0.7
+          num-ctx: 4096
+      init:
+        pull-model-strategy: never   # 启动时不自动拉模型
+        timeout: 60s</code></pre>
+
+<h3>3.3 最简 ChatClient</h3>
+
+<pre><code>@RestController
+@RequestMapping("/api/chat")
+public class ChatController {
+
+    private final ChatClient chatClient;
+
+    public ChatController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+
+    @PostMapping
+    public Map&lt;String, String&gt; chat(@RequestBody Map&lt;String, String&gt; req) {
+        String answer = chatClient.prompt()
+                .user(req.get("message"))
+                .call()
+                .content();
+        return Map.of("answer", answer);
+    }
+
+    @GetMapping(value = "/stream", produces = "text/event-stream")
+    public Flux&lt;String&gt; stream(@RequestParam String message) {
+        return chatClient.prompt()
+                .user(message)
+                .stream()
+                .content();
+    }
+}</code></pre>
+
+<h3>3.4 启动并调用</h3>
+
+<pre><code># 同步
+curl -X POST http://localhost:8080/api/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"用一句话解释 RAG"}'
+
+# 流式
+curl -N "http://localhost:8080/api/chat/stream?message=用一句话解释RAG"</code></pre>
+
+<h2>四、记录显存与首 token 延迟</h2>
+
+<p>验收时必须记录三个数字，作为后续 Phase 1 评测报告的基线：</p>
+
+<pre><code># 1. 显存占用（模型加载后）
+nvidia-smi --query-gpu=memory.used,memory.total --format=csv
+
+# 2. 首 token 延迟 + 总耗时
+time curl -X POST http://localhost:8080/api/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"写一段 100 字左右的 RAG 介绍"}'
+
+# 3. 生成 tokens/s（在 Ollama 日志中可见）
+journalctl -u ollama -n 50 --no-pager | grep "eval rate"</code></pre>
+
+<p>把结果写入 <code>summary.md</code>：</p>
+
+<pre><code>## 本地模型基线
+- 模型：qwen2.5:7b
+- 显存：5.2 GB / 8 GB
+- 首 token 延迟：约 180 ms
+- 生成速度：约 28 tokens/s
+- num_ctx：4096
+- 结论：可满足 Phase 1 本地 RAG 评测需求</code></pre>
+
+<h2>五、与 Phase 1 RAG 链路对接</h2>
+
+<p>这个本地模型后续会接入三个地方：</p>
+
+<ol>
+<li><strong>Embedding</strong>：再拉一个 <code>nomic-embed-text</code> 或 <code>qwen3-embedding:8b</code>，Spring AI 用 <code>OllamaEmbeddingModel</code> 接入。</li>
+<li><strong>RAG 生成</strong>：通过 <code>ChatClient</code> + <code>QuestionAnswerAdvisor</code> 把检索到的上下文拼进 prompt。</li>
+<li><strong>评测</strong>：用本地模型跑 LLM-as-Judge 不花钱，Phase 1 评测报告中的"改切分/加 rerank 前后对比"就靠它。</li>
+</ol>
+
+<h2>六、验收清单</h2>
+
+<ul>
+<li><code>ollama list</code> 能看到 qwen2.5:7b（或你选的型号）</li>
+<li>Spring Boot 启动无报错，<code>/api/chat</code> 返回正常文本</li>
+<li>流式接口 <code>/api/chat/stream</code> 能看到逐字输出</li>
+<li><code>summary.md</code> 中记录了显存、首 token 延迟、生成速度三个数字</li>
+<li>能用一句话口述："我本地跑的是 qwen2.5:7b，显存占 X GB，速度 Y tokens/s"</li>
+</ul>
+
+<div class="callout">
+  <div class="callout-title">相关面试题</div>
+  Function Call 底层（第一梯队）—— 本地 Ollama 模型对 function calling 的支持程度因模型版本而异，建议在本任务中顺手测一下 <code>qwen2.5:7b</code> 的 tool call 能力，为后续 Phase 1 的工具调用任务打基础。
+</div>
+
+<h2>教程来源</h2>
+<ol class="sources">
+  <li><a href="https://ollama.com/download">Ollama 官方下载页</a></li>
+  <li><a href="https://docs.spring.io/spring-ai/reference/api/chat/ollama-chat.html">Spring AI Reference — Ollama Chat Model</a></li>
+  <li><a href="https://www.cnblogs.com/wgwyanfs/p/19189824">本地大模型私有化部署实战：Ollama + Spring AI 全栈指南</a></li>
+  <li><a href="https://juejin.cn/post/7568802040387797038">Spring Boot 整合 Spring AI：调用 DeepSeek 与 Ollama 大模型</a></li>
+  <li><a href="https://www.cnblogs.com/ljbguanli/p/19601639">Spring AI Alibaba 10 分钟快速入门（含 Ollama 本地模型）</a></li>
+  <li><a href="https://github.com/smadil997/spring-ai-ollama-angular">Deep Dive into Embeddings: RAG with Spring Boot AI + Ollama + Qdrant</a></li>
+  <li><a href="https://github.com/cnddb-2024/java-ai-agent-roadmap">路线图仓库：java-ai-agent-roadmap（Phase 1 验收标准）</a></li>
+</ol>
+
+</div>
+</body>
+</html>

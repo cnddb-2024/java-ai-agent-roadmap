@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Function Calling 与 Tool Use 原理实战 | Phase 0</title>
+<style>
+  :root{
+    --bg:#0f1419;
+    --bg-soft:#161d26;
+    --card:#1a232f;
+    --card-2:#1e2937;
+    --border:#2a3a4d;
+    --text:#e6edf3;
+    --text-dim:#9fb2c4;
+    --text-mute:#6b7d8f;
+    --brand:#5b8cff;
+    --brand-2:#7c5cff;
+    --accent:#22d3ee;
+    --green:#34d399;
+    --amber:#fbbf24;
+    --rose:#fb7185;
+    --code-bg:#0d1117;
+    --code-text:#c9d1d9;
+    --c-comment:#8b949e;
+    --c-string:#a5d6ff;
+    --c-keyword:#ff7b72;
+    --c-number:#79c0ff;
+    --c-annot:#d2a8ff;
+    --c-tag:#7ee787;
+    --c-attr:#ffa657;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    background:linear-gradient(180deg,#0b1016 0%,#0f1419 280px);
+    color:var(--text);
+    line-height:1.75;
+    font-size:16px;
+  }
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    padding:54px 24px 46px;
+    border-bottom:1px solid var(--border);
+    background:
+      radial-gradient(900px 360px at 78% -40%,rgba(124,92,255,.22),transparent 60%),
+      radial-gradient(700px 340px at 12% -10%,rgba(34,211,238,.18),transparent 60%);
+    overflow:hidden;
+  }
+  .hero-inner{max-width:var(--maxw);margin:0 auto}
+  .crumbs{font-size:13px;color:var(--text-mute);letter-spacing:.04em;margin-bottom:14px}
+  .crumbs b{color:var(--accent);font-weight:600}
+  .hero h1{
+    margin:0 0 12px;
+    font-size:34px;
+    line-height:1.25;
+    background:linear-gradient(90deg,#e6edf3,#9ec5ff 60%,#b9a3ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-weight:800;
+  }
+  .hero .lead{color:var(--text-dim);font-size:16px;max-width:820px;margin:0 0 22px}
+  .badges{display:flex;flex-wrap:wrap;gap:10px}
+  .badge{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:7px 14px;border-radius:999px;
+    font-size:13px;font-weight:600;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.03);
+  }
+  .badge .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .b-phase{color:#a5b4fc;border-color:#4338ca55}
+  .b-time{color:#5eead4;border-color:#0f766e55}
+  .b-lang{color:#fcd34d;border-color:#92400e55}
+  .b-est{color:#fda4af;border-color:#9f123955}
+
+  /* ===== LAYOUT ===== */
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;display:flex;gap:34px;align-items:flex-start}
+  .toc{
+    position:sticky;top:18px;
+    width:248px;flex:0 0 248px;
+    margin-top:30px;
+    max-height:calc(100vh - 36px);overflow:auto;
+    font-size:13.5px;
+    padding:14px 12px 14px 16px;
+    border:1px solid var(--border);border-radius:14px;
+    background:var(--card);
+  }
+  .toc h4{margin:0 0 10px;font-size:12px;letter-spacing:.12em;color:var(--text-mute);text-transform:uppercase}
+  .toc ol{list-style:none;margin:0;padding:0;counter-reset:toc}
+  .toc li{counter-increment:toc}
+  .toc li a{
+    display:block;color:var(--text-dim);padding:5px 8px;border-radius:7px;
+    border-left:2px solid transparent;
+  }
+  .toc li a::before{content:counter(toc) ". ";color:var(--text-mute);font-variant-numeric:tabular-nums}
+  .toc li a:hover{background:rgba(255,255,255,.04);color:var(--text);text-decoration:none}
+  .toc li.lvl2{margin-left:14px}
+  .toc li.lvl2 a::before{content:""}
+  .main{flex:1;min-width:0;padding-top:30px}
+
+  /* ===== SECTIONS ===== */
+  section{padding:26px 0 8px;border-bottom:1px dashed var(--border)}
+  section:last-of-type{border-bottom:none}
+  h2{
+    font-size:25px;margin:6px 0 6px;
+    display:flex;align-items:center;gap:11px;
+    padding-bottom:10px;border-bottom:1px solid var(--border);
+  }
+  h2 .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:34px;height:34px;border-radius:9px;flex:0 0 34px;
+    background:linear-gradient(135deg,var(--brand),var(--brand-2));
+    color:#fff;font-size:15px;font-weight:800;
+  }
+  h3{font-size:19px;margin:26px 0 8px;color:#cfe0ff}
+  h4{font-size:16px;margin:18px 0 6px;color:#bcd4ff}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0;padding-left:24px}
+  li{margin:5px 0}
+  code.inline{
+    font-family:"JetBrains Mono","Fira Code",Consolas,monospace;
+    background:#0d1117;border:1px solid var(--border);
+    padding:2px 7px;border-radius:6px;font-size:13.5px;color:#a5d6ff;
+  }
+  strong{color:#fff}
+  .kw{color:#ffb86c}
+
+  /* ===== CALLOUTS ===== */
+  .callout{
+    margin:16px 0;border-radius:12px;padding:15px 18px 15px 16px;
+    border:1px solid var(--border);background:var(--card);
+    border-left:4px solid var(--brand);
+    display:flex;gap:13px;
+  }
+  .callout .ico{font-size:18px;line-height:1.4;flex:0 0 auto}
+  .callout .body{flex:1;min-width:0}
+  .callout .body p{margin:4px 0}
+  .callout .ttl{font-weight:700;color:#e6edf3;margin-bottom:3px;display:block}
+  .co-warn{border-left-color:var(--amber);background:rgba(251,191,36,.05)}
+  .co-warn .ttl{color:#fcd34d}
+  .co-tip{border-left-color:var(--green);background:rgba(52,211,153,.05)}
+  .co-tip .ttl{color:#6ee7b7}
+  .co-interview{border-left-color:var(--rose);background:rgba(251,113,133,.06)}
+  .co-interview .ttl{color:#fda4af}
+  .co-key{border-left-color:var(--accent);background:rgba(34,211,238,.05)}
+  .co-key .ttl{color:#67e8f9}
+
+  /* ===== CODE ===== */
+  pre.codeblock{
+    margin:16px 0;border-radius:12px;overflow:hidden;
+    border:1px solid var(--border);
+    background:var(--code-bg);
+  }
+  pre.codeblock .cb-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 14px;background:#161b22;border-bottom:1px solid var(--border);
+    font-size:12.5px;color:var(--text-mute);
+  }
+  pre.codeblock .cb-bar .lang{font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8b949e}
+  pre.codeblock .cb-bar .dots{display:flex;gap:6px}
+  pre.codeblock .cb-bar .dots i{width:11px;height:11px;border-radius:50%;display:inline-block;background:#3a3f47}
+  pre.codeblock .cb-bar .dots i:nth-child(1){background:#ff5f56}
+  pre.codeblock .cb-bar .dots i:nth-child(2){background:#ffbd2e}
+  pre.codeblock .cb-bar .dots i:nth-child(3){background:#27c93f}
+  pre.codeblock code{
+    display:block;padding:16px 18px;overflow-x:auto;
+    font-family:"JetBrains Mono","Fira Code",Consolas,monospace;
+    font-size:13.6px;line-height:1.65;color:var(--code-text);
+    white-space:pre;
+  }
+  .c{color:var(--c-comment);font-style:italic}
+  .s{color:var(--c-string)}
+  .k{color:var(--c-keyword)}
+  .n{color:var(--c-number)}
+  .an{color:var(--c-annot)}
+  .t{color:var(--c-tag)}
+  .a{color:var(--c-attr)}
+  .fn{color:#d2a8ff}
+
+  /* ===== TABLES ===== */
+  .table-wrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  th{background:#161d26;color:#cfe0ff;font-weight:700;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td code.inline{font-size:12.5px}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+
+  /* ===== DIAGRAMS ===== */
+  .flow{
+    display:flex;flex-wrap:wrap;gap:0;align-items:stretch;
+    margin:22px 0;justify-content:center;
+  }
+  .flow .step{
+    flex:1 1 150px;min-width:150px;max-width:190px;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:14px 12px;text-align:center;position:relative;
+  }
+  .flow .step .sn{
+    width:30px;height:30px;border-radius:50%;margin:0 auto 8px;
+    display:flex;align-items:center;justify-content:center;font-weight:800;
+    background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-size:14px;
+  }
+  .flow .step .st{font-weight:700;font-size:14px;color:#e6edf3;margin-bottom:4px}
+  .flow .step .sd{font-size:12.5px;color:var(--text-dim);line-height:1.5}
+  .flow .arr{
+    display:flex;align-items:center;justify-content:center;
+    color:var(--brand);font-size:22px;padding:0 4px;flex:0 0 auto;
+  }
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+  .vs .col{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--card)}
+  .vs .col h4{margin-top:0}
+  .vs .wrong{border-color:#9f123955;background:rgba(251,113,133,.05)}
+  .vs .right{border-color:#0f766e55;background:rgba(52,211,153,.05)}
+  .vs .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;margin-bottom:8px}
+  .vs .wrong .tag{background:#9f1239;color:#fff}
+  .vs .right .tag{background:#0f766e;color:#fff}
+  @media(max-width:680px){.vs{grid-template-columns:1fr}}
+
+  .pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:6px;background:rgba(124,92,255,.16);color:#c4b5fd;border:1px solid #5b21b655}
+  .hr-soft{border:none;border-top:1px solid var(--border);margin:24px 0}
+
+  .qa{margin:14px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+  .qa .q{padding:12px 16px;background:#161d26;font-weight:700;color:#cfe0ff;border-bottom:1px solid var(--border);display:flex;gap:9px}
+  .qa .q .qmark{color:var(--rose)}
+  .qa .a{padding:13px 16px;color:var(--text-dim)}
+  .qa .a p{margin:6px 0}
+
+  .src-list{counter-reset:src}
+  .src-list li{margin:9px 0;padding-left:6px}
+  .src-list li::marker{color:var(--accent);font-weight:700}
+
+  footer{padding:30px 24px 60px;text-align:center;color:var(--text-mute);font-size:13px;border-top:1px solid var(--border);margin-top:10px}
+  .top-link{position:fixed;right:22px;bottom:22px;background:var(--brand);color:#fff;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 6px 20px rgba(0,0,0,.4);cursor:pointer;border:none}
+  .top-link:hover{background:var(--brand-2)}
+
+  @media(max-width:980px){
+    .wrap{display:block}
+    .toc{position:static;width:auto;max-height:none;margin:20px 0}
+    .main{padding-top:8px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="crumbs">路线图 / <b>Phase 0 定向与双框架地基</b> / 核心任务</div>
+    <h1>Function Calling 与 Tool Use 原理实战</h1>
+    <p class="lead">理解 LLM 工具调用机制，编写 Spring AI 与 LangChain4j 的 Tool Calling demo。本任务对应 Phase 0 核心内容，是跑通"RAG + Tool Calling"基础 demo 的关键一环，也是 Phase 2 面试验收中"能讲 Function Call 底层（LLM 不执行函数）"的根基。</p>
+    <div class="badges">
+      <span class="badge b-phase"><span class="dot" style="background:#818cf8"></span>Phase 0（第 1–14 天）</span>
+      <span class="badge b-time"><span class="dot" style="background:#34d399"></span>总预估时长 ≤ 60 分钟</span>
+      <span class="badge b-lang"><span class="dot" style="background:#fbbf24"></span>主线语言：Java（Spring AI + LangChain4j 双路径）</span>
+      <span class="badge b-est"><span class="dot" style="background:#fb7185"></span>面试第一梯队知识点</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ============ TOC ============ -->
+  <nav class="toc" id="toc">
+    <h4>本教程目录</h4>
+    <ol>
+      <li><a href="#sec-objectives">学习目标与前置知识</a></li>
+      <li><a href="#sec-principle">Function Calling 原理图解</a></li>
+      <li class="lvl2"><a href="#sec-misconception">2.1 一个常见误解</a></li>
+      <li class="lvl2"><a href="#sec-truth">2.2 底层真相</a></li>
+      <li class="lvl2"><a href="#sec-flow">2.3 五步流程图</a></li>
+      <li class="lvl2"><a href="#sec-messages">2.4 一次真实请求</a></li>
+      <li><a href="#sec-springai">Spring AI Tool Calling 实战</a></li>
+      <li class="lvl2"><a href="#sec-sa-deps">3.1 依赖与配置</a></li>
+      <li class="lvl2"><a href="#sec-sa-tool">@Tool 与 @ToolParam</a></li>
+      <li class="lvl2"><a href="#sec-sa-demo">3.8 完整 demo</a></li>
+      <li><a href="#sec-langchain4j">LangChain4j Tool Calling 实战</a></li>
+      <li class="lvl2"><a href="#sec-lc-deps">4.1 依赖与配置</a></li>
+      <li class="lvl2"><a href="#sec-lc-aiservices">@Tool + AiServices</a></li>
+      <li class="lvl2"><a href="#sec-lc-lowlevel">4.5 底层 ToolSpecification</a></li>
+      <li class="lvl2"><a href="#sec-lc-demo">4.6 完整 demo</a></li>
+      <li><a href="#sec-compare">对比与最佳实践</a></li>
+      <li><a href="#sec-agent">工具调用与 Agent 关系</a></li>
+      <li><a href="#sec-interview">面试口述要点</a></li>
+      <li><a href="#sec-hands-on">动手练习清单</a></li>
+      <li><a href="#sec-sources">教程来源</a></li>
+    </ol>
+  </nav>
+
+  <main class="main">
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="sec-objectives">
+    <h2><span class="num">1</span>学习目标与前置知识</h2>
+
+    <h3>学完本教程，你将能够</h3>
+    <ul>
+      <li><strong>讲清底层</strong>：用自己的话解释"Function Calling 不是 LLM 真的调用函数，而是生成结构化 JSON 由外部代码执行"——这是面试第一梯队问题。</li>
+      <li><strong>画出流程</strong>：默写 Tool Use 的五步闭环（用户提问 → LLM 决策 → 业务执行 → 结果回填 LLM → 最终回答）。</li>
+      <li><strong>双框架落地</strong>：分别用 Spring AI 的 <code class="inline">@Tool</code> 与 LangChain4j 的 <code class="inline">@Tool</code> 写出可运行的 Tool Calling demo。</li>
+      <li><strong>设计工具</strong>：掌握工具描述最佳实践与多工具选择策略（enum 约束、描述边界、分层路由）。</li>
+      <li><strong>定位关系</strong>：说清"工具调用"与"Agent"的关系——Tool Use 是 Agent 的原子能力。</li>
+    </ul>
+
+    <div class="callout co-tip">
+      <span class="ico">✅</span>
+      <div class="body">
+        <span class="ttl">前置知识（建议先具备）</span>
+        <p>会用 ChatClient / ChatModel 完成一次最简单的文本对话；了解 JSON Schema 的基本概念；本地准备好一个可用的 LLM API Key（OpenAI / 通义千问 / Ollama 任一）。不满足？先花 15 分钟跑通"Hello LLM"再回来。</p>
+      </div>
+    </div>
+
+    <div class="callout co-key">
+      <span class="ico">📌</span>
+      <div class="body">
+        <span class="ttl">本任务在路线图中的位置</span>
+        <p>Phase 0 的核心目标之一就是"跑通 Spring AI 基础 demo（RAG + Tool Calling）"。Tool Calling 是让 LLM 从"只会说"变成"能干活"的分水岭，也是后续 Phase 1 / Phase 2 构建 Agent、通过面试验收的地基。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="sec-principle">
+    <h2><span class="num">2</span>Function Calling 原理图解</h2>
+
+    <h3 id="sec-misconception">2.1 一个最常见的误解：LLM 真的"调用"了函数吗？</h3>
+    <p>很多初学者第一次用 Function Calling 时会形成这样一个错觉：模型在对话过程中"伸手"去执行了你写的 Java/Python 方法。这是<strong>本知识点最大的认知陷阱</strong>，也是面试中最容易被追问的地方。</p>
+
+    <div class="vs">
+      <div class="col wrong">
+        <span class="tag">❌ 常见误解</span>
+        <h4>LLM 直接调用了函数</h4>
+        <p style="color:var(--text-dim);font-size:14px">以为模型在推理时通过某种 RPC / 远程调用机制，真的运行了 <code class="inline">getWeather()</code>，函数就在模型的"体内"被执行了。</p>
+      </div>
+      <div class="col right">
+        <span class="tag">✅ 实际真相</span>
+        <h4>LLM 只输出一段结构化 JSON</h4>
+        <p style="color:var(--text-dim);font-size:14px">模型自始至终只做一件事——<strong>生成下一个 token</strong>。它只是被训练成在合适时机生成一段符合格式的 JSON"调用意图"，由<strong>你的外部代码</strong>解析并真正执行，再把结果回填给模型。</p>
+      </div>
+    </div>
+
+    <h3 id="sec-truth">2.2 底层真相：受控的结构化文本生成</h3>
+    <p>从底层看，所谓"调用工具"，是模型被微调成在恰当的时机生成一段符合特定格式的<strong>结构化文本（通常是 JSON）</strong>，然后由外部代码（SDK / 你的应用）解析这段文本、真正执行对应的函数，再把结果作为一条新消息塞回去。模型的工具调用能力强弱，本质上反映的是它在"理解工具语义 + 生成合法 JSON + 正确填参数"这件事上的训练程度。</p>
+
+    <p>这意味着：工具调用的可靠性，<strong>本质上是模型生成正确格式 JSON 的概率</strong>。这也是为什么 GPT-4、Claude 等都对工具调用做了专项强化训练。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">python · 模型实际"做"的事</span></div><code id="cb-llm-truth"></code></pre>
+<script type="text/x-code" data-for="cb-llm-truth" data-lang="python">
+# 模型实际"做"的事情，本质上还是文本生成
+# 只不过这次生成的不是自然语言，而是结构化 JSON
+# 用户问："北京今天天气怎么样"
+
+# 模型内部生成的 token 序列（简化展示）：
+{
+  "type": "tool_use",
+  "name": "get_weather",
+  "input": {"city": "北京"}
+}
+
+# 这段 JSON 不会被模型自己执行，模型生成完就结束了这次推理
+# 是 SDK / 你的代码读取这段 JSON，调用真正的 get_weather() 函数
+# 函数返回结果后，再作为新的一条消息塞回去，模型才"看到"结果
+</script>
+
+    <div class="callout co-interview">
+      <span class="ico">🎤</span>
+      <div class="body">
+        <span class="ttl">面试高频口述（务必背熟）</span>
+        <p>"Function Calling 的本质是<strong>受控的文本生成</strong>，不是模型真的执行了函数。模型只负责生成一段结构化的 JSON 调用指令，真正的函数执行发生在我这边的业务代码里。执行完，我把结果作为 ToolMessage 回填给模型，模型再基于这个结果生成最终的自然语言回答。所以工具调用的可靠性，本质上是模型生成正确 JSON 的概率。"</p>
+      </div>
+    </div>
+
+    <h3 id="sec-flow">2.3 完整的 Tool Use 五步流程图</h3>
+    <p>把上面的机制抽象成流程，Tool Use 是一个"模型 ↔ 应用"之间的多轮对话闭环。无论你用 OpenAI 原生 API、Spring AI 还是 LangChain4j，底层都在重复这五步：</p>
+
+    <div class="flow">
+      <div class="step"><div class="sn">1</div><div class="st">携带工具发起请求</div><div class="sd">应用把 user 提问 + 一组工具定义（name/description/参数 schema）一起发给 LLM</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="sn">2</div><div class="st">LLM 决策并返回调用意图</div><div class="sd">模型判断需要工具，返回 tool_use：工具名 + 入参 JSON（而非纯文本）</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="sn">3</div><div class="st">应用执行业务逻辑</div><div class="sd">代码根据工具名找到对应方法，用模型给的参数真正执行，拿到结果</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="sn">4</div><div class="st">结果回填 LLM</div><div class="sd">把执行结果作为 tool_result 消息追加，再次请求模型</div></div>
+      <div class="arr">→</div>
+      <div class="step"><div class="sn">5</div><div class="st">LLM 生成最终回答</div><div class="sd">模型基于工具结果，输出用户能看懂的自然语言回答（或继续调用下一个工具）</div></div>
+    </div>
+
+    <div class="callout co-key">
+      <span class="ico">🔑</span>
+      <div class="body">
+        <span class="ttl">一个关键工程细节</span>
+        <p>模型在返回 tool_use 时已经"暂停"推理——它<strong>不会继续往下生成</strong>，必须等代码把结果喂回去才会继续。这意味着<strong>工具执行的延迟会直接累加进整个响应时间</strong>。所以工具本身的性能优化（缓存、异步、超时控制）和 LLM 推理速度同样重要。</p>
+      </div>
+    </div>
+
+    <h3 id="sec-messages">2.4 用一次真实请求看透流程</h3>
+    <p>下面用 OpenAI 风格的 messages 序列展示一次完整调用是如何流转的（Python 仅作辅助说明，主线仍是 Java）。注意 <strong>第 1 轮</strong>模型返回的是 tool_calls（不是答案），<strong>第 2 轮</strong>才出现真正的文字回答：</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">python · messages 流转（辅助）</span></div><code id="cb-messages"></code></pre>
+<script type="text/x-code" data-for="cb-messages" data-lang="python">
+# ===== 第 1 轮：请求 + 模型返回调用意图 =====
+messages = [{"role": "user", "content": "巴黎今天天气怎么样？"}]
+# 请求里带上 tools 定义（name / description / parameters schema）
+response = client.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools)
+
+# 模型返回的不是答案，而是一个 tool_call：
+# {"id":"call_abc","function":{"name":"get_weather","arguments":"{\"city\":\"Paris\"}"}}
+# —— 注意：模型没有执行 get_weather，它只是"说"要调用，参数还是字符串形式的 JSON
+
+# ===== 业务侧真正执行 =====
+args = json.loads(tool_call.function.arguments)   # {"city": "Paris"}
+result = get_weather(args["city"])                 # 真正的函数在这里运行 -> {"temp":25,"unit":"C"}
+
+# ===== 第 2 轮：把结果回填，再请求模型 =====
+messages.append({"role":"tool","tool_call_id":"call_abc","content": json.dumps(result)})
+response = client.chat.completions.create(model="gpt-4o-mini", messages=messages, tools=tools)
+
+# 这一次模型才输出最终的自然语言回答：
+# "巴黎今天 25°C，晴天。"
+</script>
+
+    <div class="callout co-warn">
+      <span class="ico">⚠️</span>
+      <div class="body">
+        <span class="ttl">安全要点（来自 Spring AI 官方）</span>
+        <p>尽管我们常把 tool calling 称为"模型能力"，但<strong>提供工具调用逻辑的其实是客户端应用</strong>。模型只能"请求"调用并给出参数，应用才负责执行并把结果返回。模型<strong>永远无法直接访问</strong>作为工具提供的任何 API——这是一个关键的安全设计考量。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="sec-springai">
+    <h2><span class="num">3</span>Spring AI Tool Calling 实战</h2>
+    <p>Spring AI 把第 2 节的整个闭环封装进了 <code class="inline">ChatClient</code> + <code class="inline">ToolCallingAdvisor</code>，你只需要：①用 <code class="inline">@Tool</code> 把一个普通 Java 方法标记成工具；②调用时通过 <code class="inline">.tools()</code> 传进去。框架会自动完成"解析模型意图 → 执行方法 → 结果回填 → 继续推理"的全流程。</p>
+
+    <h3 id="sec-sa-deps">3.1 依赖与配置</h3>
+    <p>引入 Spring AI BOM 与对应模型的 starter（这里以 OpenAI 为例，换成通义千问只需替换 starter）。注意 Spring Boot 3.2+ 才支持 Spring AI 1.0.x。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">xml · pom.xml</span></div><code id="cb-sa-pom"></code></pre>
+<script type="text/x-code" data-for="cb-sa-pom" data-lang="xml">
+<properties>
+    <java.version>17</java.version>
+    <spring-ai.version>1.0.0</spring-ai.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-bom</artifactId>
+            <version>${spring-ai.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+
+<dependencies>
+    <!-- Spring AI 的 OpenAI 模型 starter（自动装配 ChatModel） -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-openai</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+</dependencies>
+</script>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">yaml · application.yml</span></div><code id="cb-sa-yml"></code></pre>
+<script type="text/x-code" data-for="cb-sa-yml" data-lang="yaml">
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}        # 从环境变量读取，切勿硬编码
+      chat:
+        options:
+          model: gpt-4o-mini            # 需选择支持 tool calling 的模型
+          temperature: 0.7
+</script>
+
+    <h3 id="sec-sa-tool">3.2 第一个 @Tool：让 LLM 知道"现在几点"</h3>
+    <p>AI 模型本身拿不到实时信息。我们先实现一个最经典的"信息检索型"工具——获取当前时间。在方法上打 <code class="inline">@Tool</code> 并写清楚 description，Spring AI 会<strong>自动生成入参的 JSON Schema</strong> 给模型看。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · DateTimeTools.java</span></div><code id="cb-sa-time"></code></pre>
+<script type="text/x-code" data-for="cb-sa-time" data-lang="java">
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+public class DateTimeTools {
+
+    // @Tool 的 description 是"给 LLM 看的自然语言指令"——写得好坏直接影响调用准确率
+    @Tool(description = "Get the current date and time in the user's timezone")
+    String getCurrentDateTime() {
+        return LocalDateTime.now()
+                .atZone(LocaleContextHolder.getTimeZone().toZoneId())
+                .toString();
+    }
+
+    // 带参数 + @ToolParam 描述：告诉模型参数含义、格式
+    @Tool(description = "Set a user alarm for the given time, provided in ISO-8601 format")
+    void setAlarm(@ToolParam(description = "Time in ISO-8601 format, e.g. 2026-08-08T07:30:00") String time) {
+        LocalDateTime alarmTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_DATE_TIME);
+        System.out.println("Alarm set for " + alarmTime);
+    }
+}
+</script>
+
+    <p>把它交给 <code class="inline">ChatClient</code>，框架就会在第 2 节的闭环里自动调度：</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · 调用</span></div><code id="cb-sa-call"></code></pre>
+<script type="text/x-code" data-for="cb-sa-call" data-lang="java">
+ChatModel chatModel = ...; // 由 starter 自动注入
+
+String response = ChatClient.create(chatModel)
+        .prompt("Can you set an alarm 10 minutes from now?")
+        .tools(new DateTimeTools())           // 注册工具对象
+        .call()
+        .content();
+
+System.out.println(response);
+// 模型会先调用 getCurrentDateTime 拿到当前时间，
+// 再算出 +10 分钟，最后调用 setAlarm —— 这一切都是框架自动完成的
+</script>
+
+    <div class="callout co-tip">
+      <span class="ico">💡</span>
+      <div class="body">
+        <span class="ttl">@Tool 注解的核心属性</span>
+        <p><strong>name</strong>：工具名，不填则用方法名，同一请求内必须唯一；<strong>description</strong>：最关键，告诉模型"何时、如何"调用，强烈建议详细描述；<strong>returnDirect</strong>：结果是否直接返回客户端而不回填模型（适合纯数据检索）；<strong>resultConverter</strong>：自定义返回值转字符串逻辑。方法可为任意可见性、静态或实例。</p>
+      </div>
+    </div>
+
+    <h3>3.3 @ToolParam：参数描述的工程学</h3>
+    <p>默认所有入参都被视为<strong>必填</strong>。<code class="inline">@ToolParam</code> 可补充参数描述与是否必填，框架据此生成 JSON Schema 的 <code class="inline">required</code> 数组。一条经验法则：<strong>如果人类能看懂工具用途和参数含义，LLM 也大概率能看懂</strong>。</p>
+
+    <h3>3.4 多工具注册：让 LLM 自己选</h3>
+    <p>再加一个"动作型"工具——查天气（模拟），演示模型如何在多个工具间做选择。把多个工具对象一起传给 <code class="inline">.tools()</code> 即可：</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · WeatherTools.java</span></div><code id="cb-sa-weather"></code></pre>
+<script type="text/x-code" data-for="cb-sa-weather" data-lang="java">
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+
+public class WeatherTools {
+
+    // 描述里写清"做什么 + 何时用"，模型才不会在该调时不调、不该调时乱调
+    @Tool(description = "Get the current weather for a given city. Use when the user asks about weather, temperature or forecast.")
+    public String getWeather(@ToolParam(description = "City name, e.g. Beijing, Paris") String city) {
+        // 这里模拟真实天气 API 调用
+        if ("Beijing".equalsIgnoreCase(city)) {
+            return "{\"city\":\"Beijing\",\"temp\":31,\"unit\":\"C\",\"condition\":\"sunny\"}";
+        }
+        return "{\"city\":\"" + city + "\",\"temp\":22,\"unit\":\"C\",\"condition\":\"cloudy\"}";
+    }
+}
+</script>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · 多工具一起注册</span></div><code id="cb-sa-multi"></code></pre>
+<script type="text/x-code" data-for="cb-sa-multi" data-lang="java">
+String answer = ChatClient.create(chatModel)
+        .prompt("现在北京几点了？天气怎么样？顺便10分钟后提醒我")
+        .tools(new DateTimeTools(), new WeatherTools())   // 多工具
+        .call()
+        .content();
+// 模型会自主决定依次/并行调用 getCurrentDateTime、getWeather、setAlarm
+</script>
+
+    <h3>3.5 函数工具（FunctionToolCallback）——不想改源码时用</h3>
+    <p>除了方法工具，Spring AI 也支持把任意实现 <code class="inline">Function</code> 接口的对象注册成工具，或用 <code class="inline">FunctionToolCallback.builder()</code> 编程式构建。适合给已存在的类"无侵入"地加工具能力。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · FunctionToolCallback</span></div><code id="cb-sa-func"></code></pre>
+<script type="text/x-code" data-for="cb-sa-func" data-lang="java">
+import org.springframework.ai.tool.function.FunctionToolCallback;
+
+// 假设 TimeFunction implements Function<Request, Response>
+String response = chatClient.prompt("获取北京时间")
+        .toolCallbacks(FunctionToolCallback
+                .builder("getTimeByZoneId", new TimeFunction())
+                .description("Get time by zone id")
+                .inputType(TimeFunction.Request.class)
+                .build())
+        .call()
+        .content();
+</script>
+
+    <h3>3.6 工具上下文 ToolContext：传递额外信息</h3>
+    <p>当工具需要模型不知道的上下文（如当前登录用户 ID）时，用 <code class="inline">ToolContext</code> 注入，它和模型给的参数一起传给工具方法：</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · ToolContext</span></div><code id="cb-sa-ctx"></code></pre>
+<script type="text/x-code" data-for="cb-sa-ctx" data-lang="java">
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.definition.ToolContext;
+import org.springframework.util.StringUtils;
+import java.util.Map;
+
+public class UserInfoTools {
+
+    @Tool(description = "Get the current user's name")
+    public String getUserName(ToolContext context) {
+        // userId 不是模型生成的，而是应用侧注入的上下文
+        String userId = context.getContext().get("userId").toString();
+        if (!StringUtils.hasText(userId)) {
+            return "null";
+        }
+        return "user-" + userId;   // 模拟数据
+    }
+}
+
+// 调用时注入上下文
+String r = chatClient.prompt("获取我的用户名")
+        .tools(new UserInfoTools())
+        .toolContext(Map.of("userId", "12345"))
+        .call()
+        .content();
+</script>
+
+    <h3>3.7 returnDirect：结果不再过模型</h3>
+    <p>默认工具结果会回填模型进一步加工。但在纯数据检索场景（如搜索结果直出），可用 <code class="inline">@Tool(returnDirect = true)</code> 让结果直接返回调用方，省一次模型往返、也避免模型"瞎加工"。</p>
+
+    <h3 id="sec-sa-demo">3.8 完整可运行 demo</h3>
+    <p>把以上拼成一个能直接跑的 Spring Boot 应用。启动后访问 <code class="inline">http://localhost:8080/ask?q=北京几点了</code> 即可看到工具被自动调用。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · ToolCallingDemoApplication.java</span></div><code id="cb-sa-app"></code></pre>
+<script type="text/x-code" data-for="cb-sa-app" data-lang="java">
+package com.example.toolcalling;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class ToolCallingDemoApplication {
+
+    private final ChatClient chatClient;
+
+    // ChatModel 由 spring-ai-starter-model-openai 自动注入
+    public ToolCallingDemoApplication(ChatModel chatModel) {
+        this.chatClient = ChatClient.create(chatModel);
+    }
+
+    @GetMapping("/ask")
+    public String ask(@RequestParam(defaultValue = "现在几点？10分钟后提醒我") String q) {
+        return chatClient.prompt(q)
+                .tools(new DateTimeTools(), new WeatherTools())  // 注册多工具
+                .call()
+                .content();
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(ToolCallingDemoApplication.class, args);
+    }
+}
+</script>
+
+    <div class="callout co-tip">
+      <span class="ico">✅</span>
+      <div class="body">
+        <span class="ttl">Spring AI 的核心心智模型</span>
+        <p>① <code class="inline">@Tool</code> 标方法、<code class="inline">@ToolParam</code> 标参数 → ② <code class="inline">.tools(对象)</code> 注册 → ③ <code class="inline">ChatClient</code> 内部的 <code class="inline">ToolCallingAdvisor</code> 自动跑完"决策→执行→回填→再推理"闭环。你写的只是<strong>普通 Java 方法</strong>，框架帮你接上 LLM。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="sec-langchain4j">
+    <h2><span class="num">4</span>LangChain4j Tool Calling 实战</h2>
+    <p>LangChain4j 提供了<strong>两层抽象</strong>：低层用 <code class="inline">ToolSpecification</code> + <code class="inline">ChatModel</code> 手动编排（你能看清每一步）；高层用 <code class="inline">@Tool</code> + <code class="inline">AiServices</code> 自动编排（最常用）。两条路径背后是同一套机制。</p>
+
+    <h3 id="sec-lc-deps">4.1 依赖与配置</h3>
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">xml · pom.xml</span></div><code id="cb-lc-pom"></code></pre>
+<script type="text/x-code" data-for="cb-lc-pom" data-lang="xml">
+<properties>
+    <langchain4j.version>1.0.0</langchain4j.version>
+</properties>
+
+<dependencies>
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j</artifactId>
+        <version>${langchain4j.version}</version>
+    </dependency>
+    <!-- OpenAI 集成（也可换成 langchain4j-ollama / langchain4j-community-dashscope） -->
+    <dependency>
+        <groupId>dev.langchain4j</groupId>
+        <artifactId>langchain4j-open-ai</artifactId>
+        <version>${langchain4j.version}</version>
+    </dependency>
+</dependencies>
+</script>
+
+    <h3 id="sec-lc-aiservices">4.2 高层 API：@Tool + AiServices（最常用）</h3>
+    <p>用 <code class="inline">@Tool</code> 标注任意 Java 方法，参数用 <code class="inline">@P</code> 描述。AiServices 会自动把这些方法转成 <code class="inline">ToolSpecification</code>，并在每次请求里带上；模型决定调用时，AiServices 自动执行方法、把返回值送回模型。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · CalculatorTools.java</span></div><code id="cb-lc-calc"></code></pre>
+<script type="text/x-code" data-for="cb-lc-calc" data-lang="java">
+import dev.langchain4j.agent.tool.P;
+import dev.langchain4j.agent.tool.Tool;
+
+public class CalculatorTools {
+
+    @Tool("Sums 2 given numbers")
+    double sum(@P("first number") double a, @P("second number") double b) {
+        return a + b;
+    }
+
+    @Tool("Returns a square root of a given number")
+    double squareRoot(@P("the number to take root of") double x) {
+        return Math.sqrt(x);
+    }
+}
+</script>
+
+    <p>定义一个 AiService 接口，LangChain4j 会在运行时生成代理实现：</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · Assistant.java（AiService 接口）</span></div><code id="cb-lc-assistant"></code></pre>
+<script type="text/x-code" data-for="cb-lc-assistant" data-lang="java">
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.spring.AiService;  // 或用 AiServices.builder()
+
+public interface Assistant {
+
+    @SystemMessage("你是一个数学助手，遇到计算请使用提供的工具，不要自己心算。")
+    String chat(String userMessage);
+}
+</script>
+
+    <p>把模型、工具接到一起——这正是第 2 节五步闭环的"自动版"：</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · 组装与调用</span></div><code id="cb-lc-build"></code></pre>
+<script type="text/x-code" data-for="cb-lc-build" data-lang="java">
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.service.AiServices;
+
+OpenAiChatModel model = OpenAiChatModel.builder()
+        .apiKey(System.getenv("OPENAI_API_KEY"))
+        .modelName("gpt-4o-mini")
+        .build();
+
+Assistant assistant = AiServices.builder(Assistant.class)
+        .chatLanguageModel(model)
+        .tools(new CalculatorTools())        // 注册工具
+        .build();
+
+// 问一个 LLM 本身不擅长的精确计算
+String answer = assistant.chat("475695037565 的平方根是多少？");
+System.out.println(answer);
+// 输出类似：The square root of 475695037565 is 689706.486532.
+// —— 而不是模型瞎猜的 689710
+</script>
+
+    <div class="callout co-key">
+      <span class="ico">🔁</span>
+      <div class="body">
+        <span class="ttl">对照无工具 vs 有工具</span>
+        <p>同一个问题"475695037565 的平方根"：不给工具时模型会猜出 <code class="inline">689710</code>（接近但错误）；给 <code class="inline">squareRoot</code> 工具后，模型先返回 <code class="inline">squareRoot(475695037565)</code> 调用意图 → 框架执行得到 <code class="inline">689706.486532</code> → 回填后模型输出准确答案。这正是 Function Calling 的价值：把模型"不擅长的事"外包给确定性代码。</p>
+      </div>
+    </div>
+
+    <h3>4.3 @P 参数描述：必填 / 可选 / 默认值</h3>
+    <p>默认所有参数都视为<strong>必填</strong>（写进 schema 的 required 数组）。三种让参数"可选"的方式：</p>
+    <ul>
+      <li><code class="inline">@P(required = false)</code> 显式声明可选；</li>
+      <li>参数声明为 <code class="inline">Optional&lt;T&gt;</code>；</li>
+      <li><code class="inline">@P(defaultValue = "10")</code>：LLM 省略时框架自动填默认值（最省心）。</li>
+    </ul>
+    <div class="callout co-warn">
+      <span class="ico">⚠️</span>
+      <div class="body">
+        <span class="ttl">参数名丢失的坑</span>
+        <p>未加 <code class="inline">@P</code> 的 name 且未开启 javac 的 <code class="inline">-parameters</code> 选项时，反射只能拿到 <code class="inline">arg0</code>、<code class="inline">arg1</code>，模型会困惑。<strong>Spring 和 Quarkus 默认开启 <code class="inline">-parameters</code></strong>，所以用这些框架时通常没事；纯 Maven 项目建议在 pom 里加上 <code class="inline">&lt;parameters&gt;true&lt;/parameters&gt;</code>。</p>
+      </div>
+    </div>
+
+    <h3>4.4 工具可见性：ALWAYS_VISIBLE 与搜索发现</h3>
+    <p>LangChain4j 支持控制工具的可见性策略：<code class="inline">@Tool(searchBehavior = ALWAYS_VISIBLE)</code> 的工具在整个 AI Service 调用期间始终可见、不参与"工具搜索"筛选；其余工具遵循正常的搜索流程。这是"多工具选择策略"在框架层面的落地（见 5.3）。</p>
+
+    <h3 id="sec-lc-lowlevel">4.5 底层 API：ToolSpecification + ChatModel（看清每一步）</h3>
+    <p>想亲眼看到第 2 节的 messages 是怎么流转的？用底层 API 手动构建 <code class="inline">ToolSpecification</code>、手动执行、手动回填。这是面试时"讲底层"的底气来源。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · 底层手动编排</span></div><code id="cb-lc-low"></code></pre>
+<script type="text/x-code" data-for="cb-lc-low" data-lang="java">
+import dev.langchain4j.agent.tool.ToolSpecifications;
+import dev.langchain4j.data.message.*;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.request.ChatRequest;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import java.util.List;
+
+// 1. 从带 @Tool 的类自动生成工具规范（也可手动 builder）
+List<ToolSpecification> tools = ToolSpecifications.toolSpecificationsFrom(CalculatorTools.class);
+
+UserMessage userMessage = UserMessage.from("475695037565 的平方根是多少？");
+
+// 2. 第一次请求：带上工具定义
+ChatRequest request = ChatRequest.builder()
+        .messages(userMessage)
+        .toolSpecifications(tools)
+        .build();
+ChatResponse response = model.chat(request);
+AiMessage aiMessage = response.aiMessage();
+
+// 3. 模型若决定调用工具，aiMessage 会包含 toolExecutionRequests
+if (aiMessage.hasToolExecutionRequests()) {
+    for (ToolExecutionRequest req : aiMessage.toolExecutionRequests()) {
+        System.out.println("模型想调用: " + req.name());
+        System.out.println("参数: " + req.arguments());  // {"x":475695037565.0}
+
+        // 4. 你来真正执行（这里手动算）
+        double result = Math.sqrt(475695037565.0);
+
+        // 5. 把结果作为 ToolExecutionResultMessage 回填
+        ToolExecutionResultMessage resMsg =
+                ToolExecutionResultMessage.from(req, String.valueOf(result));
+        // 6. 第二次请求：连同历史消息一起再发给模型
+        ChatRequest request2 = ChatRequest.builder()
+                .messages(userMessage, aiMessage, resMsg)
+                .toolSpecifications(tools)
+                .build();
+        ChatResponse response2 = model.chat(request2);
+        System.out.println("最终回答: " + response2.aiMessage().text());
+    }
+}
+</script>
+
+    <h3 id="sec-lc-demo">4.6 完整可运行 demo</h3>
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">java · LangChain4jToolDemo.java</span></div><code id="cb-lc-demo"></code></pre>
+<script type="text/x-code" data-for="cb-lc-demo" data-lang="java">
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.service.AiServices;
+
+public class LangChain4jToolDemo {
+
+    interface Assistant {
+        String chat(String userMessage);
+    }
+
+    public static void main(String[] args) {
+        OpenAiChatModel model = OpenAiChatModel.builder()
+                .apiKey(System.getenv("OPENAI_API_KEY"))
+                .modelName("gpt-4o-mini")
+                .build();
+
+        Assistant assistant = AiServices.builder(Assistant.class)
+                .chatLanguageModel(model)
+                .tools(new CalculatorTools())
+                .build();
+
+        System.out.println(assistant.chat("475695037565 的平方根是多少？"));
+        System.out.println(assistant.chat("把 1234 和 5678 相加，结果再开平方"));
+        // 第二问：模型会链式调用 sum -> squareRoot，全程自动
+    }
+}
+</script>
+
+    <div class="callout co-tip">
+      <span class="ico">✅</span>
+      <div class="body">
+        <span class="ttl">LangChain4j 的核心心智模型</span>
+        <p>① <code class="inline">@Tool</code> 标方法、<code class="inline">@P</code> 标参数 → ② <code class="inline">AiServices.builder(接口).tools(对象).build()</code> 生成代理 → ③ 调接口方法，框架自动完成 ToolSpecification 转换、模型意图解析、方法执行、结果回填。底层 <code class="inline">ToolSpecification</code> + <code class="inline">ChatModel</code> 留给你看清每一步。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="sec-compare">
+    <h2><span class="num">5</span>双框架对比与最佳实践</h2>
+
+    <h3>5.1 Spring AI vs LangChain4j 对比</h3>
+    <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>维度</th><th>Spring AI</th><th>LangChain4j</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>工具标记注解</td><td><code class="inline">@Tool</code></td><td><code class="inline">@Tool</code></td></tr>
+        <tr><td>参数描述注解</td><td><code class="inline">@ToolParam</code></td><td><code class="inline">@P</code></td></tr>
+        <tr><td>高层编排入口</td><td><code class="inline">ChatClient</code> + <code class="inline">.tools()</code></td><td><code class="inline">AiServices</code> 代理接口</td></tr>
+        <tr><td>底层手写规范</td><td><code class="inline">MethodToolCallback</code> / <code class="inline">FunctionToolCallback</code></td><td><code class="inline">ToolSpecification</code> + <code class="inline">ChatModel</code></td></tr>
+        <tr><td>执行调度者</td><td><code class="inline">ToolCallingAdvisor</code>（Advisor 链）</td><td><code class="inline">DefaultToolExecutor</code>（AiServices 内部）</td></tr>
+        <tr><td>生态集成</td><td>深度融入 Spring Boot 自动装配</td><td>框架中立，支持 Spring/Quarkus/纯 Java</td></tr>
+        <tr><td>函数式工具</td><td>支持 <code class="inline">Function&lt;I,O&gt;</code> Bean</td><td>主要靠注解方法</td></tr>
+        <tr><td>工具上下文</td><td><code class="inline">ToolContext</code> API</td><td>通过 <code class="inline">@P</code> / 服务注入</td></tr>
+        <tr><td>多工具可见性控制</td><td>Tool Search（2.0+）</td><td><code class="inline">searchBehavior = ALWAYS_VISIBLE</code></td></tr>
+        <tr><td>选型建议</td><td>团队已是 Spring Boot 全家桶 → 优先</td><td>想框架中立 / 对接多模型生态 → 优先</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>两者的抽象不同，但<strong>背后是同一套第 2 节讲的五步机制</strong>。掌握原理后切换框架成本很低——这也是 Phase 0 要求"双框架地基"的意义。</p>
+
+    <h3>5.2 工具描述最佳实践：Schema 设计五原则</h3>
+    <p>工具的 JSON Schema 不只是给代码用的接口定义，<strong>它同时是给 LLM 看的自然语言指令</strong>。这是工具设计里最容易被低估的部分——同一个函数，描述写得好坏，调用准确率能差出 20%~30%。</p>
+
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>原则</th><th>要点</th><th>反例 → 正例</th></tr></thead>
+      <tbody>
+        <tr><td>① 用 enum 而非自由文本</td><td>取值有限时一律 enum 约束，从根本消除拼写/大小写问题</td><td><code class="inline">"status":"string"</code> → <code class="inline">"enum":["pending","shipped"]</code></td></tr>
+        <tr><td>② description 写"何时用"</td><td>不只说做什么，更要写清使用边界</td><td>"查询数据" → "按订单状态搜索用户订单，仅支持已存在订单，不能创建"</td></tr>
+        <tr><td>③ 控制工具数量</td><td>超过 20~30 个时选择准确率显著下降（占用 context + 增加混淆）</td><td>用分层路由拆分</td></tr>
+        <tr><td>④ 参数命名见名知意</td><td>命名本身是给模型的隐性提示</td><td><code class="inline">p1</code> → <code class="inline">user_email</code></td></tr>
+        <tr><td>⑤ 统一返回信封</td><td>所有工具返回结构一致，避免模型幻觉</td><td>时而数组时而对象 → 统一 <code class="inline">{success,data,error}</code></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">json · Schema 反例 vs 正例</span></div><code id="cb-schema"></code></pre>
+<script type="text/x-code" data-for="cb-schema" data-lang="json">
+// ❌ 反例：描述模糊，参数语义不清
+{
+  "name": "query",
+  "description": "查询数据",
+  "parameters": { "type": "object", "properties": { "q": { "type": "string" } } }
+}
+
+// ✅ 正例：描述具体，给出边界与枚举
+{
+  "name": "search_orders",
+  "description": "按订单状态和日期范围搜索用户订单。仅支持已存在的订单，不能创建新订单。",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": ["pending", "shipped", "completed", "cancelled"],
+        "description": "订单状态，不传则返回所有状态"
+      },
+      "date_from": {
+        "type": "string", "format": "date",
+        "description": "起始日期，格式 YYYY-MM-DD，如 2026-08-08"
+      }
+    },
+    "required": []
+  }
+}
+</script>
+
+    <h3 id="sec-multitool">5.3 多工具选择策略：分层路由</h3>
+    <p>当工具数量膨胀到几十个，一次性全塞进 context 会让模型选择准确率骤降。解法是<strong>分层路由</strong>：先用一个"调度工具"让 LLM 判断属于哪个领域（订单/库存/物流），再在该领域内暴露具体工具集——相当于给 LLM 做一次"目录导航"。</p>
+
+    <pre class="codeblock"><div class="cb-bar"><span class="dots"><i></i><i></i><i></i></span><span class="lang">python · 分层路由思路（辅助）</span></div><code id="cb-route"></code></pre>
+<script type="text/x-code" data-for="cb-route" data-lang="python">
+# 第一阶段：只暴露一个"路由"工具
+tools_stage1 = [{"name": "route_to_domain", "description": "判断用户问题属于哪个业务领域"}]
+
+# 模型返回 domain="order" 后，下一轮才注入 order 领域的工具集
+tools_order = [search_orders, update_order, cancel_order]
+# 这样每次 context 里只有少量工具，准确率与 token 成本都更优
+</script>
+
+    <div class="callout co-tip">
+      <span class="ico">💡</span>
+      <div class="body">
+        <span class="ttl">框架已内置该能力</span>
+        <p>Spring AI 2.0 提供 <strong>Tool Search</strong>（工具搜索，按需加载延迟工具）；LangChain4j 提供 <code class="inline">searchBehavior = ALWAYS_VISIBLE</code> 区分"常驻工具"与"可搜索工具"。两者都是分层路由的官方实现。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="sec-agent">
+    <h2><span class="num">6</span>工具调用与 Agent 的关系</h2>
+    <p>很多人把"工具调用"和"Agent"混为一谈。准确的关系是：<strong>Tool Use 是 Agent 的原子能力，Agent 是在 Tool Use 之上加了"规划—行动—观察"循环的编排模式</strong>。</p>
+
+    <div class="vs">
+      <div class="col">
+        <span class="tag" style="background:#3730a3;color:#fff">Tool Use（工具调用）</span>
+        <h4>单次"决策 → 执行 → 回填"</h4>
+        <p style="color:var(--text-dim);font-size:14px">一次 Tool Use = 一个工具的调用闭环。它是无状态的、原子的。框架（Spring AI / LangChain4j）帮你自动跑完第 2 节的五步。</p>
+      </div>
+      <div class="col">
+        <span class="tag" style="background:#0f766e;color:#fff">Agent（智能体）</span>
+        <h4>多轮"思考 → 行动 → 观察"循环</h4>
+        <p style="color:var(--text-dim);font-size:14px">Agent = 在 Tool Use 之外加上目标拆解、状态记忆、多步规划。它把多次工具调用串成一个完成复杂任务的流程（ReAct 模式：Reason + Act）。</p>
+      </div>
+    </div>
+
+    <div class="callout co-key">
+      <span class="ico">🔗</span>
+      <div class="body">
+        <span class="ttl">一句话定位</span>
+        <p>没有 Tool Use，Agent 就只能"空想"（无法获取实时数据、无法执行动作）；有了 Tool Use，Agent 才能真正"动手干活"。本任务掌握的 Tool Calling，正是 Phase 1 构建 Agent 的积木。Phase 2 验收要求"能讲 Function Call 底层"——底层就是第 2 节那套"LLM 不执行函数、只生成 JSON"的机制。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 7 ============ -->
+  <section id="sec-interview">
+    <h2><span class="num">7</span>面试口述要点</h2>
+    <p>Function Calling / 工具调用是 JD 中<strong>极高频率</strong>的需求，"Function Call 底层原理—LLM 不执行函数"更是面试<strong>第一梯队</strong>问题。下面是高频问答模板，建议对照代码理解后用自己的话复述。</p>
+
+    <div class="qa">
+      <div class="q"><span class="qmark">Q1</span>Function Calling 的底层原理是什么？LLM 真的调用了函数吗？</div>
+      <div class="a">
+        <p><strong>没有。</strong> LLM 自始至终只做一件事：生成下一个 token。所谓"调用工具"，是模型被训练成在合适时机生成一段符合格式的<strong>结构化 JSON 调用指令</strong>（含工具名和入参），由<strong>我这边的外部代码</strong>解析并真正执行。执行完，我把结果作为 ToolMessage 回填给模型，模型再基于结果生成最终的自然语言回答。</p>
+        <p>所以工具调用的可靠性，本质上是模型生成正确格式 JSON 的概率。这也是 GPT-4、Claude 等专门做工具调用微调的原因。</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="q"><span class="qmark">Q2</span>完整描述一次 Tool Use 的流程。</div>
+      <div class="a">
+        <p>五步闭环：① 应用把用户提问 + 工具定义（name/description/参数 schema）发给 LLM；② LLM 判断需要工具，返回工具名和入参 JSON（而非答案）；③ 应用代码根据工具名找到方法、用入参真正执行，拿到结果；④ 把结果作为 tool_result 消息回填，再次请求 LLM；⑤ LLM 基于结果生成最终回答（或继续调用下一个工具）。在模型返回 tool_use 时它已"暂停"，必须等结果回填才会继续。</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="q"><span class="qmark">Q3</span>Function Calling / Tool Use / Plugin / Action 是一回事吗？</div>
+      <div class="a">
+        <p>概念上是同一件事的不同命名。OpenAI 早期叫 Function Calling，后统一为 Tool Use；Anthropic 一直叫 Tool Use；LangChain 里叫 Tool/Action；ChatGPT Plugin 是更早的产品化叫法（已被 Tool Use 取代）。底层机制完全一致：模型生成结构化调用指令 → 外部执行 → 结果回注。</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="q"><span class="qmark">Q4</span>为什么有时模型该调用工具却不调用，或不该调用却调用了？</div>
+      <div class="a">
+        <p>三个常见原因：① 工具 description 不够清晰，模型判断不出适用场景；② System Prompt 没有明确的工具使用策略（如"涉及实时数据必须调用工具，不要依赖训练知识"）；③ 用户问题意图模糊。生产中可用 <code class="inline">tool_choice</code> 参数强制模型在特定场景必须调用工具。</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="q"><span class="qmark">Q5</span>Spring AI 和 LangChain4j 实现 Tool Calling 有什么区别？</div>
+      <div class="a">
+        <p>都是把"五步闭环"封装起来。Spring AI 用 <code class="inline">@Tool</code> + <code class="inline">@ToolParam</code>，通过 <code class="inline">ChatClient.tools()</code> 注册，由 Advisor 链里的 <code class="inline">ToolCallingAdvisor</code> 自动调度，深度融入 Spring Boot 自动装配。LangChain4j 用 <code class="inline">@Tool</code> + <code class="inline">@P</code>，通过 <code class="inline">AiServices</code> 生成代理接口自动调度，框架中立；底层还提供 <code class="inline">ToolSpecification</code> + <code class="inline">ChatModel</code> 让你手动看清每一步。两者背后是同一套机制。</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="q"><span class="qmark">Q6</span>工具调用失败时，要不要把原始异常堆栈给 LLM 看？</div>
+      <div class="a">
+        <p><strong>不要。</strong>原始堆栈（如 <code class="inline">NullPointerException at line 247</code>）对 LLM 决策没帮助，还浪费 token、泄露系统内部实现（安全风险）。正确做法是做<strong>错误转译</strong>：把技术异常转成 LLM 能理解并行动的语义化描述，如"数据查询暂时不可用，建议稍后重试或换个查询条件"，让模型决定重试还是放弃。</p>
+      </div>
+    </div>
+
+    <div class="qa">
+      <div class="q"><span class="qmark">Q7</span>工具数量很多时怎么保证准确率？</div>
+      <div class="a">
+        <p>超过 20~30 个工具时准确率显著下降（占用 context + 选项过多增加混淆）。解法是<strong>分层路由</strong>：先用一个调度工具让 LLM 判断领域，再注入该领域的具体工具集。Spring AI 2.0 的 Tool Search、LangChain4j 的 <code class="inline">searchBehavior=ALWAYS_VISIBLE</code> 都是这一策略的官方实现。</p>
+      </div>
+    </div>
+
+    <div class="callout co-interview">
+      <span class="ico">🎯</span>
+      <div class="body">
+        <span class="ttl">一句话记忆锚点</span>
+        <p>"模型只出 JSON 不执行，代码执行完再回填。"——把这句话和五步流程图默写出来，就过了 Phase 2 验收里"能讲 Function Call 底层"这一关。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 8 ============ -->
+  <section id="sec-hands-on">
+    <h2><span class="num">8</span>动手练习清单（Phase 0 任务）</h2>
+    <p>建议按顺序完成，预计 40~60 分钟可全部跑通：</p>
+    <ol>
+      <li><strong>跑通原理</strong>（10 min）：通读第 2 节，合上教程默写五步流程图，能口述"LLM 不执行函数"。</li>
+      <li><strong>Spring AI demo</strong>（20 min）：按 3.1~3.8 搭建项目，跑通 <code class="inline">/ask</code> 接口，观察日志里模型如何先调 <code class="inline">getCurrentDateTime</code> 再调 <code class="inline">setAlarm</code>。</li>
+      <li><strong>LangChain4j demo</strong>（15 min）：按 4.1~4.6 搭建项目，跑通平方根计算，对比"有工具 vs 无工具"的输出差异。</li>
+      <li><strong>加一个自定义工具</strong>（10 min）：任选一框架，实现一个"查股票价格"的模拟工具，要求用 enum 约束市场参数、description 写清使用边界。</li>
+      <li><strong>面试自测</strong>（5 min）：对着第 7 节 Q1~Q7 自言自语讲一遍，录音回听是否流畅、是否出现"模型调用函数"这类错误表述。</li>
+    </ol>
+
+    <div class="callout co-warn">
+      <span class="ico">⚠️</span>
+      <div class="body">
+        <span class="ttl">避坑提示</span>
+        <p>① 务必选<strong>支持 tool calling 的模型</strong>（如 gpt-4o-mini、qwen-plus），老模型会直接忽略 tools 参数；② API Key 走环境变量，别硬编码提交到 Git；③ LangChain4j 纯 Maven 项目记得开 <code class="inline">-parameters</code>，否则参数名变 arg0；④ 工具方法不要返回超大文本，会撑爆 context。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 9 ============ -->
+  <section id="sec-sources">
+    <h2><span class="num">9</span>教程来源</h2>
+    <p>本教程综合了以下互联网教程与路线图推荐项目（地位平等，均作为素材来源），代码示例与原理表述经过交叉验证与改写：</p>
+    <ol class="src-list">
+      <li>OpenAI 官方文档 — Function calling（含五步 tool calling flow、JSON Schema 定义）：<a href="https://developers.openai.com/api/docs/guides/function-calling" target="_blank" rel="noopener">https://developers.openai.com/api/docs/guides/function-calling</a></li>
+      <li>Spring AI 官方文档 — Tool Calling（@Tool / @ToolParam / ToolCallingAdvisor / ToolContext / returnDirect）：<a href="https://docs.spring.io/spring-ai/reference/api/toolcalling.html" target="_blank" rel="noopener">https://docs.spring.io/spring-ai/reference/api/toolcalling.html</a></li>
+      <li>Spring AI 官方文档（2.0）— Tool Calling：<a href="https://docs.spring.io/spring-ai/reference/2.0/api/tools.html" target="_blank" rel="noopener">https://docs.spring.io/spring-ai/reference/2.0/api/tools.html</a></li>
+      <li>Spring AI Alibaba 官网 — 工具调用（Tool Calling）教程（方法工具 / 函数工具 / 返回值转换 / 工具上下文）：<a href="https://www.java2ai.com/docs/1.0.0.2/tutorials/basics/tool-calling/" target="_blank" rel="noopener">https://www.java2ai.com/docs/1.0.0.2/tutorials/basics/tool-calling/</a></li>
+      <li>LangChain4j 官方文档 — 工具（函数调用）（两层抽象、@Tool/@P、ToolSpecification、AiServices）：<a href="https://docs.langchain4j.info/tutorials/tools" target="_blank" rel="noopener">https://docs.langchain4j.info/tutorials/tools</a></li>
+      <li>CSDN — 每日 Agent 核心知识 · 第 04 期 工具调用深度拆解（底层真相、Schema 五原则、执行链路、故障模式、面试 Q&A）：<a href="https://blog.csdn.net/chen_si_shang_/article/details/162153851" target="_blank" rel="noopener">https://blog.csdn.net/chen_si_shang_/article/details/162153851</a></li>
+      <li>51CTO — Function Calling 最大的骗局：AI 根本不会调用你的函数：<a href="https://www.51cto.com/article/849810.html" target="_blank" rel="noopener">https://www.51cto.com/article/849810.html</a></li>
+      <li>bswen — How to Use Spring AI @Tool Annotation for Function Calling：<a href="https://docs.bswen.com/blog/2026-02-27-spring-ai-tool-function-calling/" target="_blank" rel="noopener">https://docs.bswen.com/blog/2026-02-27-spring-ai-tool-function-calling/</a></li>
+      <li>bytzecho — Tutorial: Using Function Calling with Spring AI：<a href="https://bytzecho.com/tutorials/spring-ai/function-calling-with-spring-ai" target="_blank" rel="noopener">https://bytzecho.com/tutorials/spring-ai/function-calling-with-spring-ai</a></li>
+      <li>LogicBig — AI LangChain4j: Calling Tools With AI Services：<a href="https://www.logicbig.com/tutorials/ai-tutorials/lang-chain-4j/ai-services-tools.html" target="_blank" rel="noopener">https://www.logicbig.com/tutorials/ai-tutorials/lang-chain-4j/ai-services-tools.html</a></li>
+      <li>Microsoft — LangChain4j-for-Beginners / 04-tools（@Tool/@P/@AiService 图示）：<a href="https://github.com/microsoft/LangChain4j-for-Beginners/blob/main/04-tools" target="_blank" rel="noopener">https://github.com/microsoft/LangChain4j-for-Beginners/blob/main/04-tools</a></li>
+      <li>Spring AI 官方仓库（路线图推荐）：<a href="https://github.com/spring-projects/spring-ai" target="_blank" rel="noopener">https://github.com/spring-projects/spring-ai</a></li>
+      <li>LangChain4j 官方仓库（路线图推荐）：<a href="https://github.com/langchain4j/langchain4j" target="_blank" rel="noopener">https://github.com/langchain4j/langchain4j</a></li>
+      <li>Spring AI 示例仓库（路线图推荐）：<a href="https://github.com/spring-projects/spring-ai-examples" target="_blank" rel="noopener">https://github.com/spring-projects/spring-ai-examples</a></li>
+      <li>spring-ai-alibaba-playground 示例（路线图推荐）：<a href="https://github.com/springaialibaba/spring-ai-alibaba-examples" target="_blank" rel="noopener">https://github.com/springaialibaba/spring-ai-alibaba-examples</a></li>
+      <li>卡码笔记 — Agent 面试题（含 Function Calling，路线图推荐）：<a href="https://notes.kamacoder.com/interview/llm/agent_interview.html" target="_blank" rel="noopener">https://notes.kamacoder.com/interview/llm/agent_interview.html</a></li>
+      <li>小林 coding — AI 面试题（路线图推荐）：<a href="https://www.cnblogs.com/xiaolincoding/p/20534325" target="_blank" rel="noopener">https://www.cnblogs.com/xiaolincoding/p/20534325</a></li>
+    </ol>
+  </section>
+
+  </main>
+</div>
+
+<footer>
+  <p>Phase 0 · 定向与双框架地基（第 1–14 天）｜ Function Calling 与 Tool Use 原理实战</p>
+  <p>主线语言 Java（Spring AI @Tool + LangChain4j @Tool 双路径），Python 仅辅助说明原理 · 总预估时长 ≤ 60 分钟</p>
+</footer>
+
+<button class="top-link" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部" aria-label="回到顶部">↑</button>
+
+<script>
+/* ===== 轻量自包含语法高亮（无外部依赖） ===== */
+(function(){
+  function esc(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  var KW = {
+    java: 'abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|native|new|package|private|protected|public|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|transient|try|void|volatile|while|var|record|sealed|permits|yield',
+    python: 'False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield|self',
+    bash: 'if|then|else|elif|fi|for|in|do|done|while|case|esac|function|export|echo|cd'
+  };
+  var PH_L = '\u0001', PH_R = '\u0001';
+
+  function highlight(code, lang){
+    var s = esc(code);
+    var store = [];
+    function stash(html){
+      var i = store.length;
+      store.push(html);
+      return PH_L + i + PH_R;
+    }
+    var isXml = (lang==='xml'||lang==='html');
+    var isHash = (lang==='python'||lang==='bash'||lang==='properties'||lang==='yaml');
+    var isSlash = (lang==='java'||lang==='javascript'||lang==='c');
+
+    // 1. 注释（最高优先级）
+    if(isXml){
+      s = s.replace(/&lt;!--[\s\S]*?--&gt;/g, function(m){ return stash('<span class="c">'+m+'</span>'); });
+    }
+    if(isSlash){
+      s = s.replace(/\/\*[\s\S]*?\*\//g, function(m){ return stash('<span class="c">'+m+'</span>'); });
+      s = s.replace(/\/\/[^\n]*/g, function(m){ return stash('<span class="c">'+m+'</span>'); });
+    }
+    if(isHash){
+      s = s.replace(/#[^\n]*/g, function(m){ return stash('<span class="c">'+m+'</span>'); });
+    }
+
+    // 2. 字符串
+    if(lang==='python'){
+      s = s.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, function(m){ return stash('<span class="s">'+m+'</span>'); });
+    } else if(lang==='json'){
+      // JSON：key（字符串后跟冒号）单独着色
+      s = s.replace(/("(?:\\.|[^"\\])*")(\s*:)/g, function(m,str,colon){ return stash('<span class="k">'+str+'</span>')+colon; });
+      s = s.replace(/"(?:\\.|[^"\\])*"/g, function(m){ return stash('<span class="s">'+m+'</span>'); });
+    } else {
+      s = s.replace(/"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g, function(m){ return stash('<span class="s">'+m+'</span>'); });
+    }
+
+    // 3. XML 标签与属性
+    if(isXml){
+      s = s.replace(/(&lt;\/?)([\w.\-]+)/g, function(m,p1,p2){ return p1 + stash('<span class="t">'+p2+'</span>'); });
+      s = s.replace(/(\s)([\w.\-]+)(=)/g, function(m,sp,name,eq){ return sp + stash('<span class="a">'+name+'</span>') + eq; });
+    }
+
+    // 4. 注解（Java）
+    if(lang==='java'){
+      s = s.replace(/@[A-Za-z_][\w.]*/g, function(m){ return stash('<span class="an">'+m+'</span>'); });
+    }
+
+    // 5/6/7. 数字、布尔、关键字 —— 分段处理，跳过占位符区域
+    var parts = s.split(new RegExp('('+PH_L+'\\d+'+PH_R+')'));
+    var kws = KW[lang];
+    for(var p=0; p<parts.length; p++){
+      if(new RegExp('^'+PH_L+'\\d+'+PH_R+'$').test(parts[p])) continue;
+      // 数字
+      parts[p] = parts[p].replace(/\b\d[\d_]*\.?\d*[fFlLdD]?\b/g, function(m){ return stash('<span class="n">'+m+'</span>'); });
+      // JSON 布尔/null
+      if(lang==='json'){
+        parts[p] = parts[p].replace(/\b(true|false|null)\b/g, function(m){ return stash('<span class="k">'+m+'</span>'); });
+      }
+      // 关键字
+      if(kws){
+        parts[p] = parts[p].replace(new RegExp('\\b('+kws+')\\b','g'), function(m){ return stash('<span class="k">'+m+'</span>'); });
+      }
+    }
+    s = parts.join('');
+
+    // 还原所有占位符
+    s = s.replace(new RegExp(PH_L+'(\\d+)'+PH_R,'g'), function(m,i){ return store[+i]; });
+    return s;
+  }
+
+  function renderBlocks(){
+    var blocks = document.querySelectorAll('script[type="text/x-code"]');
+    for(var i=0;i<blocks.length;i++){
+      var sc = blocks[i];
+      var targetId = sc.getAttribute('data-for');
+      var lang = sc.getAttribute('data-lang') || 'java';
+      var target = document.getElementById(targetId);
+      if(!target) continue;
+      var raw = sc.textContent.replace(/^\n/,'').replace(/\s+$/,'');
+      target.innerHTML = highlight(raw, lang);
+    }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', renderBlocks);
+  } else {
+    renderBlocks();
+  }
+})();
+</script>
+</body>
+</html>

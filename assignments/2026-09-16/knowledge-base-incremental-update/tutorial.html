@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库增量更新实战：文档变更检测 + 向量 upsert/删除策略</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --hero-bg-1: #0f172a;
+            --hero-bg-2: #1e3a5f;
+            --card-bg: #ffffff;
+            --code-bg: #1e1e2e;
+            --code-text: #e2e8f0;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --text-mute: #94a3b8;
+            --accent: #3b82f6;
+            --accent-light: #dbeafe;
+            --accent-dark: #1e40af;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+            --warning-border: #fcd34d;
+            --success: #059669;
+            --success-bg: #ecfdf5;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.10);
+            --radius: 12px;
+            --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+            --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--hero-bg-2) 0%, var(--hero-bg-1) 100%);
+            color: #f1f5f9;
+            padding: 64px 24px 56px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        }
+        .hero-content { max-width: 880px; margin: 0 auto; }
+        .phase-badge {
+            display: inline-block;
+            background: rgba(59,130,246,0.2);
+            border: 1px solid rgba(59,130,246,0.4);
+            color: #93c5fd;
+            padding: 4px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 0.03em;
+        }
+        .hero h1 {
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+        .hero .subtitle {
+            font-size: 18px;
+            color: #cbd5e1;
+            margin-bottom: 28px;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 32px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        .hero-meta span { display: inline-flex; align-items: center; gap: 6px; }
+        .hero-meta .dot { width: 6px; height: 6px; border-radius: 50%; background: #3b82f6; display: inline-block; }
+
+        /* ===== LAYOUT ===== */
+        .container { max-width: 880px; margin: 0 auto; padding: 0 24px 80px; }
+
+        /* ===== TOC ===== */
+        .toc {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin: 32px 0;
+            box-shadow: var(--shadow);
+        }
+        .toc-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-mute);
+            margin-bottom: 14px;
+        }
+        .toc ol { list-style: none; counter-reset: toc; }
+        .toc li { counter-increment: toc; padding: 3px 0; }
+        .toc li::before {
+            content: counter(toc, decimal-leading-zero);
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--accent);
+            margin-right: 10px;
+            font-weight: 600;
+        }
+        .toc a { color: var(--text); text-decoration: none; font-size: 15px; }
+        .toc a:hover { color: var(--accent); }
+
+        /* ===== SECTIONS ===== */
+        section { margin-top: 56px; scroll-margin-top: 24px; }
+        .section-num {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 4px;
+            margin-bottom: 20px;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+        h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        p { margin-bottom: 16px; }
+        p, li { font-size: 16px; line-height: 1.8; }
+
+        ul, ol { margin: 0 0 16px 24px; }
+        li { margin-bottom: 6px; }
+
+        strong { font-weight: 700; color: var(--text); }
+        code.inline {
+            font-family: var(--mono);
+            font-size: 0.875em;
+            background: #f1f5f9;
+            color: var(--accent-dark);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* ===== CALLOUTS ===== */
+        .callout {
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+            font-size: 15px;
+            line-height: 1.7;
+            border-left: 4px solid;
+        }
+        .callout-warning {
+            background: var(--warning-bg);
+            border-color: var(--warning-border);
+            color: #78350f;
+        }
+        .callout-info {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent-dark);
+        }
+        .callout-danger {
+            background: var(--danger-bg);
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+        .callout-success {
+            background: var(--success-bg);
+            border-color: var(--success);
+            color: #065f46;
+        }
+        .callout strong { color: inherit; }
+
+        /* ===== CODE BLOCKS ===== */
+        pre {
+            background: var(--code-bg);
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid #313244;
+        }
+        pre code {
+            display: block;
+            font-family: var(--mono);
+            font-size: 14px;
+            line-height: 1.65;
+            color: var(--code-text);
+            padding: 20px 24px;
+            white-space: pre;
+            tab-size: 4;
+        }
+
+        /* Code label */
+        .code-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: -12px;
+            margin-top: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        .code-label .lang-tag {
+            font-family: var(--mono);
+            background: var(--accent);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+            box-shadow: var(--shadow);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        thead { background: #f1f5f9; }
+        th { font-weight: 700; color: var(--text); font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #f8fafc; }
+        td code { font-family: var(--mono); font-size: 13px; color: var(--accent-dark); }
+
+        /* ===== GHOST KNOWLEDGE CARDS ===== */
+        .ghost-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .ghost-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+        }
+        .ghost-card .ghost-icon {
+            font-size: 22px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .ghost-card h4 { margin-top: 0; margin-bottom: 6px; font-size: 15px; color: var(--danger); }
+        .ghost-card p { font-size: 13px; color: var(--text-light); margin: 0; line-height: 1.6; }
+
+        /* ===== INTERVIEW ===== */
+        .interview-points {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            box-shadow: var(--shadow);
+        }
+        .interview-points ol { margin-left: 20px; }
+        .interview-points li { margin-bottom: 16px; }
+        .interview-points li strong { color: var(--accent-dark); }
+
+        /* ===== GLOSSARY ===== */
+        .glossary { margin-top: 8px; }
+
+        /* ===== SOURCES ===== */
+        .sources { list-style: none; counter-reset: src; }
+        .sources li {
+            counter-increment: src;
+            padding: 10px 0 10px 40px;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .sources li:last-child { border-bottom: none; }
+        .sources li::before {
+            content: counter(src);
+            position: absolute;
+            left: 0; top: 10px;
+            width: 28px; height: 28px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: var(--mono);
+        }
+        .sources a { color: var(--accent); text-decoration: none; word-break: break-all; }
+        .sources a:hover { text-decoration: underline; }
+        .sources .src-title { font-weight: 600; color: var(--text); }
+
+        /* ===== PROJECT CARDS ===== */
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 16px 0;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--accent);
+        }
+        .project-card h4 { margin-top: 0; color: var(--accent-dark); font-family: var(--mono); font-size: 15px; }
+        .project-card p { font-size: 14px; color: var(--text-light); margin: 0; }
+        .project-card .tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .project-card .tag {
+            font-size: 12px;
+            background: #f1f5f9;
+            color: var(--text-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--mono);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--text-mute);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+
+        /* ===== MISC ===== */
+        .keyword { color: var(--accent-dark); font-weight: 600; }
+        .bridge {
+            color: var(--text-light);
+            font-size: 15px;
+            font-style: italic;
+            background: #f8fafc;
+            border-left: 3px solid var(--border);
+            padding: 8px 16px;
+            margin: 8px 0 16px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 28px; }
+            .hero { padding: 40px 16px 36px; }
+            .container { padding: 0 16px 60px; }
+            h2 { font-size: 22px; }
+            pre code { font-size: 12.5px; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== HERO ========== -->
+<header class="hero">
+    <div class="hero-content">
+        <span class="phase-badge">Phase 1 · RAG 刚需闭环 + 生产级项目 1</span>
+        <h1>知识库增量更新实战</h1>
+        <p class="subtitle">文档变更检测 + 向量 upsert/删除策略（内容哈希幂等入库）</p>
+        <div class="hero-meta">
+            <span><span class="dot"></span> 总预估时长：&le;1 小时（约 55 min）</span>
+            <span><span class="dot"></span> 飞书任务 GUID：c2d17fb1-9d03-4e31-9e67-22451b60bf8c</span>
+        </div>
+    </div>
+</header>
+
+<!-- ========== MAIN ========== -->
+<main class="container">
+
+    <!-- TOC -->
+    <nav class="toc">
+        <div class="toc-title">目录</div>
+        <ol>
+            <li><a href="#background">问题背景：为什么需要增量更新（幽灵知识问题）</a></li>
+            <li><a href="#detection">变更检测方案（内容哈希 + 时间戳粗筛）</a></li>
+            <li><a href="#spring-ai">Spring AI VectorStore API（开箱实现）</a></li>
+            <li><a href="#pipeline">完整增量更新管道实现（Java 代码示例）</a></li>
+            <li><a href="#pgvector">pgvector 增量策略（确定性 ID + diff + upsert）</a></li>
+            <li><a href="#production">生产级保障（蓝绿部署 + 一致性 + reconciliation）</a></li>
+            <li><a href="#projects">路线图推荐参考项目</a></li>
+            <li><a href="#interview">面试口述要点</a></li>
+            <li><a href="#glossary">术语表</a></li>
+            <li><a href="#sources">教程来源</a></li>
+        </ol>
+    </nav>
+
+    <!-- ========== 1. 问题背景 ========== -->
+    <section id="background">
+        <div class="section-num">01</div>
+        <h2>问题背景：为什么需要增量更新</h2>
+
+        <p>RAG（Retrieval-Augmented Generation）系统的知识库并非一次构建、永久不变。文档会更新、删除、新增，而向量数据库（Vector Database）中已入库的 Embedding 向量却不会自动同步。这种"数据已变、向量未变"的脱节会导致 RAG 检索到过时、矛盾甚至已删除的内容——这就是 <strong>幽灵知识问题（Ghost Knowledge Problem）</strong>。</p>
+
+        <div class="callout callout-danger">
+            <strong>类比理解：</strong>这和 MySQL 中"主库数据已更新但从库缓存还是旧值"的问题本质相同——只不过这里的"缓存"是向量索引，而"过期数据"是旧版本的 Embedding 向量。在 RAG 场景下，幽灵知识比普通缓存过期更危险：检索器会把旧向量当作"高度相关"返回给 LLM，而 LLM 会用这些过时信息生成回答，用户完全无法察觉。
+        </div>
+
+        <h3>幽灵知识的五种类型</h3>
+
+        <div class="ghost-grid">
+            <div class="ghost-card">
+                <span class="ghost-icon">👻</span>
+                <h4>Stale（过期）</h4>
+                <p>文档已更新，但向量库里还是旧版本的 Embedding。用户问到这个文档时，RAG 会检索到旧内容并生成过时回答。</p>
+            </div>
+            <div class="ghost-card">
+                <span class="ghost-icon">🏚️</span>
+                <h4>Orphan（孤儿）</h4>
+                <p>文档已从知识库删除，但向量库里对应的 Embedding 仍然存在。RAG 会检索到"不该存在"的内容。</p>
+            </div>
+            <div class="ghost-card">
+                <span class="ghost-icon">👯</span>
+                <h4>Duplicate（重复）</h4>
+                <p>同一文档被多次入库，向量库中存在多个相同或近似 Embedding。检索时同一信息出现多次，浪费 context window。</p>
+            </div>
+            <div class="ghost-card">
+                <span class="ghost-icon">📉</span>
+                <h4>Drift（漂移）</h4>
+                <p>Embedding 模型升级了，但旧 Embedding 没有重新生成。新旧模型产生的向量空间不一致，检索质量下降。</p>
+            </div>
+            <div class="ghost-card">
+                <span class="ghost-icon">⚔️</span>
+                <h4>Contradictory（矛盾）</h4>
+                <p>旧版和新版文档的 Embedding 同时存在于向量库。RAG 检索到两个矛盾版本，LLM 生成的回答前后冲突。</p>
+            </div>
+        </div>
+
+        <p>这五种幽灵知识的核心根因只有一个： <strong>向量数据库中的 Embedding 与源文档之间缺乏一致性保障机制</strong>。本教程的增量更新管道正是为了消灭幽灵知识而设计的。</p>
+    </section>
+
+    <!-- ========== 2. 变更检测 ========== -->
+    <section id="detection">
+        <div class="section-num">02</div>
+        <h2>变更检测方案：内容哈希 + 时间戳粗筛</h2>
+
+        <p>增量更新的第一步是回答一个问题： <strong>"这个文档到底变没变？"</strong> 答案不能靠文件名或路径——同名文件内容可能完全不同。正确做法是计算文档内容的哈希值。</p>
+
+        <h3>2.1 content hash（内容哈希）</h3>
+        <div class="bridge">
+            content hash（内容哈希）：对文档全文计算 SHA-256 摘要，得到一个 64 位十六进制字符串。类比 Git 的 commit hash——对文件内容生成唯一"指纹"，内容哪怕只改了一个字符，哈希值也完全不同。
+        </div>
+
+        <p>单纯比较哈希的代价是：每次检测都需要读取全文并计算 SHA-256，对于万级文档库来说逐个哈希太慢。因此引入 <strong>两阶段粗筛 + 精筛</strong>策略：</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>阶段</th>
+                    <th>检测维度</th>
+                    <th>复杂度</th>
+                    <th>说明</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>粗筛</strong></td>
+                    <td>lastModified 时间戳</td>
+                    <td>O(1) 磁盘 stat</td>
+                    <td>时间戳没变 → 直接跳过，无需读文件内容</td>
+                </tr>
+                <tr>
+                    <td><strong>精筛</strong></td>
+                    <td>content hash (SHA-256)</td>
+                    <td>O(n) 读取全文</td>
+                    <td>时间戳变了才计算哈希，哈希相同 → 内容未变（可能是 touch）</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.2 内容哈希工具实现</h3>
+        <div class="callout callout-warning">
+            <strong>⚠️ 框架无内置实现，以下为业界通用手写方案</strong><br>
+            Spring AI 不提供内容哈希计算工具。以下使用 JDK 标准库 <code class="inline">MessageDigest</code> 实现，是业界通用做法。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> ContentHashUtil.java — SHA-256 内容指纹
+        </div>
+        <pre><code>public class ContentHashUtil {
+
+    /**
+     * 计算文档内容的 SHA-256 哈希值（content hash）
+     * 类似 Git commit hash：对内容生成唯一指纹
+     *
+     * @param content 文档全文
+     * @return 64 位十六进制字符串
+     */
+    public static String sha256(String content) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(content.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not available", e);
+        }
+    }
+}</code></pre>
+
+        <h3>2.3 变更检测器实现</h3>
+        <div class="callout callout-warning">
+            <strong>⚠️ 框架无内置实现，以下为业界通用手写方案</strong><br>
+            Spring AI 不提供文档变更检测器。以下通过元数据库比对实现，是 RAG 系统标准组件。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> DocumentChangeDetector.java — 两阶段变更检测
+        </div>
+        <pre><code>@Service
+public class DocumentChangeDetector {
+
+    private final DocumentMetadataRepository metadataRepo;
+
+    public DocumentChangeDetector(DocumentMetadataRepository metadataRepo) {
+        this.metadataRepo = metadataRepo;
+    }
+
+    /**
+     * 变更检测：先粗筛（时间戳），再精筛（内容哈希）
+     */
+    public ChangeResult detect(String docId, String content, long lastModified) {
+        String newHash = ContentHashUtil.sha256(content);
+
+        Optional&lt;DocumentMetadata&gt; existing = metadataRepo.findById(docId);
+
+        // 新文档 → CREATE
+        if (existing.isEmpty()) {
+            return ChangeResult.created(docId, newHash);
+        }
+
+        DocumentMetadata meta = existing.get();
+
+        // 粗筛：时间戳 + 哈希均未变 → 跳过
+        if (meta.getLastModified() == lastModified
+                &amp;&amp; meta.getContentHash().equals(newHash)) {
+            return ChangeResult.unchanged(docId);
+        }
+
+        // 精筛：哈希不同 → 内容已变
+        if (!meta.getContentHash().equals(newHash)) {
+            return ChangeResult.updated(docId, newHash, meta.getContentHash());
+        }
+
+        // 时间戳变但哈希相同 → 可能是 touch，内容未变
+        return ChangeResult.unchanged(docId);
+    }
+}</code></pre>
+
+        <p><code class="inline">ChangeResult</code> 是一个密封类（sealed class），封装三种状态： <code class="inline">CREATED</code>、<code class="inline">UPDATED</code>、<code class="inline">UNCHANGED</code>，管道下游根据状态决定执行路径。</p>
+    </section>
+
+    <!-- ========== 3. Spring AI VectorStore API ========== -->
+    <section id="spring-ai">
+        <div class="section-num">03</div>
+        <h2>Spring AI VectorStore API（开箱实现）</h2>
+
+        <div class="callout callout-info">
+            <strong>框架版本：Spring AI 2.0</strong> — 提供开箱即用的 <code class="inline">VectorStore</code> 接口，支持 add / delete / similaritySearch 三大核心操作。底层自动调用 <code class="inline">EmbeddingModel</code> 将文本转为向量，开发者无需手动调用 Embedding API。
+        </div>
+
+        <p>Spring AI 2.0 的 <code class="inline">VectorStore</code> 接口是增量更新的核心抽象。它提供了三个与增量更新直接相关的方法：</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>方法签名</th>
+                    <th>用途</th>
+                    <th>增量更新角色</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>add(List&lt;Document&gt;)</code></td>
+                    <td>批量入库文档（自动生成 Embedding）</td>
+                    <td>"后增"步骤——插入新版本向量</td>
+                </tr>
+                <tr>
+                    <td><code>delete(List&lt;String&gt;)</code></td>
+                    <td>按 chunk ID 批量删除</td>
+                    <td>"先删"步骤——清除旧版本向量</td>
+                </tr>
+                <tr>
+                    <td><code>delete(Filter)</code></td>
+                    <td>按元数据条件删除（Spring AI 2.0 新增）</td>
+                    <td>按 doc_id 一键删除某文档所有 chunk</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> KnowledgeBaseService.java — Spring AI 2.0 开箱 API
+        </div>
+        <pre><code>import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
+
+// Spring AI 2.0 开箱即用的 VectorStore 接口
+@Service
+public class KnowledgeBaseService {
+
+    private final VectorStore vectorStore;  // Spring AI 自动注入
+
+    public KnowledgeBaseService(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
+
+    // 添加文档向量（自动调用 EmbeddingModel 生成 embedding）
+    public void addDocuments(List&lt;Document&gt; documents) {
+        vectorStore.add(documents);
+    }
+
+    // 按 chunk ID 批量删除（先删后增策略的"先删"步骤）
+    public void deleteByChunkIds(List&lt;String&gt; chunkIds) {
+        vectorStore.delete(chunkIds);
+    }
+
+    // 按 Filter 条件删除（Spring AI 2.0 新增）
+    // 一键删除某 doc_id 下的所有 chunk
+    public void deleteByDocId(String docId) {
+        Filter filter = Filter.builder()
+                .equals("doc_id", docId)
+                .build();
+        vectorStore.delete(filter);
+    }
+}</code></pre>
+
+        <div class="callout callout-success">
+            <strong>关键设计：</strong><code class="inline">add()</code> 方法在内部自动完成"文本 → Embedding → 向量数据库写入"全链路，开发者不需要手动调用 <code class="inline">EmbeddingModel.embed()</code>。这意味着增量更新管道只需要关注"哪些文档变了"，而不需要关心向量化细节。
+        </div>
+    </section>
+
+    <!-- ========== 4. 完整管道 ========== -->
+    <section id="pipeline">
+        <div class="section-num">04</div>
+        <h2>完整增量更新管道实现</h2>
+
+        <p>将变更检测、先删后增、分块、向量化、元数据落盘串联起来，就构成了完整的增量更新管道。核心设计原则：</p>
+
+        <ul>
+            <li><strong>先删后增</strong>（delete-then-add）：文档级别先删除旧版本所有 chunk，再插入新版本。保证同一 doc_id 在向量库中只有最新版本，避免 Contradictory 幽灵。</li>
+            <li><strong>确定性 chunk ID</strong>：<code class="inline">doc_id + "_chunk_" + index</code>，保证重复入库不会产生 Duplicate 幽灵。</li>
+            <li><strong>元数据全量记录</strong>：doc_id、content_hash、version_id、chunk_strategy、embedding_model、ingested_at 全部落盘，作为 source of truth。</li>
+        </ul>
+
+        <div class="callout callout-info">
+            <strong>框架版本：Spring AI 2.0</strong> — 管道使用 <code class="inline">VectorStore</code>（add/delete）、<code class="inline">DocumentSplitter</code>（分块）等 Spring AI 开箱组件，编排逻辑为手写。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> IncrementalUpdatePipeline.java — 完整管道
+        </div>
+        <pre><code>@Service
+public class IncrementalUpdatePipeline {
+
+    private final VectorStore vectorStore;
+    private final DocumentChangeDetector changeDetector;
+    private final DocumentMetadataRepository metadataRepo;
+    private final DocumentSplitter splitter;
+
+    public IncrementalUpdatePipeline(VectorStore vectorStore,
+            DocumentChangeDetector changeDetector,
+            DocumentMetadataRepository metadataRepo,
+            DocumentSplitter splitter) {
+        this.vectorStore = vectorStore;
+        this.changeDetector = changeDetector;
+        this.metadataRepo = metadataRepo;
+        this.splitter = splitter;
+    }
+
+    /**
+     * 增量更新管道：检测 → 先删 → 分块 → 向量化 → 入库 → 元数据落盘
+     */
+    @Transactional
+    public UpdateResult process(DocumentInput input) {
+        // 1. 变更检测
+        ChangeResult change = changeDetector.detect(
+                input.getDocId(), input.getContent(), input.getLastModified());
+        if (change.isUnchanged()) {
+            return UpdateResult.skipped(input.getDocId());
+        }
+
+        // 2. 先删旧向量（文档级"先删后增"策略）
+        //    使用 Filter 按 doc_id 一次性清除所有旧 chunk
+        Filter deleteFilter = Filter.builder()
+                .equals("doc_id", input.getDocId())
+                .build();
+        vectorStore.delete(deleteFilter);
+
+        // 3. 分块 + 构建元数据
+        Map&lt;String, Object&gt; meta = buildMetadata(input, change);
+        List&lt;Document&gt; rawChunks = splitter.split(
+                new Document(input.getContent(), meta));
+
+        // 4. 设置确定性 chunk ID（doc_id + "_chunk_" + index）
+        List&lt;Document&gt; chunks = new ArrayList&lt;&gt;();
+        for (int i = 0; i &lt; rawChunks.size(); i++) {
+            String chunkId = input.getDocId() + "_chunk_" + i;
+            chunks.add(new Document(chunkId,
+                    rawChunks.get(i).getText(), meta));
+        }
+
+        // 5. 向量化 + 入库（Spring AI 自动调用 EmbeddingModel）
+        vectorStore.add(chunks);
+
+        // 6. 元数据落盘（source of truth）
+        metadataRepo.save(buildMetadataEntity(input, change));
+
+        return UpdateResult.success(input.getDocId(), change.getNewHash());
+    }
+
+    /**
+     * 构建向量库元数据：doc_id, content_hash, version_id,
+     * chunk_strategy, embedding_model, ingested_at
+     */
+    private Map&lt;String, Object&gt; buildMetadata(DocumentInput input, ChangeResult change) {
+        Map&lt;String, Object&gt; meta = new HashMap&lt;&gt;();
+        meta.put("doc_id", input.getDocId());
+        meta.put("content_hash", change.getNewHash());
+        meta.put("version_id", change.getVersionId());
+        meta.put("chunk_strategy", "token-500-overlap-50");
+        meta.put("embedding_model", "text-embedding-3-small");
+        meta.put("ingested_at", Instant.now().toString());
+        return meta;
+    }
+}</code></pre>
+
+        <div class="callout callout-success">
+            <strong>幂等机制核心：</strong>由于 chunk ID 是确定性的（doc_id + chunk_index），重复执行 <code class="inline">process()</code> 不会产生 Duplicate 幽灵——同样的输入永远生成同样的 chunk ID，向量库中不会出现重复记录。配合元数据库中的 <code class="inline">doc_id + content_hash</code> 唯一约束，实现了真正的幂等入库。
+        </div>
+    </section>
+
+    <!-- ========== 5. pgvector 增量策略 ========== -->
+    <section id="pgvector">
+        <div class="section-num">05</div>
+        <h2>pgvector 增量策略：确定性 ID + diff + upsert</h2>
+
+        <p>Spring AI 的 <code class="inline">VectorStore</code> 抽象适合快速接入，但在生产环境中，直接操作 pgvector 可以获得更细粒度的增量控制—— <strong>逐块 diff + upsert</strong>，只重新 embedding 内容变化的 chunk，而非整篇文档"先删后增"。</p>
+
+        <h3>5.1 表结构与元数据设计</h3>
+
+        <div class="bridge">
+            pgvector 是 PostgreSQL 的向量检索扩展，类比 MySQL 的全文索引插件——但专为高维向量的近似最近邻搜索（ANN）设计。HNSW（Hierarchical Navigable Small World）是 pgvector 支持的一种索引算法，类比 MySQL 的 B+ 树索引——但 B+ 树为精确查找优化，HNSW 为"找最相似的 K 个向量"优化，通过多层图结构实现近似最近邻搜索。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">SQL</span> document_chunks 表结构 + HNSW 索引
+        </div>
+        <pre><code>-- pgvector 表结构设计
+CREATE TABLE IF NOT EXISTS document_chunks (
+    id              VARCHAR(256) PRIMARY KEY,  -- 确定性 ID: doc_id + "_chunk_" + index
+    doc_id          VARCHAR(256) NOT NULL,
+    content         TEXT NOT NULL,
+    content_hash    VARCHAR(64) NOT NULL,      -- SHA-256 内容指纹
+    version_id      INTEGER NOT NULL,          -- doc_version: 文档版本号
+    is_latest       BOOLEAN DEFAULT TRUE,     -- is_latest: 是否为最新版本
+    embedding       VECTOR(1536),              -- pgvector 向量类型 (1536 维)
+    chunk_strategy  VARCHAR(64),              -- 分块策略标识
+    embedding_model VARCHAR(128),             -- 使用的 Embedding 模型
+    ingested_at     TIMESTAMP DEFAULT NOW(),  -- 入库时间
+    UNIQUE(doc_id, content_hash)              -- 幂等约束：同一文档相同内容只入库一次
+);
+
+-- HNSW 索引（近似最近邻搜索专用索引）
+-- 类比 MySQL B+ 树索引，但为向量相似度搜索优化
+CREATE INDEX idx_chunks_embedding
+ON document_chunks
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);
+
+-- 为 doc_id 建索引，支持按文档批量删除
+CREATE INDEX idx_chunks_doc_id ON document_chunks (doc_id);
+CREATE INDEX idx_chunks_is_latest ON document_chunks (doc_id, is_latest);</code></pre>
+
+        <h4>元数据字段说明</h4>
+        <table>
+            <thead>
+                <tr><th>字段</th><th>类型</th><th>作用</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>doc_id</code></td><td>VARCHAR</td><td>文档唯一标识，关联元数据库</td></tr>
+                <tr><td><code>content_hash</code></td><td>VARCHAR(64)</td><td>chunk 内容的 SHA-256，用于 diff 比较</td></tr>
+                <tr><td><code>version_id</code></td><td>INTEGER</td><td>doc_version：文档版本号，每次更新自增</td></tr>
+                <tr><td><code>is_latest</code></td><td>BOOLEAN</td><td>is_latest：标记该 chunk 是否属于最新版本，用于查询时过滤</td></tr>
+                <tr><td><code>chunk_strategy</code></td><td>VARCHAR</td><td>分块策略标识，如 token-500-overlap-50</td></tr>
+                <tr><td><code>embedding_model</code></td><td>VARCHAR</td><td>生成该向量使用的模型，用于 Drift 检测</td></tr>
+                <tr><td><code>ingested_at</code></td><td>TIMESTAMP</td><td>入库时间，用于按时间清理</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.2 逐块 diff + upsert 策略</h3>
+        <p>与文档级"先删后增"不同，pgvector 直连方案可以在 <strong>chunk 级别</strong>做 diff——只重新 embedding 内容变化的 chunk，未变的 chunk 保持不动，大幅节省 Embedding API 调用成本。</p>
+
+        <div class="callout callout-warning">
+            <strong>⚠️ 框架无内置实现，以下为业界通用手写方案</strong><br>
+            Spring AI 的 VectorStore 抽象不暴露逐块 diff 能力。以下直接使用 pgvector SQL + JDBC 实现，是生产环境精细增量更新的标准做法。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">SQL</span> UPSERT — 幂等入库核心操作
+        </div>
+        <pre><code>-- 幂等 UPSERT：存在则更新，不存在则插入
+-- ON CONFLICT (doc_id, content_hash) 保证同一文档相同内容不重复入库
+INSERT INTO document_chunks
+    (id, doc_id, content, content_hash, version_id, is_latest,
+     embedding, chunk_strategy, embedding_model)
+VALUES ($1, $2, $3, $4, $5, TRUE, $6, $7, $8)
+ON CONFLICT (doc_id, content_hash) DO UPDATE
+SET is_latest    = TRUE,
+    version_id   = EXCLUDED.version_id,
+    ingested_at  = NOW();
+
+-- 将旧版本 chunk 标记为 is_latest = FALSE（软删除，非物理删除）
+UPDATE document_chunks
+SET is_latest = FALSE
+WHERE doc_id = $1 AND content_hash != $2;</code></pre>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> 逐块 diff + upsert — 只 re-embedding 变化的 chunk
+        </div>
+        <pre><code>/**
+ * 逐块 diff：只重新 embedding 内容变化的 chunk
+ * 节省 Embedding API 调用成本（未变的 chunk 不重新生成向量）
+ */
+@Repository
+public class PgVectorChunkRepository {
+
+    private final JdbcTemplate jdbc;
+    private final EmbeddingModel embeddingModel;  // Spring AI 2.0
+
+    public void incrementalUpsert(String docId, List&lt;Chunk&gt; newChunks) {
+        // 查询旧 chunk 的 content_hash（不需要读取 embedding 向量）
+        Map&lt;String, String&gt; oldHashes = getChunkHashes(docId);
+
+        for (int i = 0; i &lt; newChunks.size(); i++) {
+            Chunk chunk = newChunks.get(i);
+            String chunkId = docId + "_chunk_" + i;
+            String newHash = ContentHashUtil.sha256(chunk.getText());
+
+            // diff：哈希相同 → 内容未变，跳过
+            if (newHash.equals(oldHashes.get(chunkId))) {
+                continue;  // 节省一次 Embedding API 调用
+            }
+
+            // 内容变了 → 重新 embedding + upsert
+            float[] embedding = embeddingModel.embed(chunk.getText());
+
+            jdbc.update("""
+                INSERT INTO document_chunks
+                    (id, doc_id, content, content_hash, version_id,
+                     is_latest, embedding, chunk_strategy, embedding_model)
+                VALUES (?, ?, ?, ?, ?, TRUE, ?, ?, ?)
+                ON CONFLICT (doc_id, content_hash) DO UPDATE
+                SET is_latest = TRUE, ingested_at = NOW()
+                """,
+                chunkId, docId, chunk.getText(), newHash,
+                chunk.getVersionId(), createVector(embedding),
+                "token-500-overlap-50", "text-embedding-3-small");
+        }
+
+        // 删除多余的旧 chunk（新文档比旧文档短）
+        deleteSurplusChunks(docId, newChunks.size());
+    }
+}</code></pre>
+
+        <div class="callout callout-info">
+            <strong>两种策略对比：</strong>文档级"先删后增"（Spring AI VectorStore）实现简单但浪费 API 调用——即使文档只改了一个字也会重新 embedding 全部 chunk。chunk 级"diff + upsert"（pgvector 直连）精细高效——只 re-embedding 变化的 chunk，但需要手写 SQL 和 diff 逻辑。生产环境推荐 chunk 级方案。
+        </div>
+    </section>
+
+    <!-- ========== 6. 生产级保障 ========== -->
+    <section id="production">
+        <div class="section-num">06</div>
+        <h2>生产级保障：蓝绿部署 + 一致性 + reconciliation</h2>
+
+        <p>增量更新管道解决了"怎么更新"的问题，但生产环境还需要解决"更新出错怎么办"、"怎么发现遗漏"、"怎么平滑切换模型"三个问题。</p>
+
+        <h3>6.1 蓝绿索引部署 + golden-set eval</h3>
+
+        <div class="bridge">
+            蓝绿部署（blue-green deployment）：类比应用发布时准备两套环境——蓝色为当前线上版本，绿色为新版本。绿色先在隔离环境运行验证，通过后一次性将流量切到绿色，蓝色保留用于回滚。在向量库场景下，"两套环境"变为两个索引——旧索引和新索引（re-embedding 后），通过 alias 原子切换。
+        </div>
+
+        <div class="bridge">
+            golden-set eval：golden-set 是一组人工标注的"黄金测试问答对"，类比单元测试的断言——但评估的是检索质量而非代码逻辑。新索引必须通过 golden-set eval 的召回率和准确率门槛（gate），才能切流量上线。
+        </div>
+
+        <div class="callout callout-warning">
+            <strong>⚠️ 框架无内置实现，以下为业界通用手写方案</strong><br>
+            Spring AI 不提供蓝绿索引切换和 golden-set eval。以下为业界标准实践。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> BlueGreenIndexSwitcher.java — alias 原子切换 + eval gate
+        </div>
+        <pre><code>@Service
+public class BlueGreenIndexSwitcher {
+
+    private final VectorStore vectorStore;
+    private final GoldenSetEvaluator evaluator;
+
+    /**
+     * 切换流程：构建新索引 → golden-set eval → 通过 gate → alias 原子切换
+     */
+    public SwitchResult switchIndex(String newIndexName) {
+        // 1. golden-set eval：用黄金测试集评估新索引检索质量
+        EvalResult eval = evaluator.evaluate(newIndexName);
+        if (!eval.isPass()) {
+            // 未通过门槛 → 拒绝切换，保留旧索引
+            return SwitchResult.rejected(
+                "golden-set eval failed: recall=" + eval.getRecall()
+                + " precision=" + eval.getPrecision());
+        }
+
+        // 2. alias 原子切换
+        //    pgvector 不直接支持 alias，用事务 + 双写实现
+        vectorStore.executeInTransaction(() -&gt; {
+            updateAlias("knowledge_base_active", newIndexName);
+            scheduleOldIndexCleanup("knowledge_base_v1", 7); // 旧索引保留 7 天回滚
+        });
+
+        return SwitchResult.success(newIndexName);
+    }
+}</code></pre>
+
+        <h3>6.2 一致性保障：元数据库作为 source of truth + reconciliation 扫描</h3>
+
+        <div class="bridge">
+            reconciliation（对账）：类比 MySQL 主从一致性校验——定期扫描比对两份数据源，发现并修复差异。在 RAG 场景下，两份数据源是"元数据库"（source of truth，记录每个文档应该有哪些 chunk）和"向量数据库"（实际存储的 chunk）。
+        </div>
+
+        <div class="bridge">
+            tombstone（墓碑标记）：类比 Redis 的逻辑删除——不物理删除记录，而是打一个"已删除"标记。在向量库中，tombstone 标记 <code class="inline">is_latest = FALSE</code>，查询时过滤掉。物理删除延后执行，为回滚保留窗口。
+        </div>
+
+        <div class="callout callout-warning">
+            <strong>⚠️ 框架无内置实现，以下为业界通用手写方案</strong><br>
+            reconciliation 扫描器是 RAG 生产系统核心运维组件，需手写实现。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> ReconciliationScanner.java — 定期对账扫描
+        </div>
+        <pre><code>/**
+ * Reconciliation 对账扫描器
+ * 类比 MySQL 主从一致性校验：定期比对元数据库与向量数据库
+ * 发现并修复 Orphan / Stale / Missing 三类幽灵知识
+ */
+@Component
+public class ReconciliationScanner {
+
+    private final VectorStore vectorStore;
+    private final DocumentMetadataRepository metadataRepo;
+    private final ReEmbeddingQueue reEmbeddingQueue;
+
+    /**
+     * 每小时执行一次全量对账
+     */
+    @Scheduled(fixedDelay = 3600000)
+    public void reconcile() {
+        List&lt;String&gt; metaDocIds = metadataRepo.findAllActiveDocIds();
+        List&lt;String&gt; vectorDocIds = getVectorDocIds();
+
+        // 1. Orphan 检测：向量库有但元数据库无 → 物理删除
+        Set&lt;String&gt; orphans = new HashSet&lt;&gt;(vectorDocIds);
+        orphans.removeAll(metaDocIds);
+        if (!orphans.isEmpty()) {
+            vectorStore.delete(orphans.stream().toList());
+            log.warn("Cleaned {} orphan embeddings", orphans.size());
+        }
+
+        // 2. Stale 检测：元数据库标记 is_latest=false 但向量库仍有
+        List&lt;String&gt; staleDocIds = metadataRepo.findStaleDocIds();
+        for (String docId : staleDocIds) {
+            // 标记 tombstone（软删除标记）
+            metadataRepo.markTombstone(docId);
+            vectorStore.delete(getChunkIds(docId));
+            log.warn("Cleaned stale embeddings for doc: {}", docId);
+        }
+
+        // 3. Missing 检测：元数据库有但向量库无 → 触发 re-embedding
+        Set&lt;String&gt; missing = new HashSet&lt;&gt;(metaDocIds);
+        missing.removeAll(vectorDocIds);
+        for (String docId : missing) {
+            reEmbeddingQueue.send(docId);
+            log.warn("Found missing embeddings for doc: {}", docId);
+        }
+    }
+}</code></pre>
+
+        <div class="callout callout-info">
+            <strong>source of truth 设计：</strong>元数据库（MySQL）记录每个文档的 <code class="inline">doc_id</code>、<code class="inline">content_hash</code>、<code class="inline">version_id</code>、<code class="inline">is_latest</code>、<code class="inline">ingested_at</code>——它是"文档应该有哪些向量"的权威来源。向量数据库（pgvector）是"实际有哪些向量"。reconciliation 扫描以元数据库为准，修正向量数据库的偏差。
+        </div>
+
+        <h3>6.3 异步入库：幂等键 + 重试 + DLQ</h3>
+
+        <p>对于大批量文档更新，同步入库会阻塞用户请求。生产环境通常采用异步入库——文档变更事件通过消息队列投递，消费者端做幂等处理、自动重试、失败进 DLQ（Dead Letter Queue，死信队列）。</p>
+
+        <div class="callout callout-info">
+            <strong>框架版本：Spring AMQP 3.x + Spring Retry</strong> — 提供开箱即用的 <code class="inline">@RabbitListener</code>（消息消费）、<code class="inline">@Retryable</code>（自动重试）、DLQ 绑定配置。管道编排逻辑为手写。
+        </div>
+
+        <div class="code-label">
+            <span class="lang-tag">Java</span> AsyncIngestionConsumer.java — 异步入库 + 重试 + DLQ
+        </div>
+        <pre><code>/**
+ * 异步入库消费者
+ * 幂等键 = doc_id + content_hash（重复消费自动跳过）
+ * 重试 3 次，失败后进入 DLQ 人工处理
+ */
+@Component
+public class AsyncIngestionConsumer {
+
+    private final IncrementalUpdatePipeline pipeline;
+    private final AlertService alertService;
+
+    // 正常队列：最多重试 3 次，指数退避
+    @RabbitListener(queues = "doc.embedding.queue")
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2))
+    public void onDocumentEvent(DocumentEvent event) {
+        // 幂等检查：doc_id + content_hash 已存在则跳过
+        if (pipeline.isAlreadyIngested(event.getDocId(), event.getContentHash())) {
+            return;  // 幂等：重复消息直接跳过
+        }
+        pipeline.process(event.toInput());
+    }
+
+    // 死信队列：重试耗尽后的兜底处理
+    @RabbitListener(queues = "doc.embedding.dlq")
+    public void onDlq(DocumentEvent event) {
+        log.error("Ingestion failed permanently for doc: {}", event.getDocId());
+        alertService.notify("DLQ Alert: " + event.getDocId());
+    }
+}</code></pre>
+
+        <div class="callout callout-success">
+            <strong>幂等入库的完整链路：</strong>异步入库场景下，消息可能被重复投递（至少一次语义）。幂等通过两层保障：①消费者端检查 <code class="inline">doc_id + content_hash</code> 是否已入库；②pgvector 表的 <code class="inline">UNIQUE(doc_id, content_hash)</code> 约束兜底。即使并发重复消费，数据库约束也会阻止重复插入。
+        </div>
+    </section>
+
+    <!-- ========== 7. 参考项目 ========== -->
+    <section id="projects">
+        <div class="section-num">07</div>
+        <h2>路线图推荐参考项目</h2>
+
+        <p>以下两个项目是路线图中与本教程内容高度相关的生产级参考实现，建议在完成本教程后深入阅读源码。</p>
+
+        <div class="project-card">
+            <h4>rag-agent-orchestrator</h4>
+            <p>文档版本化（logicalId / version / is_latest）+ re-embedding API（latest / all 范围）增量更新。核心设计：每个文档通过 logicalId 逻辑标识，version 记录版本号，is_latest 标记当前最新版本。re-embedding API 支持两种范围——latest（只重新 embedding 最新版本）和 all（全量 re-embedding，用于 Embedding 模型升级场景）。</p>
+            <div class="tags">
+                <span class="tag">doc_version</span>
+                <span class="tag">is_latest</span>
+                <span class="tag">re-embedding</span>
+                <span class="tag">Spring AI</span>
+            </div>
+        </div>
+
+        <div class="project-card">
+            <h4>knowledgeops-agent</h4>
+            <p>Redis Stream / RabbitMQ 异步入库（幂等键 + 重试 + DLQ）。核心设计：文档变更事件通过 Redis Stream 或 RabbitMQ 投递，消费者端使用 doc_id + content_hash 作为幂等键，配合 Spring Retry 自动重试，重试耗尽后进入 DLQ 人工兜底处理。</p>
+            <div class="tags">
+                <span class="tag">Redis Stream</span>
+                <span class="tag">RabbitMQ</span>
+                <span class="tag">幂等键</span>
+                <span class="tag">DLQ</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 8. 面试口述要点 ========== -->
+    <section id="interview">
+        <div class="section-num">08</div>
+        <h2>面试口述要点</h2>
+
+        <div class="callout callout-info">
+            <strong>面试常问：</strong>RAG 知识库增量更新与一致性保障。以下是口述要点，按逻辑递进组织。
+        </div>
+
+        <div class="interview-points">
+            <ol>
+                <li>
+                    <strong>问题定义：</strong>RAG 知识库上线后文档会持续更新/删除，但向量库中的 Embedding 不会自动同步，导致"幽灵知识"——Stale（过期）、Orphan（孤儿）、Duplicate（重复）、Drift（漂移）、Contradictory（矛盾）五种问题。本质是向量库与源文档缺乏一致性保障。
+                </li>
+                <li>
+                    <strong>变更检测方案：</strong>两阶段粗筛 + 精筛。粗筛比较 lastModified 时间戳（O(1) 磁盘操作，跳过未变文档）；精筛比较 content hash（SHA-256，内容级指纹，类比 Git commit hash）。只有时间戳变化时才计算哈希，避免全文读取开销。
+                </li>
+                <li>
+                    <strong>更新策略：</strong>文档级"先删后增"（delete-then-add）——先按 doc_id 删除旧版本所有 chunk，再插入新版本。chunk 级"diff + upsert"——逐块比较 content_hash，只 re-embedding 内容变化的 chunk，节省 Embedding API 成本。生产环境推荐 chunk 级方案。
+                </li>
+                <li>
+                    <strong>幂等机制：</strong>两层保障。①确定性 chunk ID = doc_id + "_chunk_" + index，保证重复入库不产生 Duplicate；②数据库 UNIQUE(doc_id, content_hash) 约束兜底，即使并发写入也不会重复插入。类比数据库的幂等键设计。
+                </li>
+                <li>
+                    <strong>元数据设计：</strong>doc_id、content_hash、version_id（doc_version）、is_latest、chunk_strategy、embedding_model、ingested_at 七个字段全量落盘。元数据库（MySQL）作为 source of truth，向量库（pgvector）是"实际有哪些向量"。
+                </li>
+                <li>
+                    <strong>一致性保障：</strong>reconciliation（对账）扫描器定期比对元数据库与向量数据库，修复三类幽灵：Orphan（向量库有但元数据库无 → 物理删除）、Stale（is_latest=false 但向量库仍有 → tombstone 软删除）、Missing（元数据库有但向量库无 → 触发 re-embedding）。类比 MySQL 主从一致性校验。
+                </li>
+                <li>
+                    <strong>蓝绿索引部署：</strong>Embedding 模型升级时（Drift 幽灵），构建新索引 → golden-set eval（黄金测试集评估检索质量）→ 通过 gate 后 alias 原子切换 → 旧索引保留 N 天用于回滚。类比应用蓝绿部署，但"两套环境"变为两个向量索引。
+                </li>
+                <li>
+                    <strong>异步入库：</strong>大批量更新走 Redis Stream / RabbitMQ，消费者端幂等键 + 自动重试（3 次指数退避）+ DLQ 兜底。保证最终一致性和可恢复性。
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- ========== 9. 术语表 ========== -->
+    <section id="glossary" class="glossary">
+        <div class="section-num">09</div>
+        <h2>📝 术语表</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 22%;">术语</th>
+                    <th>解释</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>content hash（内容哈希）</strong></td>
+                    <td>对文档全文计算 SHA-256 摘要，得到唯一"内容指纹"。类比 Git commit hash——内容改一个字符，哈希值完全不同。用于检测文档内容是否变更。</td>
+                </tr>
+                <tr>
+                    <td><strong>内容哈希</strong></td>
+                    <td>content hash 的中文翻译，指同一概念：对文本内容计算哈希摘要，作为变更检测的依据。本教程中与 content hash 互换使用。</td>
+                </tr>
+                <tr>
+                    <td><strong>幂等入库</strong></td>
+                    <td>重复执行入库操作不会产生副作用——同样的输入无论执行多少次，向量库中只保留一份记录。通过确定性 chunk ID + UNIQUE 约束实现。类比数据库的 INSERT ... ON DUPLICATE KEY UPDATE。</td>
+                </tr>
+                <tr>
+                    <td><strong>向量 upsert</strong></td>
+                    <td>upsert = update + insert。对向量记录执行"存在则更新、不存在则插入"操作。pgvector 通过 <code class="inline">ON CONFLICT ... DO UPDATE</code> 实现，保证幂等性。</td>
+                </tr>
+                <tr>
+                    <td><strong>文档变更检测</strong></td>
+                    <td>判断文档内容是否发生变化的过程。本教程采用两阶段方案：粗筛（时间戳比较）+ 精筛（内容哈希比较），避免对未变文档做无谓的 re-embedding。</td>
+                </tr>
+                <tr>
+                    <td><strong>HNSW</strong></td>
+                    <td>Hierarchical Navigable Small World，分层可导航小世界图。pgvector 支持的向量索引算法，类比 MySQL B+ 树索引——但 B+ 树为精确查找优化，HNSW 为"找最相似的 K 个向量"（近似最近邻搜索 ANN）优化，通过多层图结构实现亚线性检索。</td>
+                </tr>
+                <tr>
+                    <td><strong>doc_version</strong></td>
+                    <td>文档版本号（version_id），每次文档更新时自增。用于追踪文档变更历史，配合 is_latest 字段实现版本管理。类比 Git 的版本序列号。</td>
+                </tr>
+                <tr>
+                    <td><strong>is_latest</strong></td>
+                    <td>布尔标记，标识该 chunk 是否属于文档的最新版本。查询时只检索 <code class="inline">is_latest = TRUE</code> 的记录，避免检索到旧版本内容（Stale 幽灵）。类比 Redis 缓存的"有效标记"。</td>
+                </tr>
+                <tr>
+                    <td><strong>reconciliation</strong></td>
+                    <td>对账/一致性校验。定期扫描比对元数据库（source of truth）与向量数据库的实际状态，发现并修复 Orphan、Stale、Missing 三类不一致。类比 MySQL 主从一致性校验。</td>
+                </tr>
+                <tr>
+                    <td><strong>tombstone</strong></td>
+                    <td>墓碑标记。不物理删除向量记录，而是标记 <code class="inline">is_latest = FALSE</code>（软删除）。查询时自动过滤。物理删除延后执行，为回滚保留窗口。类比 Redis 的逻辑删除。</td>
+                </tr>
+                <tr>
+                    <td><strong>蓝绿部署</strong></td>
+                    <td>blue-green deployment。准备两套索引——蓝色为线上版本，绿色为新版本。绿色先隔离运行验证（golden-set eval），通过后 alias 原子切换流量。蓝色保留 N 天用于回滚。类比应用蓝绿发布。</td>
+                </tr>
+                <tr>
+                    <td><strong>golden-set eval</strong></td>
+                    <td>黄金测试集评估。预先准备一组人工标注的"标准问答对"（golden set），用新索引对这些问答做检索，评估召回率（recall）和准确率（precision）。未通过门槛（gate）则拒绝切换。类比单元测试的断言——但评估的是检索质量。</td>
+                </tr>
+                <tr>
+                    <td><strong>source of truth</strong></td>
+                    <td>权威数据源。本教程中元数据库（MySQL）是 source of truth——记录每个文档"应该"有哪些 chunk。向量数据库（pgvector）的实际状态以元数据库为准，偏差由 reconciliation 修正。</td>
+                </tr>
+                <tr>
+                    <td><strong>DLQ</strong></td>
+                    <td>Dead Letter Queue，死信队列。消息重试耗尽后进入的兜底队列，由人工或告警系统处理。类比应用开发中的"异常处理兜底"——无法自动恢复的错误最终落到这里。</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- ========== 10. 教程来源 ========== -->
+    <section id="sources">
+        <div class="section-num">10</div>
+        <h2>教程来源</h2>
+
+        <ol class="sources">
+            <li>
+                <span class="src-title">CSDN — RAG 知识库更新策略完整落地指南</span><br>
+                <a href="https://blog.csdn.net/u013970991/article/details/160955939" target="_blank" rel="noopener">https://blog.csdn.net/u013970991/article/details/160955939</a>
+            </li>
+            <li>
+                <span class="src-title">JavaGuide — RAG 知识库文档更新完整指南</span><br>
+                <a href="https://javaguide.cn/ai/rag/rag-knowledge-update.html" target="_blank" rel="noopener">https://javaguide.cn/ai/rag/rag-knowledge-update.html</a>
+            </li>
+            <li>
+                <span class="src-title">小林面试笔记 — RAG 知识库动态更新</span><br>
+                <a href="https://xiaolinnote.com/ai/rag/19_dynamic_update.html" target="_blank" rel="noopener">https://xiaolinnote.com/ai/rag/19_dynamic_update.html</a>
+            </li>
+            <li>
+                <span class="src-title">AgentSwarms — Keeping RAG Honest When Documents Change</span><br>
+                <a href="https://agentswarms.fyi/blog/when-your-documents-change-keeping-rag-honest" target="_blank" rel="noopener">https://agentswarms.fyi/blog/when-your-documents-change-keeping-rag-honest</a>
+            </li>
+            <li>
+                <span class="src-title">Spring AI 2.0 官方文档 — Vector Databases</span><br>
+                <a href="https://docs.spring.io/spring-ai/reference/2.0/api/vectordbs.html" target="_blank" rel="noopener">https://docs.spring.io/spring-ai/reference/2.0/api/vectordbs.html</a>
+            </li>
+            <li>
+                <span class="src-title">Dev.to — LangChain + pgvector 生产环境 Embedding 更新</span><br>
+                <a href="https://dev.to/davidcamargo/actualizacion-de-embeddings-en-produccion-con-langchain-pgvector-3ed5" target="_blank" rel="noopener">https://dev.to/davidcamargo/actualizacion-de-embeddings-en-produccion-con-langchain-pgvector-3ed5</a>
+            </li>
+            <li>
+                <span class="src-title">CSDN — 如何应对 RAG 知识库上线后的文档更新</span><br>
+                <a href="https://blog.csdn.net/lifetragedy/article/details/160934469" target="_blank" rel="noopener">https://blog.csdn.net/lifetragedy/article/details/160934469</a>
+            </li>
+        </ol>
+    </section>
+
+</main>
+
+<footer>
+    <p>知识库增量更新实战 · Phase 1 RAG 刚需闭环 + 生产级项目 1</p>
+    <p style="margin-top: 4px;">文档变更检测 + 向量 upsert/删除策略（内容哈希幂等入库） · 2026-09-16</p>
+</footer>
+
+</body>
+</html>

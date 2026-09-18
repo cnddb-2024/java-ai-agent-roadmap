@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 面向对象编程实战 · 对比 Java OOP | Phase 0</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --ink:#1f2733; --muted:#5b6676;
+    --line:#e6e9f0; --brand:#4f46e5; --brand2:#0ea5e9;
+    --java:#e76f00; --python:#2563b8; --amber:#b45309; --green:#15803d;
+    --code-bg:#1e2230; --code-fg:#d7dCEA;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.7; font-size:16px;
+  }
+  .wrap{max-width:1120px; margin:0 auto; padding:0 20px 80px}
+
+  /* ===== 顶部横幅 ===== */
+  header.banner{
+    background:linear-gradient(135deg,#312e81 0%, #4f46e5 45%, #0ea5e9 100%);
+    color:#fff; padding:38px 20px 30px; position:relative; overflow:hidden;
+  }
+  header.banner::after{
+    content:""; position:absolute; right:-60px; top:-60px; width:240px; height:240px;
+    background:radial-gradient(circle, rgba(255,255,255,.18), transparent 70%); border-radius:50%;
+  }
+  .banner-inner{max-width:1120px; margin:0 auto; position:relative; z-index:1}
+  .crumbs{font-size:13px; opacity:.85; letter-spacing:.5px}
+  .crumbs b{background:rgba(255,255,255,.16); padding:2px 10px; border-radius:20px; margin-right:8px}
+  h1.title{font-size:30px; line-height:1.3; margin:14px 0 6px; font-weight:800}
+  .subtitle{font-size:15px; opacity:.92; max-width:760px}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px}
+  .meta-chip{
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28);
+    padding:7px 14px; border-radius:10px; font-size:13.5px; backdrop-filter:blur(4px);
+  }
+  .meta-chip b{font-weight:700}
+  .meta-chip .dot{display:inline-block; width:8px;height:8px;border-radius:50%; background:#fbbf24; margin-right:6px; vertical-align:middle}
+
+  /* ===== 区块通用 ===== */
+  section.card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:26px 28px; margin-top:26px; box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  section.card > h2{
+    font-size:23px; margin:0 0 4px; display:flex; align-items:center; gap:10px;
+  }
+  section.card > h2 .num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border-radius:9px; background:var(--brand); color:#fff;
+    font-size:15px; font-weight:800; flex:0 0 auto;
+  }
+  .sec-sub{color:var(--muted); font-size:14px; margin:0 0 18px}
+  h3{font-size:18px; margin:26px 0 10px}
+  p{margin:12px 0}
+  code.inline{
+    background:#eef0f7; color:#3730a3; padding:2px 6px; border-radius:5px;
+    font-family:"JetBrains Mono","Fira Code","SF Mono",Consolas,Menlo,monospace; font-size:13.5px;
+  }
+
+  /* ===== 对比表 ===== */
+  table.cmp{width:100%; border-collapse:collapse; margin:14px 0; font-size:14.5px; overflow:hidden; border-radius:10px}
+  table.cmp th,table.cmp td{border:1px solid var(--line); padding:10px 12px; text-align:left; vertical-align:top}
+  table.cmp thead th{background:#1e2230; color:#fff; font-weight:600}
+  table.cmp thead th.java{background:linear-gradient(135deg,#7c2d12,#e76f00)}
+  table.cmp thead th.py{background:linear-gradient(135deg,#0c4a6e,#2563b8)}
+  table.cmp tbody tr:nth-child(even){background:#fafbff}
+  table.cmp td .tag{display:inline-block; font-size:12px; padding:1px 7px; border-radius:5px; margin-right:4px}
+  .tag.j{background:#ffedd5; color:#9a3412}
+  .tag.p{background:#dbeafe; color:#1e40af}
+
+  /* ===== 代码对比布局 ===== */
+  .code-compare{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0}
+  .code-col,.code-wrap{display:flex; flex-direction:column}
+  .code-label{
+    align-self:flex-start; font-size:12.5px; font-weight:700; letter-spacing:.5px;
+    padding:4px 12px; border-radius:8px 8px 0 0; color:#fff; font-family:monospace;
+  }
+  .code-label.lang-java{background:var(--java)}
+  .code-label.lang-python{background:var(--python)}
+  .codeblock{
+    margin:0; background:var(--code-bg); color:var(--code-fg); border-radius:0 10px 10px 10px;
+    padding:16px 18px; overflow:auto; font-size:13.6px; line-height:1.65;
+    font-family:"JetBrains Mono","Fira Code","SF Mono",Consolas,Menlo,monospace;
+    border:1px solid #2b3142;
+  }
+  .code-label.lang-java + .codeblock{border-top:3px solid var(--java)}
+  .code-label.lang-python + .codeblock{border-top:3px solid var(--python)}
+  .codeblock code{font-family:inherit; background:none; color:inherit; padding:0; white-space:pre}
+
+  /* 高亮 token */
+  .tok-k{color:#c792ea}
+  .tok-s{color:#9ae6a0}
+  .tok-c{color:#6b7394; font-style:italic}
+  .tok-n{color:#f0a96b}
+  .tok-d{color:#56d4dd}
+  .tok-b{color:#82aaff}
+  .tok-self{color:#f07178; font-weight:600}
+
+  @media(max-width:760px){
+    .code-compare{grid-template-columns:1fr}
+    .code-label{border-radius:8px}
+    .codeblock{border-radius:0 0 10px 10px; border-top:3px solid #2b3142}
+  }
+
+  /* ===== Java视角 提示框 ===== */
+  .note{
+    border-left:4px solid var(--brand); background:#eef2ff;
+    padding:12px 16px; border-radius:0 10px 10px 0; margin:16px 0; font-size:14.5px;
+  }
+  .note.java-lens{border-left-color:var(--java); background:#fff7ed}
+  .note .lab{font-weight:700; color:var(--brand); margin-right:6px}
+  .note.java-lens .lab{color:var(--java)}
+  .note.tip{border-left-color:var(--green); background:#ecfdf5}
+  .note.tip .lab{color:var(--green)}
+
+  /* ===== 练习 ===== */
+  details.ex{border:1px solid var(--line); border-radius:12px; margin:14px 0; background:#fcfcfe; overflow:hidden}
+  details.ex > summary{
+    cursor:pointer; padding:14px 16px; font-weight:700; font-size:15.5px;
+    list-style:none; display:flex; align-items:center; gap:10px;
+  }
+  details.ex > summary::-webkit-details-marker{display:none}
+  details.ex > summary .badge{
+    background:var(--brand); color:#fff; font-size:12px; padding:3px 9px; border-radius:6px;
+  }
+  details.ex[open] > summary{border-bottom:1px solid var(--line); background:#f5f7ff}
+  details.ex .ex-body{padding:8px 18px 18px}
+  .task{background:#f0fdfa; border:1px dashed #5eead4; padding:10px 14px; border-radius:8px; font-size:14.5px; margin:10px 0}
+  .goal{color:var(--muted); font-size:13.5px; margin:4px 0 0}
+  .sol-label{display:inline-block; font-size:12.5px; font-weight:700; color:var(--green); margin:14px 0 4px}
+
+  /* ===== 目录 ===== */
+  .toc{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+  .toc a{
+    text-decoration:none; font-size:13px; color:#4338ca; background:#eef2ff;
+    border:1px solid #e0e7ff; padding:6px 12px; border-radius:20px; transition:.15s;
+  }
+  .toc a:hover{background:#e0e7ff}
+
+  /* ===== 页脚来源 ===== */
+  footer{margin-top:34px; padding-top:18px; border-top:2px dashed var(--line)}
+  footer h2{font-size:20px}
+  footer ol{padding-left:22px; line-height:2; font-size:14.5px}
+  footer ol li a{color:#2563b8; text-decoration:none}
+  footer ol li a:hover{text-decoration:underline}
+  .src-meta{color:var(--muted); font-size:13px; margin-bottom:10px}
+  .footnote{color:var(--muted); font-size:12.5px; margin-top:18px; border-top:1px solid var(--line); padding-top:12px}
+</style>
+</head>
+<body>
+
+<header class="banner">
+  <div class="banner-inner">
+    <div class="crumbs"><b>Phase 0</b> 定向与双框架地基 · 辅助任务（Python 贯穿线）</div>
+    <h1 class="title">Python 面向对象编程实战：类 / 继承 / 多态 / 异常处理</h1>
+    <div class="subtitle">以 Java OOP 为主线视角，对比式快速掌握 Python 面向对象核心概念。目标是「能读 Python、能写数据处理脚本」，不求精通，求不被 Python 要求卡掉初筛。</div>
+    <div class="meta-row">
+      <div class="meta-chip"><span class="dot"></span>总预估时长：<b>约 55 分钟</b>（≤ 1 小时）</div>
+      <div class="meta-chip">阅读对比：约 <b>25 min</b></div>
+      <div class="meta-chip">动手练习：约 <b>25 min</b></div>
+      <div class="meta-chip">自测回顾：约 <b>5 min</b></div>
+    </div>
+    <div class="toc">
+      <a href="#s1">1 · 类定义与实例化</a>
+      <a href="#s2">2 · 继承与多态</a>
+      <a href="#s3">3 · 魔法方法 vs Java 方法</a>
+      <a href="#s4">4 · 异常处理对比</a>
+      <a href="#s5">5 · 类方法 / 静态方法 / @property</a>
+      <a href="#s6">6 · 核心差异速查表</a>
+      <a href="#s7">7 · 动手练习代码</a>
+      <a href="#src">教程来源</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 引言 -->
+  <section class="card">
+    <h2><span class="num">0</span> 写在前面：为什么用 Java 视角学 Python OOP</h2>
+    <p class="sec-sub">本任务属于 <b>Phase 0</b>（定向与双框架地基）的辅助任务。Python 不是主线面试考点，但它是贯穿后续 transformers / langchain 学习的辅助语言。作为 Java 开发者，你已经具备完整的 OOP 心智模型——最有效的学法不是从零学 Python，而是<b>建立映射 + 识别差异</b>。</p>
+    <p>本教程的编排原则：</p>
+    <ul>
+      <li><b>主线是 Java</b>：每个知识点先用 Java 表达（你熟悉），再用 Python 对照（你要学的）。</li>
+      <li><b>抓差异，不重讲</b>：封装 / 继承 / 多态的「是什么」默认你已懂，只讲 Python <b>怎么不一样</b>。</li>
+      <li><b>可直接跑</b>：所有 Python 代码均为可运行片段，复制即可验证。</li>
+    </ul>
+    <div class="note java-lens"><span class="lab">Java 开发者一句话心智模型：</span>Python 把 OOP 当作「可选工具」而非「默认范式」——所以语法更宽松、更灵活，但也更依赖约定（convention）而非编译器强制。读 Python 代码时，把 <code class="inline">__init__</code> 当构造器、<code class="inline">self</code> 当显式 this、缺省访问当 public，就能快速进入。</div>
+  </section>
+
+  <!-- 1 类定义 -->
+  <section class="card" id="s1">
+    <h2><span class="num">1</span> 类定义与实例化</h2>
+    <p class="sec-sub">Java 用 <code class="inline">class</code> + 显式类型 + 字段声明；Python 用 <code class="inline">class</code> + 动态类型，属性在 <code class="inline">__init__</code> 中动态绑定。</p>
+
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label lang-java">Java</div>
+        <pre class="codeblock"><code class="language-java"></code></pre>
+        <script type="text/plain" data-lang="java">
+public class Student {
+    private String name;   // 字段必须显式声明类型
+    private int age;
+
+    // 构造器：与类同名
+    public Student(String name, int age) {
+        this.name = name;  // this 是隐式接收
+        this.age = age;
+    }
+
+    public String getName() { return name; }
+
+    public static void main(String[] args) {
+        Student s = new Student("Alice", 20);  // 必须 new
+        System.out.println(s.getName());
+    }
+}
+        </script>
+      </div>
+      <div class="code-col">
+        <div class="code-label lang-python">Python</div>
+        <pre class="codeblock"><code class="language-python"></code></pre>
+        <script type="text/plain" data-lang="python">
+class Student:
+    def __init__(self, name: str, age: int):  # 类型注解可选
+        self.name = name   # 实例属性在此动态绑定
+        self.age = age
+
+    def get_name(self) -> str:   # self 是显式第一个参数
+        return self.name
+
+s = Student("Alice", 20)   # 不需要 new
+print(s.name)              # 属性默认 public，直接访问
+        </script>
+      </div>
+    </div>
+
+    <h3>关键对照点</h3>
+    <table class="cmp">
+      <thead><tr><th>维度</th><th class="java">Java</th><th class="py">Python</th></tr></thead>
+      <tbody>
+        <tr><td>关键字</td><td><span class="tag j">class</span> + 显式类型</td><td><span class="tag p">class</span> + 动态类型（注解可选）</td></tr>
+        <tr><td>字段声明</td><td>类体顶部必须声明类型</td><td>无需声明，在 <code class="inline">__init__</code> 里 <code class="inline">self.x = ...</code> 绑定</td></tr>
+        <tr><td>构造器</td><td>与类同名的方法</td><td><code class="inline">__init__</code>（实例已创建后做初始化）</td></tr>
+        <tr><td>实例引用</td><td>隐式 <code class="inline">this</code></td><td>显式 <code class="inline">self</code>（第一个参数，名字可改但约定写 self）</td></tr>
+        <tr><td>实例化</td><td>必须 <code class="inline">new ClassName(...)</code></td><td>直接 <code class="inline">ClassName(...)</code>（像调用函数）</td></tr>
+        <tr><td>访问控制</td><td><code class="inline">private/protected/public</code> 关键字</td><td>约定：<code class="inline">_x</code>=protected，<code class="inline">__x</code>=name mangling（伪私有）</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note java-lens"><span class="lab">Java 视角速记：</span>记住三件事——① 没有 <code class="inline">new</code>，类名加括号即实例化；② 方法第一个参数永远是 <code class="inline">self</code>（调用时不用传，Python 自动塞）；③ 没有「字段声明区」，属性是 <code class="inline">__init__</code> 里赋值「长」出来的。</div>
+  </section>
+
+  <!-- 2 继承与多态 -->
+  <section class="card" id="s2">
+    <h2><span class="num">2</span> 继承与多态</h2>
+    <p class="sec-sub">Java 单继承 + 接口实现多态；Python 多继承 + 鸭子类型（Duck Typing）实现多态，且无需继承关系。</p>
+
+    <h3>2.1 多态：接口 vs 鸭子类型</h3>
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label lang-java">Java（接口 + 方法重写）</div>
+        <pre class="codeblock"><code class="language-java"></code></pre>
+        <script type="text/plain" data-lang="java">
+interface Animal {
+    String sound();          // 接口定义契约
+}
+
+class Dog implements Animal {
+    @Override
+    public String sound() { return "汪汪!"; }
+}
+
+class Cat implements Animal {
+    @Override
+    public String sound() { return "喵喵~"; }
+}
+
+public class Demo {
+    // 多态：参数类型必须是 Animal（有继承/实现关系）
+    public static void makeSound(Animal a) {
+        System.out.println(a.sound());
+    }
+    public static void main(String[] args) {
+        makeSound(new Dog());  // 汪汪!
+        makeSound(new Cat());  // 喵喵~
+    }
+}
+        </script>
+      </div>
+      <div class="code-col">
+        <div class="code-label lang-python">Python（鸭子类型，无需继承）</div>
+        <pre class="codeblock"><code class="language-python"></code></pre>
+        <script type="text/plain" data-lang="python">
+class Dog:
+    def sound(self): return "汪汪!"   # 不继承任何类
+
+class Cat:
+    def sound(self): return "喵喵~"
+
+# 不约束参数类型：只要对象有 sound() 方法即可
+def make_sound(animal):
+    print(animal.sound())
+
+make_sound(Dog())   # 汪汪!
+make_sound(Cat())   # 喵喵~
+# 鸭子类型：「走起来像鸭子、叫起来像鸭子，那它就是鸭子」
+        </script>
+      </div>
+    </div>
+    <div class="note tip"><span class="lab">核心差异：</span>Java 的多态<b>必须依赖</b>继承关系或接口实现，并由编译器在方法签名上约束类型；Python 的多态<b>不依赖</b>继承——只要对象有同名方法就能调用。代价是错误在<b>运行时</b>才暴露（Java 在<b>编译期</b>就能发现）。</div>
+
+    <h3>2.2 继承：单继承+接口 vs 多继承+MRO</h3>
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label lang-java">Java（单继承 + 多接口）</div>
+        <pre class="codeblock"><code class="language-java"></code></pre>
+        <script type="text/plain" data-lang="java">
+// Java 只能继承一个类，但可实现多个接口
+abstract class Animal {
+    abstract String name();
+}
+interface Flyable {
+    void fly();
+}
+
+class Bird extends Animal implements Flyable {
+    @Override String name() { return "Bird"; }
+    @Override public void fly() {
+        System.out.println("飞起来了");
+    }
+}
+// class X extends A, B {}  // 编译错误：Java 不允许多继承类
+        </script>
+      </div>
+      <div class="code-col">
+        <div class="code-label lang-python">Python（多继承 + MRO）</div>
+        <pre class="codeblock"><code class="language-python"></code></pre>
+        <script type="text/plain" data-lang="python">
+class A:
+    def hello(self): print("A")
+
+class B(A):
+    def hello(self): print("B")
+
+class C(A):
+    def hello(self): print("C")
+
+class D(B, C):   # 多继承：合法！
+    pass
+
+D().hello()          # B —— 由 MRO 决定调用谁
+print(D.__mro__)     # 查看方法解析顺序
+# (<class 'D'>, <class 'B'>, <class 'C'>, <class 'A'>, <class 'object'>)
+        </script>
+      </div>
+    </div>
+    <div class="note java-lens"><span class="lab">Java 视角速记：</span>Python 的「多继承 + MRO」替代了 Java「单继承 + 多接口」组合。<b>MRO（Method Resolution Order）</b>用 C3 线性化算法解决菱形继承的二义性——你可以把它理解为 Python 自动帮你算出「方法查找的有序链表」，用 <code class="inline">ClassName.__mro__</code> 可随时查看。日常很少需要手动写多继承，<b>读代码时知道它是怎么解析的</b>即可。</div>
+
+    <h3>2.3 抽象基类（对应 Java abstract / interface）</h3>
+    <div class="code-wrap">
+      <div class="code-label lang-python">Python</div>
+      <pre class="codeblock"><code class="language-python"></code></pre>
+      <script type="text/plain" data-lang="python">
+from abc import ABC, abstractmethod
+
+class Shape(ABC):                  # 抽象基类 ≈ Java abstract class / interface
+    @abstractmethod
+    def area(self) -> float:       # 抽象方法 ≈ Java abstract 方法
+        ...
+
+class Circle(Shape):
+    def __init__(self, r: float):
+        self.r = r
+    def area(self) -> float:       # 重写是隐式的，无 @Override
+        return 3.14159 * self.r ** 2
+
+# Shape()  # 报错：不能实例化抽象类（和 Java 一致）
+c = Circle(2)
+print(c.area())   # 12.566...
+      </script>
+    </div>
+    <p><b>抽象方法的本质区别</b>：Java 用 <code class="inline">abstract</code> 关键字 + <code class="inline">@Override</code> 强制；Python 用 <code class="inline">abc</code> 模块的 <code class="inline">@abstractmethod</code>。Python 的重写<b>完全隐式</b>——只要子类定义了同名方法就算重写，没有 <code class="inline">@Override</code> 注解（写错方法名也不会有编译报错，需靠类型检查工具 mypy 兜底）。</p>
+  </section>
+
+  <!-- 3 魔法方法 -->
+  <section class="card" id="s3">
+    <h2><span class="num">3</span> 魔法方法 vs Java 方法</h2>
+    <p class="sec-sub">Python 的「魔法方法」（dunder methods，双下划线方法）对应 Java 的构造器、<code class="inline">toString()</code>、<code class="inline">equals()</code> 等，让你自定义对象与语言内置操作的交互。</p>
+
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label lang-java">Java</div>
+        <pre class="codeblock"><code class="language-java"></code></pre>
+        <script type="text/plain" data-lang="java">
+public class Point {
+    private final double x, y;
+
+    public Point(double x, double y) {        // 构造器
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public String toString() {                 // 对应 __str__
+        return "Point(" + x + ", " + y + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {          // 对应 __eq__
+        if (!(o instanceof Point)) return false;
+        Point p = (Point) o;
+        return p.x == x && p.y == y;
+    }
+}
+Point p = new Point(1.0, 2.0);
+System.out.println(p);          // Point(1.0, 2.0)
+        </script>
+      </div>
+      <div class="code-col">
+        <div class="code-label lang-python">Python</div>
+        <pre class="codeblock"><code class="language-python"></code></pre>
+        <script type="text/plain" data-lang="python">
+class Point:
+    def __init__(self, x: float, y: float):   # 构造/初始化
+        self.x = x
+        self.y = y
+
+    def __str__(self):        # print()/str()：给用户看，可读
+        return f"Point({self.x}, {self.y})"
+
+    def __repr__(self):       # repr()：给开发者看，无歧义
+        return f"Point({self.x!r}, {self.y!r})"
+
+    def __eq__(self, other):  # == 运算符
+        if not isinstance(other, Point):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+
+p = Point(1.0, 2.0)
+print(p)                  # Point(1.0, 2.0)        -> __str__
+print(repr(p))            # Point(1.0, 2.0)        -> __repr__
+print(p == Point(1.0, 2.0))  # True                -> __eq__
+        </script>
+      </div>
+    </div>
+
+    <h3>魔法方法 ↔ Java 对照表</h3>
+    <table class="cmp">
+      <thead><tr><th>Python 魔法方法</th><th class="java">Java 对应</th><th>触发场景</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">__init__(self, ...)</code></td><td><span class="tag j">构造器</span>（与类同名的方法）</td><td>实例化时自动调用，做初始化</td></tr>
+        <tr><td><code class="inline">__new__(cls, ...)</code></td><td>（无直接对应，≈ 对象分配）</td><td>真正创建实例，极少重写</td></tr>
+        <tr><td><code class="inline">__str__(self)</code></td><td><span class="tag j">toString()</span></td><td><code class="inline">print(obj)</code> / <code class="inline">str(obj)</code>，面向用户可读</td></tr>
+        <tr><td><code class="inline">__repr__(self)</code></td><td><span class="tag j">（无，Java 只有 toString）</span></td><td><code class="inline">repr(obj)</code>，面向开发者、无歧义，理想下可重建对象</td></tr>
+        <tr><td><code class="inline">__eq__(self, o)</code></td><td><span class="tag j">equals()</span></td><td><code class="inline">==</code> 运算符（注意：Python 默认 <code class="inline">==</code> 比较值，<code class="inline">is</code> 比较身份）</td></tr>
+        <tr><td><code class="inline">__hash__(self)</code></td><td><span class="tag j">hashCode()</span></td><td>作为 dict 键 / 放进 set 时</td></tr>
+        <tr><td><code class="inline">__lt__ / __gt__ / __le__ / __ge__</code></td><td><span class="tag j">Comparable.compareTo</span></td><td>比较运算符 <code class="inline">&lt; &gt; &lt;= &gt;=</code></td></tr>
+        <tr><td><code class="inline">__len__(self)</code></td><td><span class="tag j">（无）</span></td><td><code class="inline">len(obj)</code></td></tr>
+        <tr><td><code class="inline">__getitem__ / __setitem__</code></td><td><span class="tag j">（无，需显式方法）</span></td><td><code class="inline">obj[k]</code> 下标访问</td></tr>
+        <tr><td><code class="inline">__iter__ / __next__</code></td><td><span class="tag j">Iterable / Iterator 接口</span></td><td><code class="inline">for x in obj</code></td></tr>
+        <tr><td><code class="inline">__enter__ / __exit__</code></td><td><span class="tag j">AutoCloseable / try-with-resources</span></td><td><code class="inline">with</code> 语句（资源管理，见第 4 节）</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><span class="lab">Python 独有重点：</span><code class="inline">__str__</code> 与 <code class="inline">__repr__</code> 是<b>两个</b>方法——这是 Java 没有的区分。经验法则：定义 <code class="inline">__repr__</code> 优先（调试时最有用），<code class="inline">__str__</code> 默认会回退到 <code class="inline">__repr__</code>。两者都应返回字符串。</div>
+  </section>
+
+  <!-- 4 异常处理 -->
+  <section class="card" id="s4">
+    <h2><span class="num">4</span> 异常处理对比</h2>
+    <p class="sec-sub">Java <code class="inline">try-catch-finally</code> + checked 异常；Python <code class="inline">try-except-else-finally</code>，无 checked 异常。</p>
+
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label lang-java">Java（checked 异常必须声明）</div>
+        <pre class="codeblock"><code class="language-java"></code></pre>
+        <script type="text/plain" data-lang="java">
+import java.io.IOException;
+
+public class ExceptionDemo {
+    // checked 异常：必须在签名声明 throws，或就地 try-catch
+    public static String readData() throws IOException {
+        throw new IOException("文件读取失败");
+    }
+
+    public static void main(String[] args) {
+        try {
+            readData();
+        } catch (IOException e) {       // 编译器强制你处理
+            System.out.println("捕获: " + e.getMessage());
+        } finally {
+            System.out.println("始终执行 finally");
+        }
+    }
+}
+        </script>
+      </div>
+      <div class="code-col">
+        <div class="code-label lang-python">Python（无 checked 异常 + else 子句）</div>
+        <pre class="codeblock"><code class="language-python"></code></pre>
+        <script type="text/plain" data-lang="python">
+# Python 没有 checked 异常，无需在签名声明
+def read_data() -> str:
+    raise IOError("文件读取失败")
+
+try:
+    data = read_data()
+except IOError as e:        # 捕获并绑定异常对象
+    print(f"捕获: {e}")
+else:
+    print("无异常时才执行")    # Java 中无 else，Python 特色
+finally:
+    print("始终执行 finally")
+        </script>
+      </div>
+    </div>
+
+    <h3>异常处理对照表</h3>
+    <table class="cmp">
+      <thead><tr><th>维度</th><th class="java">Java</th><th class="py">Python</th></tr></thead>
+      <tbody>
+        <tr><td>语法</td><td><span class="tag j">try-catch-finally</span></td><td><span class="tag p">try-except-else-finally</span></td></tr>
+        <tr><td>checked 异常</td><td>有，必须 <code class="inline">throws</code> 声明或捕获，否则<b>编译失败</b></td><td>无，所有异常都是 unchecked</td></tr>
+        <tr><td>异常体系根</td><td><code class="inline">Throwable</code> → Error / Exception</td><td><code class="inline">BaseException</code> → Exception</td></tr>
+        <tr><td>捕获多类型</td><td><code class="inline">catch (A | B e)</code>（多 catch）</td><td><code class="inline">except (A, B) as e</code>（元组）</td></tr>
+        <tr><td><code class="inline">else</code> 子句</td><td>无</td><td>有：try 块无异常时才执行（适合放「成功后的后续逻辑」）</td></tr>
+        <tr><td>抛出</td><td><code class="inline">throw new XxxException()</code></td><td><code class="inline">raise XxxException()</code>（不需 new，也可 raise 已有实例）</td></tr>
+        <tr><td>资源管理</td><td>try-with-resources（AutoCloseable）</td><td><code class="inline">with</code> 语句（<code class="inline">__enter__</code>/<code class="inline">__exit__</code>）</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4.1 自定义异常层次</h3>
+    <div class="code-wrap">
+      <div class="code-label lang-python">Python</div>
+      <pre class="codeblock"><code class="language-python"></code></pre>
+      <script type="text/plain" data-lang="python">
+# 自定义异常：继承 Exception（对应 Java extends Exception / RuntimeException）
+class AppError(Exception):
+    """所有业务异常的基类"""
+    pass
+
+class DataError(AppError):
+    def __init__(self, msg: str, code: int = 0):
+        super().__init__(msg)   # 调用父类构造
+        self.code = code        # 自定义字段
+
+class NetworkError(AppError):
+    pass
+
+try:
+    raise DataError("数据校验失败", code=404)
+except DataError as e:
+    print(f"业务错误 [{e.code}]: {e}")
+except AppError as e:           # 先子类后父类，顺序很重要（和 Java 一样）
+    print(f"其他应用错误: {e}")
+    </script>
+    </div>
+
+    <h3>4.2 资源管理：with 语句 ≈ try-with-resources</h3>
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label lang-java">Java 7 try-with-resources</div>
+        <pre class="codeblock"><code class="language-java"></code></pre>
+        <script type="text/plain" data-lang="java">
+// 资源必须实现 AutoCloseable
+try (Connection conn = new Connection("db://prod")) {
+    conn.query("SELECT 1");
+    conn.query("SELECT FAIL");   // 抛异常
+} // 无论是否异常，conn.close() 都会被自动调用
+        </script>
+      </div>
+      <div class="code-col">
+        <div class="code-label lang-python">Python with 语句</div>
+        <pre class="codeblock"><code class="language-python"></code></pre>
+        <script type="text/plain" data-lang="python">
+# 实现 __enter__ / __exit__ 的「上下文管理器」
+class Connection:
+    def __init__(self, dsn: str):
+        self.dsn = dsn
+    def __enter__(self):
+        print(f"打开 {self.dsn}")
+        return self
+    def __exit__(self, exc_type, exc, tb):
+        print(f"关闭 {self.dsn}")   # ≈ finally，必定执行
+        return False                 # False = 不吞异常
+    def query(self, sql):
+        if "FAIL" in sql:
+            raise RuntimeError("查询失败")
+        return f"结果: {sql}"
+
+with Connection("db://prod") as conn:
+    conn.query("SELECT 1")
+    conn.query("SELECT FAIL")   # 抛异常，但连接仍会关闭
+        </script>
+      </div>
+    </div>
+    <div class="note java-lens"><span class="lab">Java 视角速记：</span>把 Python 的 <code class="inline">except</code> 当 <code class="inline">catch</code>、<code class="inline">raise</code> 当 <code class="inline">throw</code>、<code class="inline">with</code> 当 try-with-resources。最大解放：不再有 checked 异常逼你写 <code class="inline">throws</code>，但也意味着<b>你得主动看文档</b>知道一个函数会抛什么——这是 Python「灵活但靠约定」的典型体现。</div>
+  </section>
+
+  <!-- 5 类方法/静态方法/property -->
+  <section class="card" id="s5">
+    <h2><span class="num">5</span> 类方法 / 静态方法 / @property</h2>
+    <p class="sec-sub"><code class="inline">@property</code> 对应 Java 的 getter/setter；<code class="inline">@staticmethod</code> 对应 Java static 方法；<code class="inline">@classmethod</code> 是 Python 独有，常用作「替代构造器」。</p>
+
+    <div class="code-compare">
+      <div class="code-col">
+        <div class="code-label lang-java">Java（getter/setter + static + 工厂）</div>
+        <pre class="codeblock"><code class="language-java"></code></pre>
+        <script type="text/plain" data-lang="java">
+public class Temperature {
+    private double celsius;     // private 字段
+
+    public Temperature(double celsius) {
+        this.celsius = celsius;
+    }
+
+    // Java 惯例：getXxx() / setXxx()
+    public double getCelsius() { return celsius; }
+    public void setCelsius(double c) { this.celsius = c; }
+
+    // 派生属性
+    public double getFahrenheit() { return celsius * 9 / 5 + 32; }
+
+    // 静态方法
+    public static double toFahrenheit(double c) {
+        return c * 9 / 5 + 32;
+    }
+
+    // 静态工厂（≈ Python 的类方法替代构造器）
+    public static Temperature fromFahrenheit(double f) {
+        return new Temperature((f - 32) * 5 / 9);
+    }
+}
+        </script>
+      </div>
+      <div class="code-col">
+        <div class="code-label lang-python">Python（@property + @staticmethod + @classmethod）</div>
+        <pre class="codeblock"><code class="language-python"></code></pre>
+        <script type="text/plain" data-lang="python">
+class Temperature:
+    def __init__(self, celsius: float):
+        self._celsius = celsius      # 约定：_前缀 = protected
+
+    @property
+    def celsius(self) -> float:      # 读：像属性一样访问 t.celsius
+        return self._celsius
+
+    @celsius.setter
+    def celsius(self, value: float):  # 写：可加校验
+        if value < -273.15:
+            raise ValueError("低于绝对零度")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self) -> float:    # 只读派生属性
+        return self._celsius * 9 / 5 + 32
+
+    @staticmethod
+    def to_fahrenheit(c: float) -> float:   # 无 self/cls
+        return c * 9 / 5 + 32
+
+    @classmethod
+    def from_fahrenheit(cls, f: float):     # 接收类本身 cls
+        return cls((f - 32) * 5 / 9)        # 替代构造器
+
+t = Temperature(25)
+print(t.fahrenheit)            # 77.0  —— 注意：像属性，不加括号
+t.celsius = 30                # 走 setter
+cool = Temperature.from_fahrenheit(32)  # 类方法构造
+        </script>
+      </div>
+    </div>
+
+    <table class="cmp">
+      <thead><tr><th>装饰器</th><th class="java">Java 对应</th><th>第一个参数 / 用途</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">@property</code></td><td><span class="tag j">getter</span>（getXxx）</td><td>把方法暴露成属性：<code class="inline">t.fahrenheit</code> 而非 <code class="inline">t.get_fahrenheit()</code></td></tr>
+        <tr><td><code class="inline">@x.setter</code></td><td><span class="tag j">setter</span>（setXxx）</td><td>赋值时触发校验：<code class="inline">t.celsius = 30</code></td></tr>
+        <tr><td><code class="inline">@staticmethod</code></td><td><span class="tag j">static 方法</span></td><td>无 <code class="inline">self</code>/<code class="inline">cls</code>，逻辑上属于类但不依赖实例</td></tr>
+        <tr><td><code class="inline">@classmethod</code></td><td><span class="tag j">（无直接对应，≈ 静态工厂）</span></td><td>第一个参数是类 <code class="inline">cls</code>，常用于<b>替代构造器</b>（多个 <code class="inline">from_xxx</code>）</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><span class="lab">@property 的精髓：</span>它让你<b>先用普通属性暴露数据，将来需要加校验时再换成 @property，而调用方代码完全不用改</b>（<code class="inline">t.celsius</code> 写法不变）。这是 Python 相对 Java getter/setter 的体验优势——Java 一开始就得纠结要不要写 getter。</div>
+  </section>
+
+  <!-- 6 核心差异速查表 -->
+  <section class="card" id="s6">
+    <h2><span class="num">6</span> Java vs Python OOP 核心差异速查表</h2>
+    <p class="sec-sub">一张表带走所有要点，面试或读源码时随时回看。</p>
+    <table class="cmp">
+      <thead><tr><th>维度</th><th class="java">Java</th><th class="py">Python</th></tr></thead>
+      <tbody>
+        <tr><td>类型系统</td><td>强<b>静态</b>类型，编译期检查</td><td>强<b>动态</b>类型，运行期检查（注解可选，mypy 可静态检查）</td></tr>
+        <tr><td>类定义</td><td>class + 显式类型 + 字段声明区</td><td>class + 动态类型，属性在 <code class="inline">__init__</code> 绑定</td></tr>
+        <tr><td>实例化</td><td>必须 <code class="inline">new</code></td><td>类名加括号，无 <code class="inline">new</code></td></tr>
+        <tr><td>构造器</td><td>与类同名的方法</td><td><code class="inline">__init__</code>（实例已创建后初始化）</td></tr>
+        <tr><td>this / self</td><td>隐式 <code class="inline">this</code></td><td>显式 <code class="inline">self</code>（方法首参）</td></tr>
+        <tr><td>继承</td><td>单继承 + 多接口（extends/implements）</td><td>多继承 + MRO（C3 线性化）</td></tr>
+        <tr><td>多态</td><td>接口/抽象类 + 方法重写，编译期约束</td><td>鸭子类型 + 隐式重写，运行期</td></tr>
+        <tr><td>方法重写</td><td>规则严格，建议 <code class="inline">@Override</code></td><td>同名即重写，无注解，写错不报错</td></tr>
+        <tr><td>封装</td><td><code class="inline">private/protected/public</code> 关键字</td><td>约定：<code class="inline">_x</code> protected、<code class="inline">__x</code> 改名（伪私有）</td></tr>
+        <tr><td>异常</td><td>checked + unchecked，<code class="inline">throws</code> 声明</td><td>全部 unchecked，无 <code class="inline">throws</code></td></tr>
+        <tr><td>异常语法</td><td>try-catch-finally</td><td>try-except-else-finally</td></tr>
+        <tr><td>抛出异常</td><td><code class="inline">throw new Xxx()</code></td><td><code class="inline">raise Xxx()</code></td></tr>
+        <tr><td>字符串表示</td><td><code class="inline">toString()</code></td><td><code class="inline">__str__</code>（用户）+ <code class="inline">__repr__</code>（开发者）</td></tr>
+        <tr><td>相等比较</td><td><code class="inline">equals()</code> / <code class="inline">==</code> 比引用</td><td><code class="inline">__eq__</code> / <code class="inline">==</code> 比值，<code class="inline">is</code> 比身份</td></tr>
+        <tr><td>getter/setter</td><td>getXxx() / setXxx()</td><td><code class="inline">@property</code> + <code class="inline">@x.setter</code></td></tr>
+        <tr><td>静态方法</td><td><code class="inline">static</code> 关键字</td><td><code class="inline">@staticmethod</code></td></tr>
+        <tr><td>（无直接对应）</td><td>—</td><td><code class="inline">@classmethod</code>（替代构造器）</td></tr>
+        <tr><td>资源管理</td><td>try-with-resources（AutoCloseable）</td><td><code class="inline">with</code>（<code class="inline">__enter__</code>/<code class="inline">__exit__</code>）</td></tr>
+        <tr><td>设计哲学</td><td>OOP 是默认范式，编译器强制严谨</td><td>OOP 是可选工具，灵活靠约定</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 7 练习 -->
+  <section class="card" id="s7">
+    <h2><span class="num">7</span> 动手练习代码</h2>
+    <p class="sec-sub">建议先自己写，再展开看参考答案。三道练习覆盖：多态与抽象基类、@property 与异常、自定义异常与 with 资源管理——正好串起全部知识点。</p>
+
+    <!-- 练习1 -->
+    <details class="ex">
+      <summary><span class="badge">练习 1</span> 用 Python 实现多态：Shape 基类 + Circle / Rectangle</summary>
+      <div class="ex-body">
+        <div class="task">
+          <b>任务：</b>定义抽象基类 <code class="inline">Shape</code>（含抽象方法 <code class="inline">area</code>），再实现 <code class="inline">Circle</code>、<code class="inline">Rectangle</code> 子类，写一个 <code class="inline">total_area(shapes)</code> 函数对一组图形求和，体会多态。
+          <div class="goal">目标：对应 Java 的 interface/abstract + 方法重写 + 多态调用。</div>
+        </div>
+        <div class="sol-label">参考答案（Python）</div>
+        <div class="code-wrap">
+          <div class="code-label lang-python">Python</div>
+          <pre class="codeblock"><code class="language-python"></code></pre>
+          <script type="text/plain" data-lang="python">
+from abc import ABC, abstractmethod
+
+class Shape(ABC):                  # 抽象基类 ≈ Java abstract class / interface
+    @abstractmethod
+    def area(self) -> float:
+        ...
+
+class Circle(Shape):
+    def __init__(self, radius: float):
+        self.radius = radius
+    def area(self) -> float:       # 重写（隐式，无 @Override）
+        return 3.14159 * self.radius ** 2
+
+class Rectangle(Shape):
+    def __init__(self, w: float, h: float):
+        self.w, self.h = w, h
+    def area(self) -> float:
+        return self.w * self.h
+
+def total_area(shapes: list[Shape]) -> float:
+    # 多态：同一调用 s.area() 在不同子类上表现不同
+    return sum(s.area() for s in shapes)
+
+shapes = [Circle(2), Rectangle(3, 4), Circle(1)]
+print(total_area(shapes))   # ≈ 27.708
+          </script>
+        </div>
+      </div>
+    </details>
+
+    <!-- 练习2 -->
+    <details class="ex">
+      <summary><span class="badge">练习 2</span> BankAccount：@property 控制余额 + 自定义异常防透支</summary>
+      <div class="ex-body">
+        <div class="task">
+          <b>任务：</b>实现 <code class="inline">BankAccount</code>：① 余额用 <code class="inline">@property</code> 暴露为只读；② <code class="inline">deposit/withdraw</code> 方法；③ 透支时抛自定义异常 <code class="inline">InsufficientFundsError</code>；④ 用 <code class="inline">__str__</code> 美化输出；⑤ 在 <code class="inline">try-except-finally</code> 中演示。
+          <div class="goal">目标：综合 @property、魔法方法、自定义异常、try-except-finally。</div>
+        </div>
+        <div class="sol-label">参考答案（Python）</div>
+        <div class="code-wrap">
+          <div class="code-label lang-python">Python</div>
+          <pre class="codeblock"><code class="language-python"></code></pre>
+          <script type="text/plain" data-lang="python">
+class InsufficientFundsError(Exception):
+    def __init__(self, balance: float, amount: float):
+        super().__init__(f"余额不足: 余额 {balance}, 尝试取出 {amount}")
+        self.balance, self.amount = balance, amount
+
+class BankAccount:
+    def __init__(self, owner: str, balance: float = 0):
+        self.owner = owner
+        self._balance = balance
+
+    @property
+    def balance(self) -> float:     # 只读属性
+        return self._balance
+
+    def deposit(self, amount: float) -> None:
+        if amount <= 0:
+            raise ValueError("存款必须为正")
+        self._balance += amount
+
+    def withdraw(self, amount: float) -> None:
+        if amount > self._balance:
+            raise InsufficientFundsError(self._balance, amount)
+        self._balance -= amount
+
+    def __str__(self) -> str:       # ≈ Java toString()
+        return f"BankAccount({self.owner}, 余额={self._balance:.2f})"
+
+acc = BankAccount("张三", 100)
+acc.deposit(50)
+try:
+    acc.withdraw(200)               # 透支 -> 抛异常
+except InsufficientFundsError as e:
+    print(e)                         # 余额不足: 余额 150, 尝试取出 200
+finally:
+    print(acc)                       # BankAccount(张三, 余额=150.00)
+          </script>
+        </div>
+      </div>
+    </details>
+
+    <!-- 练习3 -->
+    <details class="ex">
+      <summary><span class="badge">练习 3</span> 自定义异常层次 + with 语句做资源管理</summary>
+      <div class="ex-body">
+        <div class="task">
+          <b>任务：</b>① 建一个异常层次 <code class="inline">AppError → DatabaseError</code>；② 实现 <code class="inline">Connection</code> 上下文管理器（<code class="inline">__enter__/__exit__</code>），模拟数据库连接；③ 在 <code class="inline">with</code> 块里执行查询，遇 <code class="inline">"FAIL"</code> 抛 <code class="inline">DatabaseError</code>，验证<b>无论是否异常连接都被关闭</b>。
+          <div class="goal">目标：对应 Java try-with-resources + 自定义异常 + finally 语义。</div>
+        </div>
+        <div class="sol-label">参考答案（Python）</div>
+        <div class="code-wrap">
+          <div class="code-label lang-python">Python</div>
+          <pre class="codeblock"><code class="language-python"></code></pre>
+          <script type="text/plain" data-lang="python">
+class AppError(Exception):
+    """业务异常基类"""
+    pass
+
+class DatabaseError(AppError):
+    pass
+
+class Connection:
+    """上下文管理器：≈ Java AutoCloseable + try-with-resources"""
+    def __init__(self, dsn: str):
+        self.dsn = dsn
+        self.opened = False
+
+    def __enter__(self):
+        print(f"打开连接 {self.dsn}")
+        self.opened = True
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        print(f"关闭连接 {self.dsn}  (finally 语义，必执行)")
+        self.opened = False
+        return False        # 不吞异常，原样向上抛
+
+    def query(self, sql: str) -> str:
+        if "FAIL" in sql:
+            raise DatabaseError(f"查询失败: {sql}")
+        return f"结果: {sql}"
+
+# with = try-finally 的语法糖
+try:
+    with Connection("db://prod") as conn:
+        print(conn.query("SELECT 1"))   # 正常
+        print(conn.query("SELECT FAIL"))  # 抛 DatabaseError
+except DatabaseError as e:
+    print(f"已处理: {e}")
+# 输出顺序：打开连接 -> 结果: SELECT 1 -> 关闭连接 -> 已处理: ...
+          </script>
+        </div>
+      </div>
+    </details>
+
+    <div class="note tip"><span class="lab">完成自测：</span>能不看答案默写出 ① <code class="inline">__init__</code> 与 <code class="inline">__str__/__repr__</code> 的签名；② 一个 <code class="inline">@property</code> + <code class="inline">@x.setter</code> 的完整写法；③ <code class="inline">try-except-else-finally</code> 四块的执行顺序——即达成 Phase 0 本任务目标。</div>
+  </section>
+
+  <!-- 来源 -->
+  <footer id="src">
+    <h2>教程来源</h2>
+    <div class="src-meta">本教程综合以下公开资料整理对比而成（已去重）。所有代码示例为本教程原创编写，可直接运行。</div>
+    <ol>
+      <li>Python 官方文档 —— 9. 类（OOP 教程）：<a href="https://docs.python.org/zh-cn/3.11/tutorial/classes.html" target="_blank" rel="noopener">docs.python.org/zh-cn/3.11/tutorial/classes.html</a></li>
+      <li>Python 官方文档 —— 8. 错误和异常：<a href="https://docs.python.org/3/tutorial/errors.html" target="_blank" rel="noopener">docs.python.org/3/tutorial/errors.html</a></li>
+      <li>Python 官方文档 —— Descriptor HowTo（staticmethod / classmethod / property）：<a href="https://docs.python.org/3.11/howto/descriptor.html" target="_blank" rel="noopener">docs.python.org/3.11/howto/descriptor.html</a></li>
+      <li>Real Python —— Python's Magic Methods: Leverage Their Power in Your Classes：<a href="https://realpython.com/python-magic-methods/" target="_blank" rel="noopener">realpython.com/python-magic-methods</a></li>
+      <li>The Python Alchemist —— Python Magic Methods: The Secret Handshakes of Objects：<a href="https://www.pythonalchemist.com/blog/magic-methods-dunder" target="_blank" rel="noopener">pythonalchemist.com/blog/magic-methods-dunder</a></li>
+      <li>博客园 —— 面向对象三大特点(封装、继承、多态)（Java vs Python 多态对比）：<a href="https://www.cnblogs.com/xi-yongqi/p/19434736" target="_blank" rel="noopener">cnblogs.com/xi-yongqi/p/19434736</a></li>
+      <li>CSDN —— 面向对象编程(OOP)在 Python 中的实现——类、继承与特殊方法：<a href="https://blog.csdn.net/qq_45281820/article/details/161394863" target="_blank" rel="noopener">blog.csdn.net/qq_45281820/article/details/161394863</a></li>
+      <li>CSDN —— Python 面向对象高级：封装、继承、多态，一文讲透三大核心特性：<a href="https://blog.csdn.net/auspicious349/article/details/160773467" target="_blank" rel="noopener">blog.csdn.net/auspicious349/article/details/160773467</a></li>
+      <li>CSDN —— Python 异常处理详解：try-except-else-finally 与自定义异常：<a href="https://blog.csdn.net/m0_67391270/article/details/148282988" target="_blank" rel="noopener">blog.csdn.net/m0_67391270/article/details/148282988</a></li>
+      <li>CSDN —— Python 初体验：Java 与 Python 的差异（面向对象 / @property）：<a href="https://blog.csdn.net/yiwenbin94/article/details/118546754" target="_blank" rel="noopener">blog.csdn.net/yiwenbin94/article/details/118546754</a></li>
+      <li>CSDN —— 接口与多继承：Python 多继承 MRO 解决菱形问题：<a href="https://blog.csdn.net/du_du_o/article/details/161898070" target="_blank" rel="noopener">blog.csdn.net/du_du_o/article/details/161898070</a></li>
+      <li>TutorialsPoint —— Getter and Setter in Python（@property vs 方法式 getter）：<a href="https://www.tutorialspoint.com/article/getter-and-setter-in-python" target="_blank" rel="noopener">tutorialspoint.com/article/getter-and-setter-in-python</a></li>
+      <li>University of Toronto CSC207 Course Notes —— Classes in Java（toString vs __str__）：<a href="https://github.com/CSC207-UofT/207-course-notes/blob/master/02-classes-in-java.md" target="_blank" rel="noopener">github.com/CSC207-UofT/207-course-notes · 02-classes-in-java.md</a></li>
+      <li>University of Washington CSE341 Lecture 22 —— Java 接口 vs Python 多继承：<a href="https://courses.cs.washington.edu/courses/cse341/11au/lec22sum.pdf" target="_blank" rel="noopener">courses.cs.washington.edu/courses/cse341/11au/lec22sum.pdf</a></li>
+    </ol>
+    <div class="footnote">本文件为<b>完全自包含</b>的 HTML（无任何外部 CDN / 字体 / 脚本依赖），语法高亮由文件内嵌的轻量 JS 词法分析器实现，可直接离线打开。配色方案：暗色代码主题（类 One Dark）。适合作为 Phase 0 速查手册长期保留。</div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  // ---- 关键字表 ----
+  var PY_KW = ("class def return if elif else for while try except finally with as import from pass break continue in is not and or lambda yield raise assert del global nonlocal None True False async await").split(" ");
+  var JAVA_KW = ("class public private protected static final void int long double float boolean char byte short String return if else for while do try catch finally throw throws new extends implements interface abstract this super null true false import package switch case break continue instanceof default enum synchronized volatile transient native").split(" ");
+  var PY_BUILTIN = ("self cls super print len range str int float bool list dict set tuple type repr abs min max sum sorted open enumerate zip map filter isinstance issubclass Exception ValueError TypeError IOError RuntimeError NameError KeyError IndexError AttributeError").split(" ");
+  var JAVA_BUILTIN = ("System out println printf String Integer Double Boolean Object Math Arrays List ArrayList Map HashMap Set Scanner").split(" ");
+
+  function makeSet(arr){var s={};for(var i=0;i<arr.length;i++)s[arr[i]]=1;return s;}
+  var PYK=makeSet(PY_KW), JK=makeSet(JAVA_KW), PYB=makeSet(PY_BUILTIN), JB=makeSet(JAVA_BUILTIN);
+  var PYS=makeSet(["self","cls"]), JS=makeSet(["this","super"]);
+
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+  function highlight(code, lang){
+    var kw   = lang==="python" ? PYK : JK;
+    var builtin = lang==="python" ? PYB : JB;
+    var selfThis = lang==="python" ? PYS : JS;
+    // 分组：1=块注释/行注释(含#和//)  2=三引号串  3=普通串(带前缀)  4=装饰器/注解  5=数字  6=单词
+    var re = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*|#[^\n]*)|("""[\s\S]*?"""|'''[\s\S]*?''')|((?:[rRbBfFuU]{0,2})"(?:\\.|[^"\\])*"|(?:[rRbBfFuU]{0,2})'(?:\\.|[^'\\])*')|(@[A-Za-z_]\w*)|(\b\d[\d_]*\.?\d*(?:[eE][+-]?\d+)?\b)|([A-Za-z_]\w*)/g;
+    var out="", last=0, m;
+    while((m=re.exec(code))!==null){
+      out += esc(code.slice(last, m.index));
+      last = re.lastIndex;
+      var full=m[0], comment=m[1], triple=m[2], strng=m[3], deco=m[4], num=m[5], word=m[6];
+      if(comment!==undefined){ out += '<span class="tok-c">'+esc(comment)+'</span>'; }
+      else if(triple!==undefined){ out += '<span class="tok-s">'+esc(triple)+'</span>'; }
+      else if(strng!==undefined){ out += '<span class="tok-s">'+esc(strng)+'</span>'; }
+      else if(deco!==undefined){ out += '<span class="tok-d">'+esc(deco)+'</span>'; }
+      else if(num!==undefined){ out += '<span class="tok-n">'+esc(num)+'</span>'; }
+      else if(word!==undefined){
+        if(selfThis[word]) out += '<span class="tok-self">'+esc(word)+'</span>';
+        else if(kw[word]) out += '<span class="tok-k">'+esc(word)+'</span>';
+        else if(builtin[word]) out += '<span class="tok-b">'+esc(word)+'</span>';
+        else out += esc(word);
+      }
+    }
+    out += esc(code.slice(last));
+    return out;
+  }
+
+  function run(){
+    var blocks = document.querySelectorAll('code[class*="language-"]');
+    for(var i=0;i<blocks.length;i++){
+      var el = blocks[i];
+      var wrap = el.closest('.code-col, .code-wrap');
+      var src = wrap ? wrap.querySelector('script[type="text/plain"]') : null;
+      if(!src) continue;
+      var lang = /python/.test(el.className) ? "python" : "java";
+      var raw = src.textContent.replace(/^\r?\n/, "").replace(/\s+$/,"");
+      el.innerHTML = highlight(raw, lang);
+      src.setAttribute("data-consumed","1");
+    }
+  }
+  if(document.readyState!=="loading") run();
+  else document.addEventListener("DOMContentLoaded", run);
+})();
+</script>
+</body>
+</html>

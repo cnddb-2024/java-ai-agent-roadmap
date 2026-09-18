@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG 幻觉分层治理口述整合：检索层/生成层/数据层三层拆解与拒答设计（Phase1 收官必问）</title>
+<style>
+:root{
+  --bg:#fafaf8; --bg2:#f0efeb; --ink:#1a1a18; --sub:#6b6a66;
+  --accent:#b45309; --accent2:#0e7490; --rule:#e2e0da; --code-bg:#1c2128; --code-ink:#e6edf3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Instrument Sans',-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px}
+.wrap{max-width:860px;margin:0 auto;padding:32px 24px 64px}
+.hero{border-bottom:3px solid var(--ink);padding:28px 0 20px;margin-bottom:8px}
+.hero .phase{display:inline-block;background:var(--ink);color:#fff;font-size:.78rem;padding:3px 12px;border-radius:999px;letter-spacing:.05em;margin-bottom:12px}
+.hero h1{font-size:1.6rem;line-height:1.35;margin-bottom:10px}
+.hero .meta{color:var(--sub);font-size:.9rem}
+.hero .time-total{display:inline-block;background:var(--accent);color:#fff;font-weight:600;padding:2px 12px;border-radius:6px;margin-right:8px}
+.stage-tags{margin:14px 0 4px;display:flex;flex-wrap:wrap;gap:8px}
+.stage-tags span{background:var(--bg2);border:1px solid var(--rule);border-radius:999px;font-size:.8rem;padding:3px 10px;color:var(--sub)}
+h2{font-size:1.25rem;margin:34px 0 6px;padding-left:12px;border-left:4px solid var(--accent)}
+h3{font-size:1.05rem;margin:22px 0 6px}
+p{margin:10px 0}
+.note{background:var(--bg2);border-left:3px solid var(--accent2);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.93rem}
+.warnbox{background:#fef3c7;border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0;font-size:.93rem}
+code{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;background:var(--bg2);padding:1px 6px;border-radius:4px;font-size:.88em}
+pre code{display:block;background:var(--code-bg);color:var(--code-ink);padding:16px;border-radius:10px;white-space:pre;overflow-x:auto;font-size:.85rem;line-height:1.6}
+pre{margin:14px 0}
+table{border-collapse:collapse;margin:16px 0;font-size:.92rem;width:100%}
+th,td{border:1px solid var(--rule);padding:10px 12px;text-align:left;white-space: nowrap}
+th{background:var(--bg2);font-weight:600}
+.table-wrap{overflow-x: auto;margin:16px 0;-webkit-overflow-scrolling:touch}
+.table-wrap table{margin:0;min-width:max-content}
+.term{border-bottom:2px dotted var(--accent);font-weight:600}
+.glossary li{margin:6px 0}
+.glossary b{color:var(--accent)}
+ol.src{margin:10px 0 0 22px}
+ol.src li{margin:8px 0;font-size:.92rem;word-break:break-all}
+.src-note{color:var(--sub);font-size:.85rem}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--rule);color:var(--sub);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <span class="phase">Phase 1 · RAG 刚需闭环 · 收官必问</span>
+  <h1>RAG 幻觉分层治理口述整合：检索层/生成层/数据层三层拆解与拒答设计</h1>
+  <div class="meta">
+    <span class="time-total">总预估时长：50 分钟</span>
+    贯穿线任务 · 滴滴 Agent 岗二面真题（2026-08 掘金面经）· 路线图第一梯队硬骨头
+  </div>
+  <div class="stage-tags">
+    <span>① 幻觉不是单一问题 5min</span><span>② 三层归因 15min</span><span>③ 拒答设计 10min</span><span>④ Faithfulness 悖论 8min</span><span>⑤ 结构化溯源输出 8min</span><span>⑥ 面试口述稿 4min</span>
+  </div>
+</div>
+
+<h2>一、幻觉不是单一问题，先归因再治理（5min）</h2>
+<p><span class="term">幻觉（Hallucination）</span>——模型一本正经地编造事实，类似数据库返回了"查无此行"却拼接出来的脏数据。面试深水区答案是：先别急着说"加个 Guardrail"，而是把幻觉<b>按根因拆成三层</b>，每层手段与代价完全不同。你此前"引用与防幻觉实战"练的是单点手段，本篇升级为<b>可下钻 2-3 层的归因框架</b>。</p>
+
+<h2>二、三层归因：每层的信号、手段与代价（15min）</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>层</th><th>根因</th><th>识别信号</th><th>治理手段</th><th>代价</th></tr></thead>
+<tbody>
+<tr><td><b>检索层</b><br>没找到导致编造</td><td>正确片段根本没进上下文，模型只好自由发挥</td><td>Rerank 最高分低于阈值；Recall@K 测出来本来就低</td><td><b>拒答</b>：最高分低于阈值直接说"知识库中没有依据"，不让 LLM 强答；回头按五维排查补召回</td><td>牺牲部分回答率换准确率；阈值定高了拒答过多</td></tr>
+<tr><td><b>生成层</b><br>超发挥</td><td>上下文里有答案，但模型没用/用歪/自己加戏</td><td>答案内容在检索片段中找不到对应出处</td><td>Prompt 约束（只按上下文作答）+ [N] 来源编号引用 + 生成后 <span class="term">Faithfulness（忠实度）</span>——答案的每句主张是否能在上下文中找到依据——核查</td><td>引用约束轻微降流畅度；生成后核查多一次 LLM 调用（可用小模型裁判省成本）</td></tr>
+<tr><td><b>数据层</b><br>忠实但错误</td><td>答案确实来自上下文，但上下文本身错误/过时/冲突</td><td>同一问题不同文档说法不一致；答案过了知识截止日期</td><td>来源可信度 + 知识截止日期进 metadata（元数据，入库时打的标签，类似表的冗余列）；时间敏感查询强制日期过滤；多文档交叉校验（≥2 个独立来源一致才采信）</td><td>入库时多维护字段；交叉校验提高入库复杂度；不能 100% 消除</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note">记忆锚点：检索层"没饭吃"、生成层"有饭不会吃"、数据层"饭是坏的"。三层的治理介入点分别在召回后、生成前后、入库时——这也是为什么幻觉治理是全链路工程而不是一个开关。</div>
+<p>三层治理架构口述配图（面试白板版）：</p>
+<div class="table-wrap">
+<table>
+<thead><tr><th>链路位置</th><th>入库时</th><th>召回后</th><th>生成时</th><th>生成后</th></tr></thead>
+<tbody>
+<tr><td>治理动作</td><td>数据层：来源可信度/截止日期/交叉校验</td><td>检索层：Rerank 分数阈值 → 不足则拒答</td><td>生成层：Prompt 接地约束 + [N] 编号引用</td><td>生成层：Faithfulness 核查 + 低分重试或降级</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>三、拒答设计：5 条触发条件与阈值切点（10min）</h2>
+<p><span class="term">拒答（Refusal）</span>——主动承认"我不知道"，类似接口参数校验失败时返回 400 而不是硬返回脏数据。面试要求能给出至少 5 条触发条件：</p>
+<ol>
+<li>Rerank 最高分低于阈值（检索层没找到）</li>
+<li>向量相似度全部低于阈值（阈值切点：把"已知/未知"问题分开的分数线，类似风控里的拒绝线）</li>
+<li>无直接证据：答案的主张在片段中找不到支撑句</li>
+<li>资料冲突且无法判断权威性（两文档矛盾、可信度元数据相同）</li>
+<li>超出知识库范围（问题类别与语料分布不匹配，如拿技术手册答财务问题）</li>
+</ol>
+<p>阈值切点怎么定：<b>用"已知答案 + 明知库里没有"两类问题构造测试集</b>，扫不同阈值画命中率-误拒率曲线，选两 类错误代价平衡的切点（已知问题被拒 vs 未知问题硬答）。已知-未知测试集划分是这题的加分下钻点。</p>
+<p>⚠️ 框架无内置实现，以下为业界通用手写方案（原理级，Spring AI 1.1+ 的 QuestionAnswerAdvisor 只按 topK 拼上下文，不含拒答判断）：</p>
+<pre><code>// 拒答判断：Rerank 分数低于阈值直接返回固定话术，不送 LLM
+if (ranked.isEmpty() || maxRerankScore(ranked) &lt; REFUSAL_THRESHOLD) {
+    return Answer.refuse("知识库中暂无足够依据，建议补充资料或换个问法");
+}
+// REFUSAL_THRESHOLD 由"已知/未知"双测试集扫描确定（示例 0.35）</code></pre>
+
+<h2>四、Faithfulness 悖论：忠实 ≠ 真实（8min）</h2>
+<p>Faithfulness 只衡量<b>答案对检索上下文的忠实度</b>，不衡量真实性——上下文本身错了，答案可以 100% 忠实地复述错误。这就是数据层幻觉"忠实但错误"的由来，也是面试官追问"你 Faithfulness 1.0 就没幻觉了吗"的标准陷阱。</p>
+<p>生成后核查用 Spring AI 开箱能力，不必手写裁判 Prompt：</p>
+<pre><code>// Spring AI 1.1+ 开箱评测器：FactCheckingEvaluator 基于上下文核验主张是否被支撑
+FactCheckingEvaluator factChecker = new FactCheckingEvaluator.Builder(chatModel)
+        .build();
+EvaluationRequest req = new EvaluationRequest(query, contextDocuments, answer);
+EvaluationResponse resp = factChecker.evaluate(req);
+// resp.getScore() 低 → 生成层幻觉嫌疑；此时若上下文本身有据且互相印证
+// → 疑似数据层问题，走交叉校验与来源可信度复核</code></pre>
+<div class="warnbox">面试下钻句："Faithfulness 高只说明'没超纲'，要保证真实还需数据层治理——所以我的评测是检索 Recall@K + 生成 Faithfulness + 数据交叉校验三层合看的。"</div>
+
+<h2>五、结构化溯源输出：比 [N] 编号更可机检（8min）</h2>
+<p>引用溯源的工程化升级版：让模型输出结构化 JSON（结构化输出——强制模型按 Schema 返回可解析数据，类似接口响应体契约），系统逐条校验：</p>
+<pre><code>{
+  "answer": "支持蓝绿索引切换需先双写……",
+  "statements": [
+    {"claim": "新旧索引并行期用 alias 切换查询指针",
+     "source_ids": ["doc-17#chunk-3"],
+     "confidence": 0.92}
+  ]
+}</code></pre>
+<p>系统侧校验两条规则：source_ids 必须真实存在（防编造来源）；confidence 低于 0.6 的主张触发规则复核或人工抽检。Java 侧用 Spring AI 1.0+ 开箱的 StructuredOutputConverter（按 Java 类定义映射 JSON Schema）解析，校验逻辑为普通业务代码。</p>
+
+<h2>六、面试口述稿（4min）</h2>
+<div class="warnbox"><b>90 秒版</b>："幻觉我按根因拆三层：检索层没找到导致编造——Rerank 最高分低于阈值就拒答，不让模型强答；生成层超发挥——Prompt 接地约束加 [N] 编号引用，生成后用 Spring AI 的 FactCheckingEvaluator 核查忠实度；数据层'忠实但错误'——上下文本身错或过时，用来源可信度、截止日期元数据和多文档交叉校验治理。特别说明 Faithfulness 只管忠实不管真实，所以三层必须合看。拒答阈值用已知/未知双测试集扫描定切点。这套在项目里把点踩率从 X 降到 Y。"</div>
+
+<h2>📝 术语表（本篇解释过的非白名单术语）</h2>
+<ul class="glossary">
+<li><b>幻觉（Hallucination）</b>：模型编造事实；按根因分检索层/生成层/数据层三层。</li>
+<li><b>Faithfulness（忠实度）</b>：答案逐句主张能否在检索上下文找到依据；只管忠实不管真实。</li>
+<li><b>拒答（Refusal）</b>：无足够依据时主动承认"不知道"，类似参数校验失败返回 400 而非脏数据。</li>
+<li><b>阈值切点</b>：用已知/未知双测试集扫描出的"回答 vs 拒答"分数线。</li>
+<li><b>metadata（元数据）</b>：入库时打的标签字段（来源可信度/截止日期），用于数据层归因与过滤。</li>
+<li><b>结构化输出</b>：强制模型按 JSON Schema 返回，类似接口响应体契约，可被程序直接校验。</li>
+<li><b>FactCheckingEvaluator</b>：Spring AI 1.1+ 开箱的忠实度评测器（LLM-as-Judge 范式，用一次模型调用当裁判）。</li>
+</ul>
+
+<h2>教程来源</h2>
+<ol class="src">
+<li>RAG 幻觉全解 4 层防御体系（掘金）— <a href="https://juejin.cn/post/7661160061001039912">https://juejin.cn/post/7661160061001039912</a></li>
+<li>滴滴 Agent 岗二面 RAG 幻觉真题（CSDN）— <a href="https://agent.csdn.net/6a81285b662f9a54cb9d5c7b.html">https://agent.csdn.net/6a81285b662f9a54cb9d5c7b.html</a></li>
+<li>RAG 虚假引用与 Faithfulness（Zilliz）— <a href="https://zilliz.com.cn/blog/rag-evaluation-fake-citations-faithfulness">https://zilliz.com.cn/blog/rag-evaluation-fake-citations-faithfulness</a></li>
+<li>大模型 + RAG 幻觉治理方案总结（CSDN）— <a href="https://blog.csdn.net/qq_44716086/article/details/161022497">https://blog.csdn.net/qq_44716086/article/details/161022497</a></li>
+<li>生产级 RAG 幻觉校准 3 分层（博客园）— <a href="https://www.cnblogs.com/zhaoxuan-chi-mu-de/p/21669418">https://www.cnblogs.com/zhaoxuan-chi-mu-de/p/21669418</a></li>
+<li>knowledgeops-agent（生产级参照：EvidenceJudge 三维评分 + Citation 编号引用，路线图推荐项目）— <a href="https://github.com/however-yir/knowledgeops-agent">https://github.com/however-yir/knowledgeops-agent</a></li>
+<li>Spring AI 官方仓库（FactCheckingEvaluator / StructuredOutputConverter 开箱来源）— <a href="https://github.com/spring-projects/spring-ai">https://github.com/spring-projects/spring-ai</a></li>
+</ol>
+<p class="src-note">注：第 6 条为路线图推荐项目 cryptocopilot 的实现参照入口（严格接地策略详见其仓库文档与 Spring AI 官方示例）。</p>
+
+<footer>Phase 1 RAG 刚需闭环 · 收官必问整合复盘 · 生成于 2026-09-18 每日维护</footer>
+</div>
+</body>
+</html>
