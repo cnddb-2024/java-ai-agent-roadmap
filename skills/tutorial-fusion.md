@@ -30,15 +30,22 @@
 - HTML 顶部 Hero 区标注总预估时长，**控制在 1 小时以内（极限 1.5 小时）**
 - 教程内按阶段标注分钟数（如"部署 20min / Java SDK 25min / 总结 10min"）
 
-### 3. 文件命名
+### 3. 文件命名（2026-09-16 用户要求：标题即文件名，废止旧的 tutorial.html 统一命名）
 
-- 统一叫 `tutorial.html`，不随任务变化
-- 不再出现 `qdrant-deploy-guide.html` 这种每次不同的名字
+- 文件名 = 任务全称 + `.html`，不再统一叫 `tutorial.html`（此前本地/飞书云盘多篇同名无法分辨）。
+- 任务全称即 HTML `<h1>` 文本（`<title>` 标签保持与之一致），与飞书任务 summary 一致（第 7 节已要求）。
+- 文件名清洗规则（任务全称 → 安全文件名）：
+  1. 去除文件系统/云盘非法字符 `/ \ : * ? " < > |` 及控制字符；
+  2. 连续空白折叠为单个连字符 `-`，并去除首尾 `-` 与空白；
+  3. 总长度上限 60 字符，超长截断；
+  4. 示例：任务全称「知识库增量更新与去重」→ `知识库增量更新与去重.html`。
+- 各任务存于独立 `<slug>/` 目录，文件名重名由目录隔离，无需额外去重。
+- 幂等扫描兼容历史命名：`assignments/*/<slug>/` 下存在任一 `*.html` 即视为已有教程（同时覆盖旧 `tutorial.html` 与新 `<任务全称>.html`，见第 9 节）。
 
 ### 4. 存放位置
 
 ```
-assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
+assignments/YYYY-MM-DD/<已有任务目录slug>/<任务全称>.html
 ```
 
 - 与该任务的 `code/`、`summary.md` 平级
@@ -48,7 +55,7 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 
 - 生成后将 **飞书云盘 URL**（非 GitHub raw URL）写入飞书任务的评论中
   - 背景：GitHub 仓库不可访问（私有/不存在/未 push）曾导致 raw URL 全部 404，已废弃此路径
-  - 现方案：教程 HTML 上传到飞书云盘 `assignments/<due日期>/<slug>/tutorial.html`，与 GitHub 仓库目录结构保持一致便于溯源
+  - 现方案：教程 HTML 上传到飞书云盘 `assignments/<due日期>/<slug>/<任务全称>.html`，与 GitHub 仓库目录结构保持一致便于溯源
 - 用户正常路线：飞书任务 → 评论中的飞书云盘 URL → 点击预览/在浏览器中打开 → 完美渲染（HTML 原生执行环境）
 - 不在 HTML 内写 GUID 或"作业二"这类模糊标识
 - HTML 顶部标注当前 Phase 和任务全称（与飞书一致）
@@ -73,10 +80,114 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 
 - 自包含 HTML 文件（无外部依赖）
 - 使用 html-report skill 规范生成
-- 文件名固定为 `tutorial.html`
+- 文件名为 `<任务全称>.html`（标题即文件名，清洗规则见第 3 节）
 - 字体使用 canvas-fonts（如 InstrumentSans + JetBrainsMono）
 - 图表/图示用 Mermaid 或 ECharts
 - 底部含"教程来源"章节，使用 `<ol>` 有序列表
+
+### 8.3 固定视觉模板（必选，强制复用 glm-5.3 标准模板 -- 视觉层任模型不可自由发挥）
+
+**背景**：此前视觉主题未固化，产物完全取决于模型的隐式模板。换模型（glm-5.3 → TRAE auto）后，同一套 skill 产出了三种互不相关的主题（浅底+深色渐变 hero、GitHub 深色 `#0d1117`、Python/Spring 主题色卡片），格式失控。为让格式"可迁移到任意模型"，从 2026-09-15 的稳定模板提炼出**唯一合法**的视觉模板如下。
+
+**硬性规则（禁止违反）**：
+
+1. **CSS 必须逐字复用 8.3.1 的 `<style>` 块**（复制到 `<head>`），禁止增删变量/规则。
+2. **页面结构必须遵循 8.3.2 骨架**（`.container` / `.hero` / `.tip` / `.table-wrap` / `.src` / `footer` 的 class 与顺序）。
+3. **禁止出现 8.3.3 元素**：渐变背景、`box-shadow` 卡片、深色页面背景（如 `#0d1117`）、hero 徽章（`phase-badge`）、TOC 目录卡片、额外彩色强调体系、夸张圆角 hero。这些都不是模板的一部分。
+4. 校验见 11.7；任一禁止元素出现或变量与模板不符，即判不通过。
+
+#### 8.3.1 唯一合法的 `<style>` 块（逐字复制，禁止增删）
+
+以下 CSS 变量与规则正是 2026-09-15 那套纸感模板（浅米白 `--bg:#fafaf7` + 暗金 `--accent:#b8860b` + 深藏青 `--accent2:#2c3e50`，无渐变无阴影）：
+
+```css
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+  display: block;
+}
+table { border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; white-space: nowrap; }
+th { background: var(--bg2); font-weight: 600; }
+.table-wrap { overflow-x: auto; margin: 16px 0; -webkit-overflow-scrolling: touch; }
+.table-wrap table { margin: 0; min-width: max-content; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+```
+
+#### 8.3.2 唯一合法的页面骨架（body 结构与 class 约定，遵循此顺序）
+
+- `.container`：`max-width:880px; margin:0 auto; padding:48px 32px 80px;`，包住全部正文。
+- `.hero`：左竖线样式。内含 `.phase`（强调色小字，如 `Phase 1 · 第 49/168 天 · <贯穿线>`）、`h1`（任务全称，与飞书 summary 一致）、`.meta`（总预估时长，含 `min` 分段）。
+- 正文标题：`h2` 用于大节，章节用中文数字序号（一、二、三…）；`h3` 用于小节。
+- 提示框：`<div class="tip">…</div>`（浅底 + 左侧强调色竖线）。
+- 表格：一律 `<div class="table-wrap">` 包裹（见 8.0）。
+- 代码：`<pre><code>` 纯文本，禁 span（见 8.1 / 8.2）。
+- 教程来源：`<h2>教程来源</h2>` + `<ol class="src">`，每条 `<li>` 形如「标题: 完整URL」。
+- 术语表：`<h2>📝 术语表</h2>` + 包裹表格。
+- 底部：`<footer>Phase X · 第 N/168 天 · 专属融合教程 · YYYY-MM-DD 生成 · <贯穿线标注></footer>`。
+
+#### 8.3.3 禁止元素（出现即校验失败）
+
+- `linear-gradient` 渐变背景、`box-shadow` 卡片容器。
+- 深色页面背景（如 `#0d1117`、GitHub dark 系）。
+- hero 徽章（`phase-badge`）、TOC 目录卡片（`box-shadow` 圆角卡片）。
+- 除模板外的额外彩色强调体系（如彩虹彩虹强调色变量）。
+- `border-radius` 夸张圆角 hero / 强调视觉。
+- 模板未定义的自造 class（如 `hero-content`、`hero-meta`、`.dot` 等）。
 
 ### 8.0 表格滚动规范（极其重要 -- 防表格撑爆横向布局）
 
@@ -183,24 +294,24 @@ pre code {
 - **前置动作（必做）**：`git pull --rebase origin main` 同步远程——不同会话的本地副本可能落后于远程，未同步会导致误判"未生成"而重复生成+重复评论（8.22 事故根因）。
 - **三信号检查，任一命中即跳过**：
   1. **注册表（权威）**：读取 `.trae/tutorial_registry.json`，按**任务 guid 精确匹配**（guid 全局唯一且稳定，优先于 slug 模糊匹配）。命中即跳过，不生成、不覆盖、不追加评论，记录日志"已有教程（注册表），跳过"。文件不存在视为空注册表（首次运行自动创建）。
-  2. **文件扫描**：计算该任务的 slug，扫描 `assignments/` 下**所有日期子目录**，查找是否存在 `<slug>/tutorial.html`。命中即跳过，记录日志"已有教程（文件），跳过"。
+  2. **文件扫描**：计算该任务的 slug，扫描 `assignments/` 下**所有日期子目录**，查找 `<slug>/` 目录下是否存在任一 `*.html`（兼容历史 `tutorial.html` 与现行 `<任务全称>.html` 命名）。命中即跳过，记录日志"已有教程（文件），跳过"。
   3. **评论状态**：lark-cli task 当前仅有 `+comment` 写入、无评论读取命令（已实测确认，勿猜测子命令）。"是否已评论"以注册表中 `feishu_comment_id` 字段（飞书云盘 URL 评论）为等价记录；旧 `comment_id` 字段为废弃的 raw URL 评论历史值，**不再作为幂等依据**（同一任务允许同时存在旧 raw URL 评论 + 新飞书云盘评论，不再追加新评论以 `feishu_comment_id` 是否存在为准）。
 - **slug 匹配优先级**：guid 优先；无 guid 场景（对话中手动触发）先用 summary 的 kebab-case 匹配，再按 summary 关键词模糊匹配已有目录名，视为同一任务。
-- **存放路径**：新教程存入 `assignments/<当前due日期>/<slug>/tutorial.html`（用任务当前的 due 日期，不是今天日期）。
+- **存放路径**：新教程存入 `assignments/<当前due日期>/<slug>/<任务全称>.html`（文件名取任务全称即 HTML 标题，清洗规则见第 3 节；用任务当前的 due 日期，不是今天日期）。
 - **幂等规则总结**：同一任务（同 guid，或同 slug/summary 关键词兜底）的教程与评论**全局只产生一次**；due 顺延不触发重新生成。
 
 ### 10. 任务筛选规则
 
-- 当天 due 的任务：优先处理，存入 `assignments/<当前due日期>/<slug>/tutorial.html`
+- 当天 due 的任务：优先处理，存入 `assignments/<当前due日期>/<slug>/<任务全称>.html`
 - 逾期任务（due < TODAY 且未完成）：同样按第 9 节全局扫描判断是否已有教程
-  - 任意日期目录下已有该 slug 的 `tutorial.html` -> 跳过
-  - 全部没有 -> 生成并存入 `assignments/<当前due日期>/<slug>/tutorial.html`
+  - 任意日期目录下该 slug 目录已存在任一 `*.html`（历史 `tutorial.html` 或 `<任务全称>.html`）-> 跳过
+  - 全部没有 -> 生成并存入 `assignments/<当前due日期>/<slug>/<任务全称>.html`
 - 已完成任务：跳过，不生成教程
 - **关键变更**：不再因 due 顺延而重新生成教程。一个任务只要生成过一次教程，后续顺延/重新分配 due 时一律跳过。
 
 ### 11. Agent 校验环节（生成后必须执行，禁止跳过）
 
-**原则**：每个 `tutorial.html` 生成后，在写入文件之前，必须经过校验。校验不通过则修复后重新校验，最多重试 2 次。仍不通过则记录错误日志，该教程标记为"生成失败"。
+**原则**：每篇教程 HTML（文件名 `<任务全称>.html`，见第 3 节）生成后，在写入文件之前，必须经过校验。校验不通过则修复后重新校验，最多重试 2 次。仍不通过则记录错误日志，该教程标记为"生成失败"。
 
 **校验流程**（按顺序执行，任一项失败则整体不通过）：
 
@@ -242,7 +353,7 @@ if issues:
     sys.exit(1)
 else:
     print('表格包裹校验通过')
-" <tutorial.html路径>
+" <教程HTML路径>
 ```
 
 #### 11.1 代码块完整性校验
@@ -282,7 +393,7 @@ else:
 
 #### 11.5 校验执行方式
 
-校验通过脚本自动化执行。在生成 tutorial.html 后，运行以下检查命令：
+校验通过脚本自动化执行。在生成教程 HTML（`<任务全称>.html`）后，运行以下检查命令：
 
 ```bash
 # 检查 span 泄漏：在 pre/code 块内不应有 span 标签
@@ -307,7 +418,7 @@ if issues:
     sys.exit(1)
 else:
     print('代码块校验通过')
-" <tutorial.html路径>
+" <教程HTML路径>
 ```
 
 若校验失败，必须修复后重新校验。修复方式：
@@ -323,6 +434,37 @@ else:
   - 解释是否含桥接类比（锚定 Java/Spring/MySQL/Redis 等已有知识，或按 Python 入门者深度展开）。
 - 任一抽查术语首次出现处无解释或无桥接 -> 校验不通过，按第 12 节规范补写后重新校验。
 - 校验通过的同时，确认教程底部「📝 术语表」小节存在且覆盖本篇解释过的非白名单术语。
+
+#### 11.7 视觉模板一致性校验（8.3 配套，禁止跳过）
+
+**目标**：确保产物套用了 8.3 固定视觉模板，防止模型自由发挥导致格式漂移（9.16 事故）。
+
+对生成的 HTML 执行以下检查，任一不通过则整体不通过：
+
+- **CSS 变量锚点匹配**：`<style>` 内必须同时含 `--bg: #fafaf7` 与 `--accent: #b8860b` 与 `--accent2: #2c3e50`（可容忍缩进/空格差异，但色值必须一致）。若整片 `<style>` 采用了完全不同的配色体系，判不通过。
+- **禁止元素检测**：全文不得出现 `linear-gradient`、`#0d1117`、`phase-badge`、`box-shadow`（`box-shadow: 0 1px 3px rgba(0,0,0,0.08)` 这类卡片阴影判不通过）。
+- **必用 class 检测**：必须出现 `.hero`、`.container`、`.table-wrap`、`.src`。
+
+校验脚本（可直接套用，返回非零即失败）：
+
+```bash
+python3 -c "
+import sys, re
+html = open(sys.argv[1]).read()
+issues = []
+for token in ['--accent: #b8860b', '--accent2: #2c3e50', '--bg: #fafaf7']:
+    if token not in html: issues.append('CSS 缺模板锚点: ' + token)
+for bad in ['linear-gradient', '#0d1117', 'phase-badge', 'box-shadow']:
+    if bad in html: issues.append('禁止元素出现: ' + bad)
+for need in ['.hero', '.container', '.table-wrap', '.src']:
+    if need not in html: issues.append('必用 class 缺失: ' + need)
+if issues:
+    print('视觉模板校验失败:'); [print('  - '+i) for i in issues]; sys.exit(1)
+print('视觉模板校验通过')
+" <教程HTML路径>
+```
+
+**修复方式**：用 8.3.1 的 `<style>` 块整体替换生成的 `<style>`；删除 8.3.3 的禁止元素；按 8.3.2 骨架调整 class 与结构。修复后重新校验，最多重试 2 次。
 
 ### 12. 专有名词解释规范（新手友好，硬性要求）
 
@@ -361,14 +503,14 @@ else:
 0. 【同步远程】git pull --rebase origin main（防本地副本落后导致误判"未生成"）
 1. 【全局幂等检查·三信号】读 .trae/tutorial_registry.json 按任务 guid 匹配；
    未命中再计算任务 slug，扫描 assignments/ 下所有日期子目录
-   - 任一命中（注册表 OR assignments/*/<slug>/tutorial.html） -> 跳过该任务，
+   - 任一命中（注册表 OR assignments/*/<slug>/ 下任一 *.html） -> 跳过该任务，
      记录日志"已有教程（注册表/文件），跳过"，不评论
    - 皆未命中 -> 继续
 2. 获取飞书任务详情（summary + description）
 3. 解析路线图 HTML，确定当前 Phase，提取相关推荐项目和面试题
 4. 读取 skills/term-whitelist.md，区分「已掌握/待观察」术语（供第 12 节规范使用）
 5. 搜索互联网教程（至少 5 个来源），同步确认 Spring AI / LangChain4j 最新稳定版本及该主题的开箱实现情况（第 13 节）
-6. 融合生成 tutorial.html，按上述规范
+6. 融合生成 <任务全称>.html（标题即文件名，见第 3 节），按上述规范
    - 代码块使用纯文本 <pre><code>，禁止 <span> 高亮标签
    - HTML 实体正确转义（< -> &lt; 等）
    - 白名单外专有名词首次出现必须桥接式解释；底部含「📝 术语表」
@@ -377,15 +519,15 @@ else:
    - 校验通过 -> 继续步骤 8
    - 校验失败 -> 修复问题，重新校验（最多重试 2 次）
    - 仍失败 -> 记录错误日志，标记"生成失败"，跳过该任务
-8. 存入 assignments/<due日期>/<slug>/tutorial.html（due日期≠当天时为逾期任务）
+8. 存入 assignments/<due日期>/<slug>/<任务全称>.html（due日期≠当天时为逾期任务）
 9. git add + commit + push 到路线图仓库（保留 git 流程，仓库不可访问时也不阻塞，
    写本地 commit 即可，远程 push 失败仅记录日志，不影响后续步骤 10/11）
-10. 【上传飞书云盘·与 GitHub 同构】按 assignments/<due日期>/<slug>/tutorial.html
+10. 【上传飞书云盘·与 GitHub 同构】按 assignments/<due日期>/<slug>/<任务全称>.html
     的路径，在飞书云盘根目录创建同名层级目录：
     - 用 lark-cli drive +create-folder 逐级创建（assignments → <due日期> → <slug>）；
     - 已存在的目录跳过（可先 lark-cli drive +search --query <目录名> --doc-types folder
       或用 .trae/feishu_drive_cache.json 缓存 folder_token 复用，避免重复创建）
-    - 用 lark-cli drive +upload --file <本地 tutorial.html> --name "tutorial.html"
+    - 用 lark-cli drive +upload --file <本地 <任务全称>.html> --name "<任务全称>.html"
       --folder-token <slug 目录的 folder_token> 上传
     - 返回结果中拿到 file_token 和 url（即 https://my.feishu.cn/file/<file_token>），
       立即写入 .trae/tutorial_registry.json 该 guid 条目：
@@ -394,7 +536,7 @@ else:
     lark-cli task +comment --task-id <guid> --content
     "📚 专属融合教程已生成（飞书云盘，可点击预览/下载）:
     <feishu_url>
-    目录: assignments/<due日期>/<slug>/tutorial.html"
+    目录: assignments/<due日期>/<slug>/<任务全称>.html"
     （禁止 && 批量链；成功取得 comment_id 后写入注册表 feishu_comment_id 字段）
 12. 【本地预览·可选，会话内可访问】集中复制今日 N 篇 HTML 到
     /workspace/今日作业教程_<TODAY>/<slug>.html，启动 nohup python3 -m http.server 8765
@@ -407,7 +549,7 @@ else:
 
 | 产出 | 位置 |
 |------|------|
-| tutorial.html（本地） | assignments/YYYY-MM-DD/<slug>/tutorial.html |
-| tutorial.html（飞书云盘） | 飞书云盘根 → assignments → YYYY-MM-DD → <slug> → tutorial.html，URL 形如 https://my.feishu.cn/file/<file_token> |
+| <任务全称>.html（本地） | assignments/YYYY-MM-DD/<slug>/<任务全称>.html |
+| <任务全称>.html（飞书云盘） | 飞书云盘根 → assignments → YYYY-MM-DD → <slug> → <任务全称>.html，URL 形如 https://my.feishu.cn/file/<file_token> |
 | 飞书任务评论 | 包含飞书云盘 URL，可直接点击预览/在浏览器中打开 |
 | 本地预览（会话内） | http://localhost:8765/ 由 OpenPreview 暴露，会话历史保留可回看 |

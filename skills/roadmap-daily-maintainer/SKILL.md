@@ -1,10 +1,10 @@
 ---
 name: roadmap-daily-maintainer
 description: "Java AI Agent 转型学习计划的每日无人值守维护：拉取路线图仓库、飞书鉴权、更新反馈层(HTML/雷达图)、滑动窗口任务规划与拆解、融合教程生成、写回与兜底。当用户要求执行该学习计划每日维护或为其设置定时任务时使用。"
-version: "1.0.0"
+version: "1.1.0"
 author: "user"
 created: "2026-08-17"
-updated: "2026-08-17"
+updated: "2026-09-16"
 ---
 
 # Java AI Agent 转型学习计划 · 每日无人值守维护提示词
@@ -98,37 +98,37 @@ updated: "2026-08-17"
         前置（必做）：git pull --rebase origin main 同步远程（如远程不可访问则跳过，仅本地比对，不阻塞后续流程）。
         三信号检查，任一命中即跳过：
         - 信号①注册表（权威）：读 .trae/tutorial_registry.json，按任务 guid 精确匹配（guid 全局唯一且稳定，优先于 slug 模糊匹配）。注册表记录每个已生成教程任务的 summary/slug/tutorial_path/raw_url(已废弃)/feishu_url/feishu_file_token/feishu_comment_id/generated_at。文件不存在视为空注册表（首次运行自动创建）。
-        - 信号②文件：计算该任务的slug（先按summary关键词匹配assignments目录中已有的子目录名，若无匹配则用summary的kebab-case），全局扫描 assignments/ 下所有日期子目录，查找是否存在 <slug>/tutorial.html（即 assignments/*/<slug>/tutorial.html 任意一个存在）。
+        - 信号②文件：计算该任务的slug（先按summary关键词匹配assignments目录中已有的子目录名，若无匹配则用summary的kebab-case），全局扫描 assignments/ 下所有日期子目录，查找 <slug>/ 目录下是否存在任一 *.html（即 assignments/*/<slug>/*.html 任意一个存在，兼容历史 tutorial.html 与现行 <任务全称>.html 命名，文件名规则见 tutorial-fusion.md 第3节）。
         - 信号③评论状态：lark-cli task 当前仅有 +comment 写入、无评论读取命令（已实测确认，勿再猜测子命令）。"是否已评论"以注册表中的 feishu_comment_id 字段（飞书云盘 URL 评论）为等价记录；旧 comment_id 字段为废弃 raw URL 评论历史值，不再作为幂等依据。
         - 命中任一信号 -> 跳过，记录日志"任务<summary>已有教程（注册表/文件），跳过生成"，不重复生成、不覆盖、不追加评论。
         - 三信号皆未命中 -> 继续生成。
-        - 新教程存入 assignments/<当前due日期>/<slug>/tutorial.html（用任务当前的due日期，不是今天日期）。
+        - 新教程存入 assignments/<当前due日期>/<slug>/<任务全称>.html（文件名取HTML标题/任务全称，清洗规则见 tutorial-fusion.md 第3节；用任务当前的due日期，不是今天日期）。
         - 关键：due顺延不触发重新生成；注册表或 assignments 树中已有该任务记录/教程的，后续顺延/重新分配due时一律跳过。
    8.3 对需要生成教程的每个任务，按 tutorial-fusion.md 规范执行：
         - 获取飞书任务详情（summary + description）
         - 解析 java-ai-agent-roadmap.html 确定当前 Phase，提取相关推荐项目链接和面试题
         - 搜索互联网教程（至少5个来源），同时提取路线图中推荐的参考项目链接
         - 读取 skills/term-whitelist.md 区分"已掌握/待观察"术语，按 tutorial-fusion.md 第12节规范：白名单外专有名词首次出现必须桥接式解释（类比 Java/Spring/MySQL/Redis 已有知识），教程底部附术语表
-        - 按 tutorial-fusion.md 规范融合生成 tutorial.html：主线语言 Java（LangChain4j + Spring AI），Python 仅辅助；顶部标注总预估时长（≤1小时，极限1.5小时）；顶部标注 Phase 和任务全称；底部"教程来源"列出所有来源链接（互联网+路线图推荐项目，地位平等）；自包含 HTML，使用 html-report skill 规范。
-        - 存入 assignments/<当前due日期>/<slug>/tutorial.html
+        - 按 tutorial-fusion.md 规范融合生成 <任务全称>.html（标题即文件名，见该 skill 第3节）：主线语言 Java（LangChain4j + Spring AI），Python 仅辅助；顶部标注总预估时长（≤1小时，极限1.5小时）；顶部标注 Phase 和任务全称；底部"教程来源"列出所有来源链接（互联网+路线图推荐项目，地位平等）；自包含 HTML，使用 html-report skill 规范。
+        - 存入 assignments/<当前due日期>/<slug>/<任务全称>.html
    8.4 教程生成完成后，本地提交一次（远程不可访问时跳过 push，仅本地 commit）：git add assignments/ && git commit -m "feat(tutorial): <TODAY> 生成<N>篇融合教程" && git push || 记录日志"远程 push 失败，本地已 commit"。
    8.5 【上传飞书云盘·与 GitHub 同构路径】对每个新生成教程的任务：
         - 用 lark-cli drive +create-folder 逐级创建 assignments → <当前due日期> → <slug> 三层目录（已存在则跳过，可读 .trae/feishu_drive_cache.json 缓存 folder_token 复用）。
-        - 用 lark-cli drive +upload --file <本地 tutorial.html> --name "tutorial.html" --folder-token <slug 目录的 folder_token> 上传。
+        - 用 lark-cli drive +upload --file <本地 <任务全称>.html> --name "<任务全称>.html" --folder-token <slug 目录的 folder_token> 上传。
         - 拿到返回的 file_token 和 url（形如 https://my.feishu.cn/file/<file_token>），立即写入 .trae/tutorial_registry.json 该 guid 条目：
           feishu_url / feishu_file_token / feishu_folder_path / raw_url_status="unavailable_github_repo_404"。
         - 上传完成后立即提交注册表：git add .trae/tutorial_registry.json && git commit -m "chore(registry): <TODAY> 教程注册表更新" && git push || 记录日志。
    8.6 【评论·防重】对每个新生成教程的任务，单任务单命令执行 lark-cli task +comment --task-id <guid> --content：
         评论格式："📚 专属融合教程已生成（飞书云盘，可点击预览/下载）:
                    <feishu_url>
-                   目录: assignments/<当前due日期>/<slug>/tutorial.html"
+                   目录: assignments/<当前due日期>/<slug>/<任务全称>.html"
         幂等与防重（2026-08-22 重复评论事故修复，硬性规则）：
         - 发送前必查注册表：该任务 guid 已有 feishu_comment_id 记录 -> 禁止再次发送。
         - 单任务单命令：+comment 逐条执行，禁止 && 批量链；返回结果中取得 comment_id 才算成功。输出不完整/超时时，先用 --dry-run 核对参数并重查注册表，禁止盲目重发。
         - 评论成功后立即将 feishu_comment_id 写入 .trae/tutorial_registry.json 对应 guid 条目，单独 commit + push 注册表。
         - 已跳过（8.2 命中）的任务一律不评论。
         - 注意：旧的 raw URL 评论无法删除（lark-cli task 无评论删除命令），保留即可；用户看到新评论（含飞书云盘 URL）后优先使用新评论。
-   8.7 【本地预览·可选，会话内可访问】全部教程生成并上传完成后，集中复制今日 N 篇 HTML 到 /workspace/今日作业教程_<TODAY>/<slug>.html，启动 nohup python3 -m http.server 8765 & 后用 OpenPreview 工具传 command_id 和 http://localhost:8765/ 给用户；将 URL 作为本次会话答案返回（Trae 自动化会话历史以启动时间命名，会话内 URL 可长期回看）。
+   8.7 【本地预览·可选，会话内可访问】全部教程生成并上传完成后，集中复制今日 N 篇 HTML 到 /workspace/今日作业教程_<TODAY>/<任务全称>.html，启动 nohup python3 -m http.server 8765 & 后用 OpenPreview 工具传 command_id 和 http://localhost:8765/ 给用户；将 URL 作为本次会话答案返回（Trae 自动化会话历史以启动时间命名，会话内 URL 可长期回看）。
    8.8 若某任务的教程生成失败，记录错误日志，继续处理下一个任务，不中断整体流程。
 
 9. 写回与兜底
