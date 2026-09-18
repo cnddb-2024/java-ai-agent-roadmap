@@ -30,15 +30,22 @@
 - HTML 顶部 Hero 区标注总预估时长，**控制在 1 小时以内（极限 1.5 小时）**
 - 教程内按阶段标注分钟数（如"部署 20min / Java SDK 25min / 总结 10min"）
 
-### 3. 文件命名
+### 3. 文件命名（2026-09-16 用户要求：标题即文件名，废止旧的 tutorial.html 统一命名）
 
-- 统一叫 `tutorial.html`，不随任务变化
-- 不再出现 `qdrant-deploy-guide.html` 这种每次不同的名字
+- 文件名 = 任务全称 + `.html`，不再统一叫 `tutorial.html`（此前本地/飞书云盘多篇同名无法分辨）。
+- 任务全称即 HTML `<h1>` 文本（`<title>` 标签保持与之一致），与飞书任务 summary 一致（第 7 节已要求）。
+- 文件名清洗规则（任务全称 → 安全文件名）：
+  1. 去除文件系统/云盘非法字符 `/ \ : * ? " < > |` 及控制字符；
+  2. 连续空白折叠为单个连字符 `-`，并去除首尾 `-` 与空白；
+  3. 总长度上限 60 字符，超长截断；
+  4. 示例：任务全称「知识库增量更新与去重」→ `知识库增量更新与去重.html`。
+- 各任务存于独立 `<slug>/` 目录，文件名重名由目录隔离，无需额外去重。
+- 幂等扫描兼容历史命名：`assignments/*/<slug>/` 下存在任一 `*.html` 即视为已有教程（同时覆盖旧 `tutorial.html` 与新 `<任务全称>.html`，见第 9 节）。
 
 ### 4. 存放位置
 
 ```
-assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
+assignments/YYYY-MM-DD/<已有任务目录slug>/<任务全称>.html
 ```
 
 - 与该任务的 `code/`、`summary.md` 平级
@@ -48,7 +55,7 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 
 - 生成后将 **飞书云盘 URL**（非 GitHub raw URL）写入飞书任务的评论中
   - 背景：GitHub 仓库不可访问（私有/不存在/未 push）曾导致 raw URL 全部 404，已废弃此路径
-  - 现方案：教程 HTML 上传到飞书云盘 `assignments/<due日期>/<slug>/tutorial.html`，与 GitHub 仓库目录结构保持一致便于溯源
+  - 现方案：教程 HTML 上传到飞书云盘 `assignments/<due日期>/<slug>/<任务全称>.html`，与 GitHub 仓库目录结构保持一致便于溯源
 - 用户正常路线：飞书任务 → 评论中的飞书云盘 URL → 点击预览/在浏览器中打开 → 完美渲染（HTML 原生执行环境）
 - 不在 HTML 内写 GUID 或"作业二"这类模糊标识
 - HTML 顶部标注当前 Phase 和任务全称（与飞书一致）
@@ -73,7 +80,7 @@ assignments/YYYY-MM-DD/<已有任务目录slug>/tutorial.html
 
 - 自包含 HTML 文件（无外部依赖）
 - 使用 html-report skill 规范生成
-- 文件名固定为 `tutorial.html`
+- 文件名为 `<任务全称>.html`（标题即文件名，清洗规则见第 3 节）
 - 字体使用 canvas-fonts（如 InstrumentSans + JetBrainsMono）
 - 图表/图示用 Mermaid 或 ECharts
 - 底部含"教程来源"章节，使用 `<ol>` 有序列表
@@ -287,24 +294,24 @@ pre code {
 - **前置动作（必做）**：`git pull --rebase origin main` 同步远程——不同会话的本地副本可能落后于远程，未同步会导致误判"未生成"而重复生成+重复评论（8.22 事故根因）。
 - **三信号检查，任一命中即跳过**：
   1. **注册表（权威）**：读取 `.trae/tutorial_registry.json`，按**任务 guid 精确匹配**（guid 全局唯一且稳定，优先于 slug 模糊匹配）。命中即跳过，不生成、不覆盖、不追加评论，记录日志"已有教程（注册表），跳过"。文件不存在视为空注册表（首次运行自动创建）。
-  2. **文件扫描**：计算该任务的 slug，扫描 `assignments/` 下**所有日期子目录**，查找是否存在 `<slug>/tutorial.html`。命中即跳过，记录日志"已有教程（文件），跳过"。
+  2. **文件扫描**：计算该任务的 slug，扫描 `assignments/` 下**所有日期子目录**，查找 `<slug>/` 目录下是否存在任一 `*.html`（兼容历史 `tutorial.html` 与现行 `<任务全称>.html` 命名）。命中即跳过，记录日志"已有教程（文件），跳过"。
   3. **评论状态**：lark-cli task 当前仅有 `+comment` 写入、无评论读取命令（已实测确认，勿猜测子命令）。"是否已评论"以注册表中 `feishu_comment_id` 字段（飞书云盘 URL 评论）为等价记录；旧 `comment_id` 字段为废弃的 raw URL 评论历史值，**不再作为幂等依据**（同一任务允许同时存在旧 raw URL 评论 + 新飞书云盘评论，不再追加新评论以 `feishu_comment_id` 是否存在为准）。
 - **slug 匹配优先级**：guid 优先；无 guid 场景（对话中手动触发）先用 summary 的 kebab-case 匹配，再按 summary 关键词模糊匹配已有目录名，视为同一任务。
-- **存放路径**：新教程存入 `assignments/<当前due日期>/<slug>/tutorial.html`（用任务当前的 due 日期，不是今天日期）。
+- **存放路径**：新教程存入 `assignments/<当前due日期>/<slug>/<任务全称>.html`（文件名取任务全称即 HTML 标题，清洗规则见第 3 节；用任务当前的 due 日期，不是今天日期）。
 - **幂等规则总结**：同一任务（同 guid，或同 slug/summary 关键词兜底）的教程与评论**全局只产生一次**；due 顺延不触发重新生成。
 
 ### 10. 任务筛选规则
 
-- 当天 due 的任务：优先处理，存入 `assignments/<当前due日期>/<slug>/tutorial.html`
+- 当天 due 的任务：优先处理，存入 `assignments/<当前due日期>/<slug>/<任务全称>.html`
 - 逾期任务（due < TODAY 且未完成）：同样按第 9 节全局扫描判断是否已有教程
-  - 任意日期目录下已有该 slug 的 `tutorial.html` -> 跳过
-  - 全部没有 -> 生成并存入 `assignments/<当前due日期>/<slug>/tutorial.html`
+  - 任意日期目录下该 slug 目录已存在任一 `*.html`（历史 `tutorial.html` 或 `<任务全称>.html`）-> 跳过
+  - 全部没有 -> 生成并存入 `assignments/<当前due日期>/<slug>/<任务全称>.html`
 - 已完成任务：跳过，不生成教程
 - **关键变更**：不再因 due 顺延而重新生成教程。一个任务只要生成过一次教程，后续顺延/重新分配 due 时一律跳过。
 
 ### 11. Agent 校验环节（生成后必须执行，禁止跳过）
 
-**原则**：每个 `tutorial.html` 生成后，在写入文件之前，必须经过校验。校验不通过则修复后重新校验，最多重试 2 次。仍不通过则记录错误日志，该教程标记为"生成失败"。
+**原则**：每篇教程 HTML（文件名 `<任务全称>.html`，见第 3 节）生成后，在写入文件之前，必须经过校验。校验不通过则修复后重新校验，最多重试 2 次。仍不通过则记录错误日志，该教程标记为"生成失败"。
 
 **校验流程**（按顺序执行，任一项失败则整体不通过）：
 
@@ -346,7 +353,7 @@ if issues:
     sys.exit(1)
 else:
     print('表格包裹校验通过')
-" <tutorial.html路径>
+" <教程HTML路径>
 ```
 
 #### 11.1 代码块完整性校验
@@ -386,7 +393,7 @@ else:
 
 #### 11.5 校验执行方式
 
-校验通过脚本自动化执行。在生成 tutorial.html 后，运行以下检查命令：
+校验通过脚本自动化执行。在生成教程 HTML（`<任务全称>.html`）后，运行以下检查命令：
 
 ```bash
 # 检查 span 泄漏：在 pre/code 块内不应有 span 标签
@@ -411,7 +418,7 @@ if issues:
     sys.exit(1)
 else:
     print('代码块校验通过')
-" <tutorial.html路径>
+" <教程HTML路径>
 ```
 
 若校验失败，必须修复后重新校验。修复方式：
@@ -454,7 +461,7 @@ for need in ['.hero', '.container', '.table-wrap', '.src']:
 if issues:
     print('视觉模板校验失败:'); [print('  - '+i) for i in issues]; sys.exit(1)
 print('视觉模板校验通过')
-" <tutorial.html路径>
+" <教程HTML路径>
 ```
 
 **修复方式**：用 8.3.1 的 `<style>` 块整体替换生成的 `<style>`；删除 8.3.3 的禁止元素；按 8.3.2 骨架调整 class 与结构。修复后重新校验，最多重试 2 次。
@@ -496,14 +503,14 @@ print('视觉模板校验通过')
 0. 【同步远程】git pull --rebase origin main（防本地副本落后导致误判"未生成"）
 1. 【全局幂等检查·三信号】读 .trae/tutorial_registry.json 按任务 guid 匹配；
    未命中再计算任务 slug，扫描 assignments/ 下所有日期子目录
-   - 任一命中（注册表 OR assignments/*/<slug>/tutorial.html） -> 跳过该任务，
+   - 任一命中（注册表 OR assignments/*/<slug>/ 下任一 *.html） -> 跳过该任务，
      记录日志"已有教程（注册表/文件），跳过"，不评论
    - 皆未命中 -> 继续
 2. 获取飞书任务详情（summary + description）
 3. 解析路线图 HTML，确定当前 Phase，提取相关推荐项目和面试题
 4. 读取 skills/term-whitelist.md，区分「已掌握/待观察」术语（供第 12 节规范使用）
 5. 搜索互联网教程（至少 5 个来源），同步确认 Spring AI / LangChain4j 最新稳定版本及该主题的开箱实现情况（第 13 节）
-6. 融合生成 tutorial.html，按上述规范
+6. 融合生成 <任务全称>.html（标题即文件名，见第 3 节），按上述规范
    - 代码块使用纯文本 <pre><code>，禁止 <span> 高亮标签
    - HTML 实体正确转义（< -> &lt; 等）
    - 白名单外专有名词首次出现必须桥接式解释；底部含「📝 术语表」
@@ -512,15 +519,15 @@ print('视觉模板校验通过')
    - 校验通过 -> 继续步骤 8
    - 校验失败 -> 修复问题，重新校验（最多重试 2 次）
    - 仍失败 -> 记录错误日志，标记"生成失败"，跳过该任务
-8. 存入 assignments/<due日期>/<slug>/tutorial.html（due日期≠当天时为逾期任务）
+8. 存入 assignments/<due日期>/<slug>/<任务全称>.html（due日期≠当天时为逾期任务）
 9. git add + commit + push 到路线图仓库（保留 git 流程，仓库不可访问时也不阻塞，
    写本地 commit 即可，远程 push 失败仅记录日志，不影响后续步骤 10/11）
-10. 【上传飞书云盘·与 GitHub 同构】按 assignments/<due日期>/<slug>/tutorial.html
+10. 【上传飞书云盘·与 GitHub 同构】按 assignments/<due日期>/<slug>/<任务全称>.html
     的路径，在飞书云盘根目录创建同名层级目录：
     - 用 lark-cli drive +create-folder 逐级创建（assignments → <due日期> → <slug>）；
     - 已存在的目录跳过（可先 lark-cli drive +search --query <目录名> --doc-types folder
       或用 .trae/feishu_drive_cache.json 缓存 folder_token 复用，避免重复创建）
-    - 用 lark-cli drive +upload --file <本地 tutorial.html> --name "tutorial.html"
+    - 用 lark-cli drive +upload --file <本地 <任务全称>.html> --name "<任务全称>.html"
       --folder-token <slug 目录的 folder_token> 上传
     - 返回结果中拿到 file_token 和 url（即 https://my.feishu.cn/file/<file_token>），
       立即写入 .trae/tutorial_registry.json 该 guid 条目：
@@ -529,7 +536,7 @@ print('视觉模板校验通过')
     lark-cli task +comment --task-id <guid> --content
     "📚 专属融合教程已生成（飞书云盘，可点击预览/下载）:
     <feishu_url>
-    目录: assignments/<due日期>/<slug>/tutorial.html"
+    目录: assignments/<due日期>/<slug>/<任务全称>.html"
     （禁止 && 批量链；成功取得 comment_id 后写入注册表 feishu_comment_id 字段）
 12. 【本地预览·可选，会话内可访问】集中复制今日 N 篇 HTML 到
     /workspace/今日作业教程_<TODAY>/<slug>.html，启动 nohup python3 -m http.server 8765
@@ -542,7 +549,7 @@ print('视觉模板校验通过')
 
 | 产出 | 位置 |
 |------|------|
-| tutorial.html（本地） | assignments/YYYY-MM-DD/<slug>/tutorial.html |
-| tutorial.html（飞书云盘） | 飞书云盘根 → assignments → YYYY-MM-DD → <slug> → tutorial.html，URL 形如 https://my.feishu.cn/file/<file_token> |
+| <任务全称>.html（本地） | assignments/YYYY-MM-DD/<slug>/<任务全称>.html |
+| <任务全称>.html（飞书云盘） | 飞书云盘根 → assignments → YYYY-MM-DD → <slug> → <任务全称>.html，URL 形如 https://my.feishu.cn/file/<file_token> |
 | 飞书任务评论 | 包含飞书云盘 URL，可直接点击预览/在浏览器中打开 |
 | 本地预览（会话内） | http://localhost:8765/ 由 OpenPreview 暴露，会话历史保留可回看 |
