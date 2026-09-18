@@ -13,6 +13,6 @@
 # 临时「今日作业教程」导出目录
 今日作业教程_*/
 
-# assignments 下自动生成的教程 HTML
-# （兼容历史 tutorial.html 与现行「标题即文件名」命名）
-assignments/**/*.html
+# 注意：assignments/**/*.html 需要保留在版本库中 ——
+# 每日任务生成这些教程 HTML 并 push，用户通过 git pull 拉取获得，
+# 因此不能忽略。本文件不包含对该目录的忽略规则。
