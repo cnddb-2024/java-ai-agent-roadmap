@@ -1,0 +1,78 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-09-20 (北京时间, 周日)
+当前Phase: Phase 1 收官 · 第 54/168 天 (项目期, 09-22收官)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定), 本次维持20条 (高18 / 中2)
+- 淘汰: 3条
+  * 杭州云审中软信息技术·Java软件开发工程师(LangChain4j) (2026-09-05) — 本轮核验鱼泡网链接已无有效岗位, 职位失效
+  * 某大型半导体公司（深圳）·Java Agent开发 (2026-09-04) — Boss直聘职位已关闭(核验失效)
+  * 法本·Java开发工程师（AI 智能体）(2026-08-27) — 人力外包驻场性质, 与自研岗方向偏离且时效最旧, 让位新增高匹配岗
+- 日期刷新: 9条 (本轮核验同岗仍在招, 更新时效)
+  * 南京众信慧德网络科技 (09-05 → 09-19)
+  * 胥瓷信息科技 (09-05 → 09-19)
+  * 成都图巧科技 (08-26 → 09-11)
+  * 天宇股份 (09-06 → 09-07)
+  * 蚂蚁消金 (08-31 → 09-07)
+  * 某中型人工智能研究公司 (09-05 → 09-06)
+  * 上海某大型移动互联网公司 (08-29 → 09-05)
+  * 某人工智能公司·AI Agent 工程师 (08-29 → 09-05)
+  * LinkDoc (09-03 → 09-04)
+- 新增: 3条 (WebSearch检索, 猎聘2 + Boss直聘1)
+  * 深圳智能链·Java开发工程师（AI Agent / 大模型方向）(2026-09-18, 高, 猎聘) — RAG知识库问答体系工程化 + Agent核心架构(ReAct/Plan-and-Execute/Multi-Agent协作) + Function Calling完整链路 + Claude Code/Cursor等AI Coding工具 + Spring Cloud Alibaba, Java-only全对口
+  * 北京某电子签公司·Java研发工程师（AI Agent）(2026-09-18, 高, 猎聘) — Java后端核心系统攻坚 + 独立研发电子签产品专属AI Agent + 提示词工程/规划决策/函数调用/多Agent协作 + Codex/Claude Code编程Agent工具
+  * 某大型自动化设备上市公司·Java开发工程师（AI 应用 RAG / Agent）(2026-08-29, 高, Boss直聘) — Java + Spring AI开发企业AI应用, RAG/Agent功能落地, 内部知识库与智能问答系统
+- 当前总数: 20条 (高18 / 中2), 日期严格降序, 时效分布: 09-04~09-19共16条, 08-23~08-30共4条
+
+【区块2 实战项目】
+- 动态上限: 5条在学 (Phase 1收官仍属项目期, base 3升至4-5)
+- 状态降级: 4条 (在学→参考, 对应实战任务已完成)
+  * rag-knowledge-system — 本地化RAG全链路实战完成, 转入参考池
+  * cryptocopilot — 引用溯源与防幻觉拒答实战完成, 转入参考池
+  * spring-ai-alibaba-examples — RAG评测实战完成, 转入参考池
+  * rag-agent-orchestrator — 多轮查询改写与增量更新实战完成, 转入参考池
+- 参考池抗堆叠移除: 4条
+  * spring-ai-ragas (RAG评测已掌握, 与cryptocopilot评测实战定位重叠)
+  * spring-ai-crossborder-customer-service (评测/引用溯源已掌握, 定位重叠)
+  * JavaDocRAG (Python transformers对照标杆, 对照任务已完成)
+  * egovframe-ai-rag (增量更新反面案例, 该待办已完成)
+- 新增在学: 4条 (对应Phase 2核心: ReAct Agent / MCP / Redis记忆 / Graph多智能体)
+  * langgraph4j [37] — Java版Agent编排框架(LangGraph4j 1.9): ReAct Agent官方示例(@Tool/@ToolParam + AgentExecutor) + Graph状态机, 对应ReAct Agent实战待办
+  * agent-openai-java-banking-assistant [38] — Azure官方多Agent参照: Supervisor架构(Agent Router意图路由) + 业务API经MCP tools暴露 + 图片RAG, 对应MCP协议实战待办
+  * agent-long-term-memory-with-spring-ai [39] — Redis官方记忆方案: ChatMemory短期 + 语义/情景长期记忆双Advisor + RedisVectorStore检索, 直接对应Redis ChatMemory待办
+  * spring-ai-alibaba-graph-example [40] — Graph官方多智能体示例: ReAct/Supervisor/Human-in-the-Loop + FlowAgent/Sequential/Parallel/LoopAgent编排, 对应Agent进阶与Spring AI Alibaba学习主线
+- 当前总数: 20条 (在学5 / 参考15), 在学数=5符合项目期动态上限
+
+【区块3 面试题】
+- 动态上限: 10题T1 (Phase 1非冲刺期, 维持5-10)
+- T1淘汰: 1题
+  * "RAG 评测三层指标" — 对应RAG评测实战任务已完成, 移出当前梯队
+- T1补位: 1题
+  * "AIGC 异步任务处理架构: MQ解耦文档入库与消息可靠性" (博客园2026-02大厂三轮拷问真题) — 全链路解耦 + 消息可靠性四保障(durable/持久化/手动ACK/DLQ) + 幂等消费(内容哈希去重) + 失败重试与孤儿对账, 对应Phase 2 RabbitMQ中间件硬门槛(相关待办已逾期未完成, 需前置认知)
+- T1深化: 1题
+  * "Agent Loop 可靠性治理" 补充死循环三层根因(Prompt层缺收敛信号/工具设计层无法判断"搜够了"/框架层max_iterations只是硬上限)与收敛方案(收敛式Prompt/信息增益门控/结构化输出强制收敛, 掘金2026-06真题)
+- T2淘汰: 10个题点 (对应本周snapshot已完成实战: RAG评测/引用溯源/增量更新/多轮改写/混合检索)
+  * RAG评测集构造与baseline设计 / 多轮对话Query重写与上下文依赖检索 / 知识库增量更新与向量数据一致性 / 混合检索与Rerank原理表达巩固 / RAG离线评测与线上体验对齐 / Prompt注入防护 / Faithfulness指标悖论 / 知识库灰度发布与回滚 / 引用溯源结构化输出 / Reflection自我反思(并入三范式选型)
+- T2增强: 3题点
+  * ReAct / Plan-and-Execute / Reflection 三范式选型 (ReAct每步思考全局灵活但Token高, P&E一次规划Token低但偏差难修正, Reflection生成+审查循环, 小林2026)
+  * A2A协议细化 (Agent标识/任务ID/权限令牌/消息格式, 与MCP分层互补、同属Agentic AI Foundation, 小林2026)
+  * MCP协议工程细节扩展 (连接生命周期initialize→initialized→tools/list→tools/call + 错误处理三层: 传输层/协议层-32700·-32600/应用层isError:true + stdio场景stdout专用JSON-RPC + 工具投毒与"抽地毯"攻击防护, DataCamp 2026-07)
+- T2新增: 4题点 (按Phase 2最弱维度: Redis中间件 / MQ / Multi-Agent / 并发工程)
+  * Redis会话记忆存储与分布式会话共享 (session:{id}:history结构 + Spring Session + WebSocket推送, Java大厂真题2026-02)
+  * Multi-Agent协作三层架构与动态切换 (Orchestrator/Router→Manager→Sub-Agent + 新增复杂性: 通信开销/状态一致性/调试观测, 京东面经2026-09)
+  * Agent多工具调用输出校验与无效结果处理 (工具返回Schema校验/失败降级/结果聚合, 网易Agent后端一面实录2026-08)
+  * Agent并发会话设计与线程池调优 (会话并发控制/线程池参数设计/OOM排查, 牛客2026-08)
+- T3修复: 1处 ("RAG vs 微调"段落括号闭合)
+- 当前总数: T1 10题(上限内) / T2题点结构维持 / T3段落结构不变
+
+【其他维护】
+- today-marker: Phase 1收官 第52天 → 第54天
+- 页脚时效日期: 2026-09-13 → 2026-09-20
+- 引用区: cite-29改为小林A2A协议, cite-31改为小林Agent三范式, 新增cite-32~cite-40共9条(小林/DataCamp/牛客x2/掘金/博客园/GitHub x4), 全文引用共39个(cite-18为前周已移除的孤儿编号), 引用角标与正文引用全部核验闭合
+- 校验: JD 20条日期严格降序(高18/中2), 项目20行(在学5/参考15), T1 10题, tr/tbody标签配对完整
+
+【运行结论】
+- 三区块增量刷新全部成功, 抗堆叠策略执行到位: JD净变化0(淘汰3+新增3), 项目净变化0(降级4+移除4+新增4), 面试题按掌握度移出9题点并按Phase 2最弱维度补位
+- 无失败中断, 脚本32步替换全部断言唯一命中后写回
