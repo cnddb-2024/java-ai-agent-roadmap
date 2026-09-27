@@ -1,0 +1,54 @@
+=====================================
+每周定时刷新运行日志
+日期: 2026-09-27 (北京时间, 周日)
+当前Phase: Phase 2 · 第 61/168 天 (工程化补齐+中间件+Agent进阶, 09-23进入, 项目期)
+=====================================
+
+【区块1 岗位JD清单】
+- 容量上限: 20条 (固定), 本次维持20条 (高18 / 中2)
+- 淘汰: 3条 (本轮WebFetch逐一核验)
+  * 中恒信工程造价咨询·AI集成与平台开发 (2026-08-28) — 核验页面标注"职位信息待核验", 且为应届毕业生岗+月薪偏低, 与在职转岗方向不符
+  * 某大型自动化设备上市公司·Java开发(AI应用RAG/Agent) (2026-08-29) — 发布近30天进入下架高发期, 时效淘汰
+  * 某知名互联网公司·Java开发(Agent) (2026-08-30) — 同为最旧批次, 时效淘汰让位新JD
+- 日期刷新: 1条
+  * 上海艾策通讯 (08-23 → 09-27, 核验前程无忧仍在招2人, 补充JVM/多线程/NIO/Kafka·RocketMQ等核验到的任职要求, 移至顶部)
+- 新增: 3条 (WebSearch检索 + WebFetch核验有效: 前程无忧2 + 猎聘1)
+  * 郑州恒达智控(韬正人力代招)·Java智能体开发工程师 (2026-09-27核验在招, 高, 前程无忧) — 智能体平台+Tools接入+MCP市场建设+SSE流式+LangChain4j/Spring AI智能体项目硬性+ReAct+工具Schema, Java-only全对口
+  * 长春某央企平台·AI应用开发工程师(Java方向) (2026-09-26, 中, 猎聘) — Java/SpringBoot+Function Calling+信创部署+Docker/K8s+toB/toG, 硕士及以上硬性故标中
+  * 西安泽润通远·Agent开发工程师 (2026-09-25, 高, 猎聘) — Java/Python至少一种(Java可投)+Agent平台+大模型集成+MCP/向量库优先不硬性, 14-28k·14薪
+- 核验不引入: 某大型半导体公司Java Agent开发(Boss直聘显示职位已关闭, 更新09-12)
+- 当前总数: 20条 (高18 / 中2), 日期严格降序, 时效分布: 09-25~09-27共4条, 09-04~09-19共16条
+
+【区块2 实战项目】
+- 动态上限: 5条在学 (Phase 2项目期, base 3升至4-5)
+- 状态降级: 1条 (在学→参考)
+  * agentic-rag — Phase 1收官向规划-验证闭环RAG, 相关认知已沉淀至T1面试题, 转入参考池
+- 参考池抗堆叠移除: 1条
+  * rag-spring-ai (Spring AI 1.1.4示例, 与spring-ai-examples 2.0官方示例集/spring-ai-tutorial定位重叠且版本旧, cite-25转为未引用条目保留于来源列表)
+- 新增在学: 1条 (对应Phase 2核心: SpringCloud微服务Nacos + A2A)
+  * spring-ai-alibaba-multi-agent-demo [41] — Nacos官网Demo: Supervisor按对话属性委托Consult/Business领域Agent的分布式多智能体 + AgentCard元数据注册/Nacos Agent Registry动态发现 + A2A跨进程通信(starter-a2a-nacos), 直接对应SpringCloud微服务实战Nacos待办
+- 在学维持: 5条 (langgraph4j-对应ReAct待办 / banking-assistant-对应MCP待办 / redis记忆-对应Redis ChatMemory待办 / graph-example-对应Agent进阶 / multi-agent-demo-对应Nacos微服务), 均有未完成snapshot待办对应, 不降级
+- 当前总数: 20条 (在学5 / 参考15), 在学数=5符合项目期动态上限
+
+【区块3 面试题】
+- 动态上限: 10题T1 (Phase 2非冲刺期, 维持5-10)
+- T1淘汰: 0题 (snapshot无新完成任务, 现有10题均对应未完成待办或基础必考, 全部保留)
+- T1深化: 1题
+  * "Agent vs Workflow + 混合架构" 补快手真题视角("为什么很多Agent最终以Workflow形式实现而非完全自由规划", 牛客2026-09): 控制权归属 + Token/稳定性/可控性三维权衡 + 按任务可枚举性切分混合架构
+- T2新增: 2题点 (按Phase 2最弱维度: 微服务/A2A落地 + Agent设计根基)
+  * A2A + Nacos分布式多智能体注册与发现 (AgentCard元数据注册/Agent Registry动态上下线/starter-a2a-nacos跨进程通信, Nacos 3.1 A2A注册中心, 对应SpringCloud Nacos待办) [41]
+  * Agent MVP最小可行组成 (规划器+记忆+工具集+执行循环四件套, 先跑通闭环再加护栏与评测, 快手真题2026-09) [36]
+- T3: 维持不变
+- 当前总数: T1 10题(上限内) / T2题点+2 / T3段落结构不变
+
+【其他维护】
+- today-marker: Phase 1收官 第54天 → Phase 2 第61天
+- 阶段callout: "消化暂停期" → "Phase 2进行中" (09-23起正式进入Phase 2, 列明当前主线待办: RabbitMQ/Redis/SpringCloud/ReAct/MCP/asyncio)
+- 引用区: 新增cite-41 (Nacos官网分布式Multi-Agent构建指南), 全文引用共41个, 正文引用与定义全部核验闭合, 无孤儿引用
+- 页脚时效日期: 2026-09-20 → 2026-09-27
+- 校验: JD 20条日期严格降序(高18/中2), 项目20行(在学5/参考15), T1 10题, tr/td/tbody/div/sup/li/p/a标签配对完整
+
+【运行结论】
+- 三区块增量刷新全部成功, 抗堆叠策略执行到位: JD净变化0(淘汰3+新增3), 项目净变化0(降级1+移除1+新增1), 面试题无新增T1堆叠仅深化1题+T2补2题点
+- Phase切换标注(Phase1收官→Phase2)与项目期容量策略同步生效
+- 无失败中断, 全部编辑一次命中
