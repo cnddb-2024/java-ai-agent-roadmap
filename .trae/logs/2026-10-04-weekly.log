@@ -1,0 +1,48 @@
+# 周度内容刷新日志 2026-10-04（周日）
+
+运行时间：2026-10-04（北京时间）
+上次刷新：2026-09-27
+当前阶段：Phase 2 · 第 68/168 天（项目期，依据 today-marker 推断）
+
+## 区块1 岗位JD清单（#jd-list）
+- 容量：固定 20 条
+- 淘汰 5 条（时效性淘汰，发布于 2026-09-04~09-06，已近一月）：
+  1. 某中型人工智能研究公司 · Java 开发工程师（Agent 方向）[2026-09-06]
+  2. 上海某大型移动互联网公司 · AI Agent 开发专家 [2026-09-05]
+  3. 某人工智能公司 · AI Agent 工程师 [2026-09-05]
+  4. 中电信人工智能科技 · AI 应用研发工程师 [2026-09-04]
+  5. LinkDoc · 大模型应用开发工程师 [2026-09-04]
+- 新增 5 条（WebSearch 检索，Java-only 优先，匹配度均为"高"）：
+  1. 航班管家 · Agent 开发工程师（JAVA）[Boss直聘]
+  2. 某宁波大型制造企业（猎头代招）· Java 高级开发工程师（大模型 RAG / 云原生）[猎聘]
+  3. 天津某科技公司（猎头代招）· AI 开发工程师（Java 方向）[猎聘]
+  4. 上海某金融机构（猎头代招）· 高级 Java 开发工程师（AI 应用方向）[猎聘]
+  5. 智能思创 · 研发工程师（Java 开发 + 大模型应用开发）[Boss直聘]
+- 当前总数：20 条（满员）✓
+- 备注：检索中发现猎聘 80032365（北京电子签 Java+Agent）与现有 09-18 条目为同岗位重复发布，未重复收录。
+
+## 区块2 实战项目（#projects）
+- 动态上限：项目期（Phase2）4-5 个"在学"
+- 淘汰 0 条：在学 5 个项目（langgraph4j / agent-openai-java-banking-assistant / agent-long-term-memory-with-spring-ai / spring-ai-alibaba-graph-example / spring-ai-alibaba-multi-agent-demo）对应待办（ReAct Agent / MCP Server / Redis ChatMemory / Agent 编排 / Nacos 微服务）在 snapshot.json 中均未完成，无淘汰依据。
+- 新增 0 条：在学 5 个已达 Phase2 上限，无空位（抗堆叠原则，不追加）。WebSearch 发现的高匹配候选 langchain4j-spring-agent（Gitee，Redis+MySQL 多轮对话 / MCP / 混合检索）已记录，待后续出现空位时优先补入。
+- 当前总数：20 条（在学 5 / 参考 15）✓
+
+## 区块3 面试题（#interview-t1/t2/t3）
+- 动态上限：非冲刺期维持 5-10
+- 第一梯队（#interview-t1）：淘汰 0（两道 RAG 收官题对应整合复盘任务未完成，保留）；新增 0（已达 10 条上限）。当前 10 条。
+- 第二梯队（#interview-t2）：按 snapshot.json 掌握度淘汰 2 条：
+  1. "HyDE / Multi-Query 查询改写"（多轮对话 RAG 实战：查询改写 + 指代消解 已完成）
+  2. "流式输出 SSE 实现"（Spring AI ChatClient 流式对话 demo 已完成）
+  新增 2 条（Phase2 方向 + 最弱维度：Agent 编排 / 并发工程化，来源 CSDN 2026 Java 后端 AI 面试题 RAG+Agent 专项）：
+  1. Agent 并行工具调用与并发编排（CompletableFuture / 虚拟线程 / asyncio 对比、部分失败聚合）
+  2. Agent 任务状态管理与中断恢复（状态机持久化、checkpoint 断点续跑、Human-in-the-loop）
+- 第三梯队（#interview-t3）：无变更。
+- 当前总数：T1=10、T2≈45 要点、T3≈12 要点 ✓
+
+## 其他
+- today-marker 时效更新：第 61/168 天 → 第 68/168 天
+- 数据源：snapshot.json（掌握度）、WebSearch（Boss直聘 / 猎聘 / 智联 / CSDN / 牛客 / 小林coding）
+
+## 结果
+- git commit: chore(weekly): 2026-10-04 内容刷新
+- git push: main ✓
