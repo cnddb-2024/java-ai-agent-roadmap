@@ -1,0 +1,48 @@
+# 周度内容刷新日志 2026-10-11（周日）
+
+运行时间：2026-10-11（北京时间）
+上次刷新：2026-10-04
+当前阶段：Phase 2 · 第 75/168 天（项目期，依据 today-marker 推断）
+
+## 区块1 岗位JD清单（#jd-list）
+- 容量：固定 20 条
+- 淘汰 4 条（时效性淘汰，发布于 2026-09-07，已超一月）：
+  1. 网易（效率工程部）· AI Agent 开发工程师 [2026-09-07]
+  2. 互呈信息 · 全栈开发（Java/JS/AI）[2026-09-07]（兼匹配度"中"、全栈偏前端，双重淘汰依据）
+  3. 天宇股份 · AI Agent 应用开发工程师 [2026-09-07]
+  4. 蚂蚁消金 · Java 高级 AI 工程师/专家（猎头代招）[2026-09-07]
+- 新增 4 条（WebSearch 检索 + WebFetch 逐条核验在线状态与语言要求，Java-only/Java可投优先）：
+  1. 江苏开拓信息 · AI Agent 开发工程师/资深AI全栈工程师 [2026-10-10，智联]——Python/Java/Go 至少一门（Java 可投），MCP/A2A/ANP、Eval Pipeline，匹配"高"
+  2. 哔哩哔哩（updream）· Agent 高级研发工程师 [2026-10-10，B站招聘]——Python/Go/Java 任一（Python 优先），Agent Harness 底座，匹配"中"
+  3. 广州某金融科技公司（猎头代招）· Java 工程师（AI 开发/金融）[2026-10-10，猎聘]——25-30k·16薪，RAG/Agent/金融级合规/幻觉治理，匹配"高"
+  4. 上海某 AI 公司（猎头代招，北/上）· AI Agent 开发工程师（Agent 方向）[2026-10-09，猎聘]——80-100k·15薪，ReAct 循环/上下文工程/LLM-as-Judge，Java/Python/Go 至少一种（Java 可投），匹配"高"
+- 当前总数：20 条（满员）✓
+- 备注（检索中排除项）：
+  1. 新智认知 · Java 开发工程师（Agent 与大模型方向）：WebFetch 核验显示"职位已关闭"，不收录——同时验证了本次时效性淘汰的必要性。
+  2. 阿里灵犀互娱 · 高级后端开发工程师-java [2026-10-08 更新]：任职要求明确"熟练掌握 Java 和 Python"双硬性，按匹配规则暂避。
+  3. 猎聘 78190063（Java+Agent 研发工程师）：与现有 2026-09-18"北京某电子签公司"为同岗位重复发布，且新增清华/西电院校硬门槛，不收录。
+  4. 鑫锡软件 · JAVA 开发工程师（AI Agent 方向）[智联]：JD 页面显示发布于 03-10，时效过老，未收录（该公司仍保留在投递策略第一梯队）。
+
+## 区块2 实战项目（#projects）
+- 动态上限：项目期（Phase2）4-5 个"在学"
+- 淘汰 0 条：在学 5 个项目（langgraph4j / agent-openai-java-banking-assistant / agent-long-term-memory-with-spring-ai / spring-ai-alibaba-graph-example / spring-ai-alibaba-multi-agent-demo）对应待办（ReAct Agent / MCP Server / Redis ChatMemory / Agent 编排 / Nacos 微服务）在 snapshot.json（更新于 2026-09-18）中均 completed=false，无淘汰依据；亦无状态为"已完成"需改标"参考"的行。
+- 新增 0 条：在学 5 个已达 Phase2 上限，无空位（抗堆叠原则，不追加）。
+- 检索备注：Spring AI Alibaba 官方新推 DeepResearch(Graph) 多智能体应用（Multi-Agent + Hybrid RAG + Sandbox + Self-evolution Memory）及 spring-ai-alibaba-agent-framework 新组件（ReactAgent/Hooks/Skills），前者已被现有参考池"Spring AI Alibaba 官方生态（JManus/DataAgent/DeepResearch）"条目覆盖，后者为框架组件非独立项目，均不单列。上次记录的候选 langchain4j-spring-agent 继续候补。
+- 当前总数：20 条（在学 5 / 参考 15）✓
+
+## 区块3 面试题（#interview-t1/t2/t3）
+- 动态上限：非冲刺期维持 5-10
+- 第一梯队（#interview-t1）：淘汰 0（两道 RAG 收官题对应整合复盘任务在 snapshot 中未完成，MCP/MQ/记忆题对应 Phase2 待办均未完成，保留）；新增 0（已达 10 条上限）。当前 10 条。
+- 第二梯队（#interview-t2）：淘汰 0（snapshot 自 2026-09-18 无新增完成任务，无新掌握度依据；A2A+Nacos/Redis 会话记忆题对应待办未完成保留）。新增 2 条（Phase2 方向 + 最弱维度"分布式中间件"，增量插入原段落结构，来源均为 2026 面经）：
+  1. AI 应用后端微服务治理与 Nacos 深挖（AI 服务拆分边界 / 网关鉴权流控 / Nacos 配置中心管理 Prompt 模板与模型路由热更新，深圳云泽 Java AI 面经 2026）
+  2. Agent 记忆与长上下文 2026 演进（短期走 Context Window、长期 RAG 化经验检索；长文本直存 vs 摘要层级递归压缩，牛客 2026）
+- 第三梯队（#interview-t3）：无变更。
+- 当前总数：T1=10、T2≈47 要点、T3≈12 要点 ✓
+
+## 其他
+- today-marker 时效更新：第 68/168 天 → 第 75/168 天
+- 数据源：snapshot.json（掌握度）、WebSearch + WebFetch（智联 / 猎聘 / Boss直聘 / B站招聘 / 牛客 / 编程导航）
+
+## 结果
+- git commit: chore(weekly): 2026-10-11 内容刷新
+- git push: main ✓
