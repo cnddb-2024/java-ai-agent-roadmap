@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RabbitMQ 异步文档入库实战：消息队列解耦文档解析与向量入库 + 幂等消费 + 失败重试（Phase2 中间件补齐）</title>
+<style>
+:root {
+  --bg: #fafaf7;
+  --bg2: #f3f1ea;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #b8860b;
+  --accent2: #2c3e50;
+  --rule: #e0ddd3;
+  --code-bg: #1c2128;
+  --code-ink: #e6edf3;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+.container { max-width: 880px; margin: 0 auto; padding: 48px 32px 80px; }
+.hero { border-left: 4px solid var(--accent); padding: 8px 0 8px 20px; margin-bottom: 40px; }
+.hero .phase { color: var(--accent); font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.hero h1 { font-size: 1.85rem; margin: 8px 0 12px; line-height: 1.3; }
+.hero .meta { color: var(--muted); font-size: 0.92rem; }
+.hero .meta strong { color: var(--ink); }
+h2 { font-size: 1.3rem; margin-top: 44px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+h3 { font-size: 1.08rem; margin-top: 28px; color: var(--accent2); }
+p { margin: 12px 0; }
+ul, ol { padding-left: 24px; }
+li { margin: 6px 0; }
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: var(--bg2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 18px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre;
+  display: block;
+}
+table { border-collapse: collapse; margin: 16px 0; font-size: 0.92rem; width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 10px 12px; text-align: left; white-space: nowrap; }
+th { background: var(--bg2); font-weight: 600; }
+.table-wrap { overflow-x: auto; margin: 16px 0; -webkit-overflow-scrolling: touch; }
+.table-wrap table { margin: 0; min-width: max-content; }
+.tip { background: var(--bg2); border-left: 3px solid var(--accent); padding: 12px 16px; border-radius: 0 6px 6px 0; margin: 16px 0; font-size: 0.94rem; }
+.src li { margin: 8px 0; font-size: 0.9rem; }
+.src a { color: var(--accent2); word-break: break-all; }
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="phase">Phase 2 · 第 78/168 天 · 分布式中间件贯穿线</div>
+  <h1>RabbitMQ 异步文档入库实战：消息队列解耦文档解析与向量入库 + 幂等消费 + 失败重试（Phase2 中间件补齐）</h1>
+  <div class="meta">总预估时长：<strong>约 60min</strong>（原理与架构 12min / 部署与接入 15min / 生产端 10min / 消费端 15min / 验收与面试 8min） · 技术栈：Spring Boot 3.3 + Spring AMQP 3.2 + Spring AI 2.0.1</div>
+</div>
+
+<h2>一、为什么文档入库要过消息队列（12min）</h2>
+
+<p>你在 Phase 1 的 RAG 知识库里，文档入库链路是「解析 → 切分 → 向量化 → 写向量库」，整条同步跑下来一个 50 页的 PDF 要几十秒。如果这是用户上传文档后触发的 HTTP 接口，请求早超时了。解决方案和你熟悉的电商场景一模一样：<strong>下单接口只负责把订单写库 + 发一条"去发货"的消息，真正的发货逻辑由消费端慢慢处理</strong>——把"要做的重活"从请求线程里剥离出去。</p>
+
+<p><strong>RabbitMQ</strong>（一个基于 AMQP 协议的消息队列服务器）就是干这个的。<strong>消息队列（MQ）</strong>可以类比为"跨进程的阻塞队列"：你在 Java 里用过的 <code>BlockingQueue</code> 只能在同一个 JVM 内解耦生产者和消费者，MQ 把这个队列搬到了独立的服务进程里，两边通过网络读写——于是上游服务崩了不影响下游消费，下游慢了消息先排队不会压垮上游，这就是<strong>异步解耦</strong>。</p>
+
+<p><strong>AMQP</strong>（Advanced Message Queuing Protocol）是消息队列的通用协议标准，地位类似 JDBC 之于 MySQL：你面向 AMQP 编程，RabbitMQ 只是其中一个实现。Spring Boot 的 <code>spring-boot-starter-amqp</code> 开箱封装了全部常用能力（本篇全部用它，不引第三方）。</p>
+
+<h3>1.1 本篇目标架构</h3>
+
+<pre><code>用户上传文档
+     |
+     v
+[rag-web 服务]                          [rag-ingest 服务]（同一应用的两个模块也可）
+     | 1. 存原始文件（本地/MinIO）              |
+     | 2. 写 doc_id 幂等记录                    | 3. @RabbitListener 收到消息（手动 ACK）
+     | 3. convertAndSend(队列, 消息) --------&gt; | 4. 幂等检查：Redis setIfAbsent(doc_id)
+     | 4. publisher-confirm 收到 broker 确认    | 5. PDFBox 解析 -&gt; TokenTextSplitter 切分
+     |                                         |    -&gt; EmbeddingModel 向量化 -&gt; VectorStore.add
+     |                                         | 6. 成功: basicAck / 业务失败: basicNack(requeue=false)
+     |                                         v
+     |                                   [业务死信队列 dlq.doc.ingest]
+     |                                         |
+     v                                         v
+  秒级返回 "已受理"                      告警 / 人工重放 / 定时补偿</code></pre>
+
+<div class="tip">可靠性三件套对应关系：<strong>不丢消息</strong>靠 publisher-confirm + 持久化 + 手动 ACK；<strong>不重复处理</strong>靠幂等键（doc_id）；<strong>失败不吞</strong>靠 nack 进死信队列（DLQ）。这是面试「MQ 可靠性」的高频三问，路线图 knowledgeops-agent 项目里就是「幂等键 + 重试 + DLQ」这套组合。</div>
+
+<h3>1.2 核心概念速览</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>概念</th><th>一句话解释</th><th>你熟悉的类比</th></tr></thead>
+<tbody>
+<tr><td>Exchange 交换机</td><td>消息的入口，按规则转发到队列，本身不存消息</td><td>邮局分拣员</td></tr>
+<tr><td>routing key</td><td>生产者发消息时贴的"地址标签"</td><td>收件地址</td></tr>
+<tr><td>Binding 绑定</td><td>交换机与队列之间的转发规则</td><td>分拣规则表</td></tr>
+<tr><td>Queue 队列</td><td>真正存消息的缓冲区，FIFO</td><td>待办箱</td></tr>
+<tr><td>手动 ACK</td><td>消费者处理完才确认，崩溃未确认的消息会重新投递</td><td>签收快递，不签不算送达</td></tr>
+<tr><td>DLQ 死信队列</td><td>存放被拒绝/过期/超长的"死消息"的兜底队列</td><td>退件柜</td></tr>
+<tr><td>TTL</td><td>消息或队列的存活时间，过期即死信</td><td>验证码有效期</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>二、部署 RabbitMQ 并接入 Spring Boot（15min）</h2>
+
+<h3>2.1 Docker 一条命令起服务</h3>
+
+<pre><code>docker run -d --name rabbitmq \
+  -p 5672:5672 -p 15672:15672 \
+  rabbitmq:3.13-management
+
+# 5672 = AMQP 通信端口（应用连它）；15672 = 管理控制台
+# 浏览器打开 http://localhost:15672 ，默认账号密码 guest/guest</code></pre>
+
+<h3>2.2 依赖与配置</h3>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-amqp&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+<pre><code>spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    publisher-confirm-type: correlated   # 开启发送方确认（broker 收到后回调 ConfirmCallback）
+    publisher-returns: true              # 路由不到队列时回退消息（ReturnCallback 可感知）
+    listener:
+      simple:
+        acknowledge-mode: manual         # 手动 ACK，处理完成才确认
+        prefetch: 5                      # 每个消费者最多预取 5 条未确认消息，防止压垮
+        default-requeue-rejected: false  # 抛异常被拒后不再自动重入队（交给 DLQ）</code></pre>
+
+<div class="tip">Spring Boot 3.3.x 对应 Spring AMQP 3.2.x，以上配置项全部开箱支持，无需任何额外代码。<code>prefetch</code> 的意义：默认不限流时 broker 会把队列消息全推给消费者打爆内存，类似 MySQL 连接池必须设 maxPoolSize。</div>
+
+<h3>2.3 声明交换机、队列、死信拓扑（开箱 Bean 方式）</h3>
+
+<p>业务队列通过 <code>x-dead-letter-exchange</code> 参数绑定死信交换机——被 nack 拒绝的消息会自动转入死信队列，这是 RabbitMQ 开箱的 DLQ 机制，不需要你手动搬运消息。</p>
+
+<pre><code>@Configuration
+public class MqTopologyConfig {
+
+    public static final String EXCHANGE_DOC = "ex.doc.ingest";
+    public static final String QUEUE_DOC = "q.doc.ingest";
+    public static final String DLX = "ex.doc.dlx";
+    public static final String DLQ_DOC = "dlq.doc.ingest";
+
+    @Bean
+    public TopicExchange docExchange() {
+        return ExchangeBuilder.topicExchange(EXCHANGE_DOC)
+                .durable(true)          // 持久化：broker 重启后交换机仍在
+                .build();
+    }
+
+    @Bean
+    public Queue docQueue() {
+        return QueueBuilder.durable(QUEUE_DOC)
+                .withArgument("x-dead-letter-exchange", DLX)   // 死信去哪
+                .withArgument("x-dead-letter-routing-key", "doc.dead")
+                .build();
+    }
+
+    @Bean
+    public Binding docBinding() {
+        return BindingBuilder.bind(docQueue())
+                .to(docExchange()).with("doc.ingest.#");   // topic 通配：doc.ingest.pdf 等
+    }
+
+    @Bean
+    public DirectExchange dlxExchange() {
+        return ExchangeBuilder.directExchange(DLX).durable(true).build();
+    }
+
+    @Bean
+    public Queue dlqQueue() {
+        return QueueBuilder.durable(DLQ_DOC).build();
+    }
+
+    @Bean
+    public Binding dlqBinding() {
+        return BindingBuilder.bind(dlqQueue()).to(dlxExchange()).with("doc.dead");
+    }
+}</code></pre>
+
+<h2>三、生产端：上传后发消息 + 发送确认（10min）</h2>
+
+<p>上传接口只做三件事：存文件、发消息、秒回"已受理"。消息体里只放<strong>定位信息</strong>（docId、文件路径、文档类型），不带文件内容——消息队列传大文件是反模式，类似你不会把整个 Excel 塞进 Kafka 的 key。</p>
+
+<pre><code>@RestController
+@RequestMapping("/api/documents")
+public class DocumentController {
+
+    private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
+
+    public DocumentController(RabbitTemplate rabbitTemplate, ObjectMapper objectMapper) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.objectMapper = objectMapper;
+    }
+
+    /** 上传接口：同步部分只做落盘 + 投递，秒级返回 */
+    @PostMapping("/upload")
+    public Map&lt;String, Object&gt; upload(@RequestParam MultipartFile file) throws IOException {
+        String docId = UUID.randomUUID().toString();
+        Path saved = Files.write(
+                Path.of("/data/docs", docId + "-" + file.getOriginalFilename()),
+                file.getBytes());
+
+        Map&lt;String, String&gt; msg = Map.of(
+                "docId", docId,
+                "path", saved.toString(),
+                "type", "pdf");
+
+        rabbitTemplate.convertAndSend(
+                MqTopologyConfig.EXCHANGE_DOC, "doc.ingest.pdf",
+                objectMapper.writeValueAsString(msg));
+
+        return Map.of("docId", docId, "status", "ACCEPTED");
+    }
+
+    /** 发送方确认：broker 是否真的收到了（开箱回调，注册一次全局生效） */
+    @PostConstruct
+    public void initConfirmCallback() {
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -&gt; {
+            if (!ack) {
+                // 真实项目在此落库补偿或告警，demo 打日志即可
+                System.err.println("消息未到达 broker: " + cause);
+            }
+        });
+        rabbitTemplate.setReturnsCallback(returned -&gt;
+                System.err.println("消息路由失败(无匹配队列): " + returned.getMessage()));
+    }
+}</code></pre>
+
+<h2>四、消费端：解析 → 切分 → 向量化 → 入库，幂等 + 手动 ACK + 死信（15min）</h2>
+
+<p>消费端复用你 Phase 1 已掌握的 Spring AI 开箱组件（<code>TokenTextSplitter</code>、<code>EmbeddingModel</code>、<code>VectorStore</code>，Spring AI 2.0.1 GA），本篇新增的只有 MQ 这一层壳。</p>
+
+<h3>4.1 幂等消费：Redis setIfAbsent 挡重</h3>
+
+<p><strong>为什么必然重复</strong>：手动 ACK 模式下，消费者处理完但 ACK 网络丢失、或进程在 ACK 前被杀，broker 会重新投递——<strong>至少一次投递（at-least-once）</strong>是 MQ 的默认语义，重复不可避免，只能靠业务侧幂等兜住。<strong>幂等消费</strong>指同一条消息被处理多次，结果和处理一次相同（你在知识库增量更新任务里做过的"内容哈希幂等入库"是同一思想：入库动作必须能安全重放）。</p>
+
+<p>最简单的挡重实现：Redis <code>setIfAbsent</code>（即 SETNX，key 不存在才写入并返回 true），docId 作为幂等键。它相当于数据库唯一索引的缓存版，但注意 SETNX 方案要求"检查 + 占位"原子完成，<code>setIfAbsent</code> 一条命令天然满足。</p>
+
+<pre><code>public boolean tryLockDoc(String docId) {
+    // 90 天过期：防止 Redis 堆积；入库成功的 docId 短期内不该再处理
+    Boolean first = stringRedisTemplate.opsForValue()
+            .setIfAbsent("rag:ingested:" + docId, "1", Duration.ofDays(90));
+    return Boolean.TRUE.equals(first);
+}</code></pre>
+
+<div class="tip">更硬的兜底是数据库唯一索引：向量库的 metadata 里给 <code>doc_id</code> 建唯一约束，即使 Redis 键过期后消息重放，入库也会被唯一索引拒绝。Redis 挡重 + DB 唯一索引兜底 = 双保险，面试答到这两层就完整了。</div>
+
+<h3>4.2 完整监听器（手动 ACK + 失败进 DLQ）</h3>
+
+<pre><code>@Component
+public class DocIngestListener {
+
+    private final DocumentReaderFactory readerFactory;   // 你的解析封装（PDFBox/POI）
+    private final TokenTextSplitter splitter = new TokenTextSplitter();
+    private final EmbeddingModel embeddingModel;
+    private final VectorStore vectorStore;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public DocIngestListener(DocumentReaderFactory readerFactory,
+                             EmbeddingModel embeddingModel,
+                             VectorStore vectorStore,
+                             StringRedisTemplate stringRedisTemplate) {
+        this.readerFactory = readerFactory;
+        this.embeddingModel = embeddingModel;
+        this.vectorStore = vectorStore;
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
+
+    @RabbitListener(queues = MqTopologyConfig.QUEUE_DOC, ackMode = "MANUAL")
+    public void onMessage(Message message, Channel channel) throws IOException {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        String body = new String(message.getBody(), StandardCharsets.UTF_8);
+        String docId = null;
+        try {
+            Map&lt;String, String&gt; msg = objectMapper.readValue(body, new TypeReference&lt;&gt;() {});
+            docId = msg.get("docId");
+
+            // 1. 幂等挡重：重复投递直接 ACK 跳过（视为处理成功）
+            if (!tryLockDoc(docId)) {
+                channel.basicAck(deliveryTag, false);
+                return;
+            }
+
+            // 2. 解析（Phase 1 已掌握：PDFBox / POI reader）
+            Document doc = readerFactory.read(msg.get("type"), Path.of(msg.get("path")));
+
+            // 3. 切分 + 补充 docId 元数据，再向量化入库（Spring AI 开箱链路）
+            List&lt;Document&gt; chunks = splitter.apply(List.of(doc));
+            chunks.forEach(c -&gt; c.getMetadata().put("doc_id", docId));
+            vectorStore.add(chunks);   // 内部走 EmbeddingModel 向量化后写入向量库
+
+            // 4. 成功：手动确认
+            channel.basicAck(deliveryTag, false);
+        } catch (Exception e) {
+            // 业务失败：nack 且不重入队 -&gt; 按队列死信配置自动进 DLQ
+            // 注意：重复 3 次以上仍失败的消息，人工在 DLQ 里排查（解析损坏文件等永久错误）
+            channel.basicNack(deliveryTag, false, false);
+        }
+    }
+}</code></pre>
+
+<div class="tip">两种失败的区分（你写 Python requests 调 LLM API 时遇到过的同款问题）：<strong>瞬时错误</strong>（网络抖动、embedding 服务超时）值得重试，可以配置 <code>spring.rabbitmq.listener.simple.retry</code> 让框架在内存里重试 N 次后才进死信；<strong>永久错误</strong>（文件损坏、密码格式错误）重试无意义，直接 nack 进 DLQ。demo 阶段先统一进 DLQ，生产再加区分。</div>
+
+<h3>4.3 验证闭环</h3>
+
+<pre><code># 1. 上传触发
+curl -F "file=@sample.pdf" http://localhost:8080/api/documents/upload
+# 返回 {"docId":"...","status":"ACCEPTED"}
+
+# 2. 控制台 http://localhost:15672 观察：
+#    q.doc.ingest 消息数涨了又归零（消费完成）
+#    dlq.doc.ingest 应为 0（除非你故意传损坏文件）
+
+# 3. 重复投递验证幂等：手动在控制台把同一条消息 move 回业务队列，
+#    观察日志确认第二次直接 basicAck 跳过，向量库中 doc_id 无重复</code></pre>
+
+<h2>五、验收清单与面试要点（8min）</h2>
+
+<h3>5.1 验收清单</h3>
+
+<ul>
+<li>Docker 起 RabbitMQ，管理控制台可见交换机与两个队列；</li>
+<li>上传接口秒级返回，向量库出现带 <code>doc_id</code> 元数据的 chunk；</li>
+<li>故意上传损坏 PDF，消息落入 <code>dlq.doc.ingest</code>；</li>
+<li>重放同一条消息，幂等生效不重复入库。</li>
+</ul>
+
+<h3>5.2 面试高频问答（对应路线图岗位要求「分布式 / 缓存 / 消息队列」）</h3>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>面试题</th><th>30 秒答法</th></tr></thead>
+<tbody>
+<tr><td>怎么保证消息不丢？</td><td>三段：生产端 publisher-confirm + returns 回调兜底；broker 端交换机/队列/消息持久化；消费端手动 ACK，处理完才确认。</td></tr>
+<tr><td>怎么保证不重复消费？</td><td>MQ 本身只能做到 at-least-once，幂等在业务层：Redis setIfAbsent 挡重 + 向量库 doc_id 唯一约束兜底。</td></tr>
+<tr><td>消费失败怎么办？</td><td>区分瞬时/永久错误：瞬时错误框架级重试（退避），永久错误 nack 进 DLQ 告警 + 人工/定时补偿重放。</td></tr>
+<tr><td>为什么用 MQ 而不是线程池异步？</td><td>线程池在 JVM 内，重启丢任务且无法水平扩展；MQ 持久化消息、天然多消费者分摊、上下游独立伸缩。</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>教程来源</h2>
+
+<ol class="src">
+<li>博客园 · 别再瞎装 RabbitMQ 了！从 0 到 1 部署到 Spring Boot 全链路实战（publisher-confirm / manual ack / prefetch 配置参考）: https://www.cnblogs.com/zrui-xyu/p/23233045</li>
+<li>Spring AMQP 3.2 官方文档 · Resilience: Recovering from Errors and Broker Failures（重试与恢复机制权威来源）: https://docs.spring.io/spring-amqp/reference/3.2/amqp/resilience-recovering-from-errors-and-broker-failures.html</li>
+<li>腾讯云开发者社区 · 7000 字详解 Spring Boot 项目集成 RabbitMQ 实战以及坑点分析（消息持久化取舍与死信队列建议）: https://cloud.tencent.com/developer/article/2384925</li>
+<li>腾讯云开发者社区 · RabbitMQ 重试机制 &amp;&amp; TTL &amp;&amp; 死信队列（basicAck/basicNack requeue 语义演示）: https://cloud.tencent.com/developer/article/2618448</li>
+<li>博客园 · Java 大厂面试真题：从 Spring Boot 到 AI 微服务的三轮科技拷问（MQ 可靠性三问，路线图引用 [35]）: https://www.cnblogs.com/jzssuanfa/p/19607774</li>
+<li>路线图推荐项目 · however-yir/knowledgeops-agent（Redis Stream / RabbitMQ 异步入库：幂等键 + 重试 + DLQ 生产参照）: https://github.com/however-yir/knowledgeops-agent</li>
+<li>路线图推荐项目 · springai-knowledge-server 对应实现思路（RabbitMQ 异步文档处理 + 混合检索生产级链路）: https://github.com/GTyingzi/spring-ai-tutorial</li>
+</ol>
+
+<h2>📝 术语表</h2>
+
+<div class="table-wrap">
+<table>
+<thead><tr><th>术语</th><th>一句话解释</th></tr></thead>
+<tbody>
+<tr><td>RabbitMQ / 消息队列（MQ）</td><td>跨进程的"阻塞队列"服务器：生产者把消息投进队列就返回，消费者按自己的节奏取件处理，实现异步解耦。</td></tr>
+<tr><td>AMQP</td><td>消息队列的通用协议标准，类似 JDBC 之于 MySQL——面向协议编程，换实现不用改代码。</td></tr>
+<tr><td>Exchange / routing key / Binding</td><td>邮局分拣三件套：交换机按消息上的地址标签（routing key）和分拣规则（Binding）把消息投进队列。</td></tr>
+<tr><td>异步解耦</td><td>重活从请求线程剥离到队列另一端，上游不被下游拖慢，下游崩溃也不丢任务。</td></tr>
+<tr><td>publisher-confirm / returns</td><td>发送方确认：broker 收到消息回调 ConfirmCallback；消息路由不到任何队列时回调 ReturnsCallback。</td></tr>
+<tr><td>手动 ACK</td><td>消费者处理完才"签收"，进程崩溃时未签收的消息会被 broker 重新投递。</td></tr>
+<tr><td>prefetch</td><td>每个消费者最多预取的未确认消息数，防止 broker 疯狂推送打爆消费者内存，类似连接池 maxPoolSize。</td></tr>
+<tr><td>幂等消费</td><td>同一消息处理多次结果不变；实现上用 Redis setIfAbsent（SETNX）挡重 + 数据库唯一索引兜底。</td></tr>
+<tr><td>死信队列（DLQ）</td><td>被拒绝/过期/超长的消息的兜底队列，等价于快递的退件柜，供告警与人工重放。</td></tr>
+<tr><td>TTL</td><td>消息/队列的存活时间，过期未消费即转入死信。</td></tr>
+<tr><td>at-least-once</td><td>MQ 默认投递语义：消息至少送达一次，可能重复——所以业务侧幂等是标配而非可选项。</td></tr>
+<tr><td>瞬时错误 / 永久错误</td><td>网络抖动类重试有意义；文件损坏类重试无意义，应直接进死信。（你在 Python requests 篇已接触同款概念）</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>Phase 2 · 第 78/168 天 · 专属融合教程 · 2026-10-14 生成 · Phase2 中间件补齐贯穿线（MQ 异步文档入库）</footer>
+
+</div>
+</body>
+</html>
