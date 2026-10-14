@@ -1,0 +1,13 @@
+{
+  "summary": "Multi-Agent 多智能体协作实战：Spring AI Alibaba Graph 编排接入与参数调优（Supervisor 委派模式，Phase2 Agent 进阶）",
+  "description": "【学习目标】Phase2 Agent 进阶任务（第78天），用 Spring AI Alibaba 1.1.2.x 的 spring-ai-alibaba-agent-framework（Graph 运行时，配套 Spring AI 1.1.x + Spring Boot 3.5）搭一个 Supervisor + 2 个领域 Agent 的多智能体协作最小 demo（客服场景：Supervisor 按意图委派售前/售后 Agent），口述 Multi-Agent 相比单 Agent 的优势与新增复杂性，认知 A2A 协议与 Nacos 分布式多智能体注册架构，为项目2 智能客服的意图路由打地基。\n【知识点】Multi-Agent / Supervisor-Worker 委派 / SequentialAgent·ParallelAgent·RoutingAgent·LoopAgent / Graph 状态机 / A2A 协议与 AgentCard 注册（认知层）\n【学习资源】Spring AI Alibaba 官方文档（版本说明与多智能体编排）: https://java2ai.com/docs/ ; spring-ai-alibaba 官方仓库（Graph/多智能体示例）: https://github.com/alibaba/spring-ai-alibaba ; 路线图推荐项目 spring-ai-alibaba-multi-agent-demo（Nacos 3.1 A2A 注册中心）: https://nacos.io/blog/nacos-gvr7dx_awbbpb_gpaafxqsssxklfct/\n【验收标准】跑通 Supervisor 委派 demo（2 个领域 Agent 被正确路由）；能口述 Multi-Agent 相比单 Agent 的优势与新增复杂性（通信开销/状态一致性/调试观测）；能口述 A2A 与 MCP 的定位分层（Agent↔Agent vs Agent↔工具）。\n【相关面试题】Multi-Agent 协作三层架构与动态切换（第二梯队）；Agent vs Workflow + 混合架构（第一梯队）",
+  "due": {
+    "timestamp": "1792108800000",
+    "is_all_day": true
+  },
+  "tasklists": [
+    {
+      "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d"
+    }
+  ]
+}

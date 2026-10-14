@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-18",
+  "updated": "2026-10-14",
   "note": "飞书云盘目录 token 缓存。每次 lark-cli drive +create-folder 成功后立即把 folder_token 写入此文件,下次运行优先读此缓存避免重复创建。结构与 GitHub 仓库 assignments 目录树一致便于溯源。",
   "root": {
     "assignments": {
@@ -57,6 +57,24 @@
             "tech-decision-log-03-production-upgrade": {
               "folder_token": "YEvlfaEgDlDklQdGuPrcYJmHnIt",
               "url": "https://my.feishu.cn/drive/folder/YEvlfaEgDlDklQdGuPrcYJmHnIt"
+            }
+          }
+        },
+        "2026-10-14": {
+          "folder_token": "VQ1lfA8eXlaBtrdsKcQcfHK2nyc",
+          "url": "https://my.feishu.cn/drive/folder/VQ1lfA8eXlaBtrdsKcQcfHK2nyc",
+          "slug_dirs": {
+            "rabbitmq-async-ingest": {
+              "folder_token": "KSNjfm49Ll6GmldGGYZcbSCAnDd",
+              "url": "https://my.feishu.cn/drive/folder/KSNjfm49Ll6GmldGGYZcbSCAnDd"
+            },
+            "redis-chatmemory-cache": {
+              "folder_token": "FG2gfarrOlRUVBdT8drcTYkBnqf",
+              "url": "https://my.feishu.cn/drive/folder/FG2gfarrOlRUVBdT8drcTYkBnqf"
+            },
+            "springcloud-microservice-basics": {
+              "folder_token": "B7XWfOjbSl2N3OdeYebcmX1Endd",
+              "url": "https://my.feishu.cn/drive/folder/B7XWfOjbSl2N3OdeYebcmX1Endd"
             }
           }
         }

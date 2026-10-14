@@ -1,6 +1,78 @@
 {
   "tasks": [
     {
+      "guid": "c3902111-50e5-4a05-ab72-5e61677649a4",
+      "summary": "RabbitMQ 异步文档入库实战：消息队列解耦文档解析与向量入库 + 幂等消费 + 失败重试（Phase2 中间件补齐）",
+      "due": "2026-10-14",
+      "created_at": "1789598123265",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "4642a9f0-4892-4664-bcd3-db6c9edc5980",
+      "summary": "Redis 会话记忆与缓存实战：Spring AI ChatMemory 持久化到 Redis + 会话状态缓存（Phase2 中间件补齐）",
+      "due": "2026-10-14",
+      "created_at": "1789598123265",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "0fa7ef57-dfb0-4fee-bc92-e707e741d3a4",
+      "summary": "SpringCloud 微服务基础实战：Nacos 注册中心 + Gateway 网关 + OpenFeign 声明式调用（项目1 微服务化第一步，Phase2 工程化补齐）",
+      "due": "2026-10-14",
+      "created_at": "1789598123265",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "084bb411-649d-4aa5-9f56-907ea10a5749",
+      "summary": "ReAct Agent 实战：Spring AI Tool-Calling Loop 实现 思考-行动-观察 循环 + 死循环防护（Phase2 Agent 进阶）",
+      "due": "2026-10-15",
+      "created_at": "1789684756834",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "a63ae1ea-138a-4ded-83e2-4b04fb901dd9",
+      "summary": "MCP 协议实战：Spring AI 1.1.x 写一个能被任意客户端调用的 MCP Server（Phase2 差异化筹码）",
+      "due": "2026-10-15",
+      "created_at": "1789684757530",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "c591988c-3a41-4415-8cc6-0f9c9aa49110",
+      "summary": "Python 补齐：asyncio 异步并发实战（对比 Java CompletableFuture/虚拟线程，跑通 LLM 多工具并发调用）",
+      "due": "2026-10-15",
+      "created_at": "1789684758440",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "c5e65f5b-5de9-4870-afdb-361c4f09d2ba",
+      "summary": "Multi-Agent 多智能体协作实战：Spring AI Alibaba Graph 编排接入与参数调优（Supervisor 委派模式，Phase2 Agent 进阶）",
+      "due": "2026-10-16",
+      "created_at": "1791960327458",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "e9d581b1-b66a-4a1c-957e-adb67126c407",
+      "summary": "Plan-Execute 计划执行模式实战：Planner-Executor 两阶段 Agent 原理 + Spring AI 最小可运行示例（对比 ReAct 三范式选型，Phase2 Agent 进阶）",
+      "due": "2026-10-16",
+      "created_at": "1791960335066",
+      "completed": false,
+      "frozen": false
+    },
+    {
+      "guid": "ff5b5d22-5a25-4a1c-b64b-10e4d6e5931b",
+      "summary": "流式输出 SSE 与令牌桶限流实战：Spring AI ChatClient 流式接口 + Spring Cloud Gateway RequestRateLimiter 接入与参数调优（智能客服流式地基，Phase2 工程化补齐）",
+      "due": "2026-10-16",
+      "created_at": "1791960342136",
+      "completed": false,
+      "frozen": false
+    },
+    {
       "guid": "d181d3e6-79b3-4b83-a5af-303d3abab399",
       "summary": "Python 基础环境搭建与语法速览（对比 Java：变量/函数/类/模块/异常处理）",
       "due": "2026-08-02",
@@ -284,7 +356,7 @@
       "guid": "1fa0b16b-e6bc-4c22-bffb-2526027e4654",
       "summary": "Prompt 注入防护实战：RAG 间接注入检测 + 输入-架构-输出三层防护 Allow-Deny-Ask（Phase1 安全收官）",
       "due": "2026-09-17",
-      "created_at": 1789425503940,
+      "created_at": "1789425503940",
       "completed": true,
       "frozen": false
     },
@@ -292,7 +364,7 @@
       "guid": "8e565e94-f4b5-4de8-b753-2f7182e9a6d4",
       "summary": "知识库灰度发布实战：chunk version 标签 + 双 namespace 并行双跑验证 + 一键回滚（Phase1 工程化收官）",
       "due": "2026-09-17",
-      "created_at": 1789425503940,
+      "created_at": "1789425503940",
       "completed": true,
       "frozen": false
     },
@@ -300,7 +372,7 @@
       "guid": "ca306ed3-c066-4046-952f-a4d650a513cb",
       "summary": "RAG 线上体验对齐实战：点踩率/空回答率埋点 + bad case 回流评测集 + CI 质量门禁（Phase1 评测闭环收官）",
       "due": "2026-09-17",
-      "created_at": 1789425503940,
+      "created_at": "1789425503940",
       "completed": true,
       "frozen": false
     },
@@ -309,7 +381,7 @@
       "summary": "RAG 召回效果排查与调优整合复盘：五维排查 + 分层策略（Phase1 收官整合题）",
       "due": "2026-09-18",
       "created_at": "1789511827911",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -317,7 +389,7 @@
       "summary": "RAG 幻觉分层治理口述整合：检索层/生成层/数据层三层拆解与拒答设计（Phase1 收官必问）",
       "due": "2026-09-18",
       "created_at": "1789511834983",
-      "completed": false,
+      "completed": true,
       "frozen": false
     },
     {
@@ -325,57 +397,9 @@
       "summary": "技术决策日志 #03：项目1 生产级五层升级路径评估（可靠性/可观测/安全/评测/成本现状盘点与补齐决策）",
       "due": "2026-09-18",
       "created_at": "1789511839576",
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "c3902111-50e5-4a05-ab72-5e61677649a4",
-      "summary": "RabbitMQ 异步文档入库实战：消息队列解耦文档解析与向量入库 + 幂等消费 + 失败重试（Phase2 中间件补齐）",
-      "due": "2026-09-19",
-      "created_at": "1789598123265",
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "4642a9f0-4892-4664-bcd3-db6c9edc5980",
-      "summary": "Redis 会话记忆与缓存实战：Spring AI ChatMemory 持久化到 Redis + 会话状态缓存（Phase2 中间件补齐）",
-      "due": "2026-09-19",
-      "created_at": "1789598123265",
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "0fa7ef57-dfb0-4fee-bc92-e707e741d3a4",
-      "summary": "SpringCloud 微服务基础实战：Nacos 注册中心 + Gateway 网关 + OpenFeign 声明式调用（项目1 微服务化第一步，Phase2 工程化补齐）",
-      "due": "2026-09-19",
-      "created_at": "1789598123265",
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "084bb411-649d-4aa5-9f56-907ea10a5749",
-      "summary": "ReAct Agent 实战：Spring AI Tool-Calling Loop 实现 思考-行动-观察 循环 + 死循环防护（Phase2 Agent 进阶）",
-      "due": 1789862400000,
-      "created_at": 1789684756834,
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "a63ae1ea-138a-4ded-83e2-4b04fb901dd9",
-      "summary": "MCP 协议实战：Spring AI 1.1.x 写一个能被任意客户端调用的 MCP Server（Phase2 差异化筹码）",
-      "due": 1789862400000,
-      "created_at": 1789684757530,
-      "completed": false,
-      "frozen": false
-    },
-    {
-      "guid": "c591988c-3a41-4415-8cc6-0f9c9aa49110",
-      "summary": "Python 补齐：asyncio 异步并发实战（对比 Java CompletableFuture/虚拟线程，跑通 LLM 多工具并发调用）",
-      "due": 1789862400000,
-      "created_at": 1789684758440,
-      "completed": false,
+      "completed": true,
       "frozen": false
     }
   ],
-  "updated": "2026-09-18"
+  "updated": "2026-10-14"
 }

@@ -1,0 +1,13 @@
+{
+  "summary": "流式输出 SSE 与令牌桶限流实战：Spring AI ChatClient 流式接口 + Spring Cloud Gateway RequestRateLimiter 接入与参数调优（智能客服流式地基，Phase2 工程化补齐）",
+  "description": "【学习目标】Phase2 工程化任务（第78天），把项目1 的问答接口升级为流式 SSE 输出（Spring AI 1.1.x ChatClient stream() 返回 Flux 逐 token 下发，理解 SSE 与 WebSocket 区别与背压机制），并用 Spring Cloud Gateway 的 RequestRateLimiter（Redis 令牌桶）给 AI 接口加分布式限流，掌握 replenishRate / burstCapacity 参数调优与 KeyResolver 用户维度限流，口述\"高并发限流（令牌桶）+ 流式输出\"的生产价值（Java 工程师差异化标签）。\n【知识点】SSE 协议 / Flux 流式与背压 / 令牌桶算法 / RequestRateLimiter / KeyResolver / 429 语义\n【学习资源】Spring AI ChatClient 流式文档: https://docs.spring.io/spring-ai/reference/api/chatclient.html ; Spring Cloud Gateway RequestRateLimiter 文档: https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway/gateway-request-rate-limiter.html ; 路线图推荐项目 rag-knowledge-system（SSE 流式 + bucket4j 限流工程参照）与 ai-code-helper（LangChain4j + SSE 流式对话）\n【验收标准】跑通 SSE 流式接口（curl -N 可见逐块增量输出，非一次性返回）；网关令牌桶限流生效（突发超限返回 429）并完成一次 replenishRate/burstCapacity 调参；口述令牌桶 vs 漏桶差异、AI 接口为什么按用户维度而非纯 QPS 限流。\n【相关面试题】AI 应用后端微服务治理与 Nacos 深挖（网关统一鉴权与流控，第二梯队）；成本延迟优化（第二梯队）",
+  "due": {
+    "timestamp": "1792108800000",
+    "is_all_day": true
+  },
+  "tasklists": [
+    {
+      "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d"
+    }
+  ]
+}

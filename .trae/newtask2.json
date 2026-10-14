@@ -1,0 +1,13 @@
+{
+  "summary": "Plan-Execute 计划执行模式实战：Planner-Executor 两阶段 Agent 原理 + Spring AI 最小可运行示例（对比 ReAct 三范式选型，Phase2 Agent 进阶）",
+  "description": "【学习目标】Phase2 Agent 进阶任务（第78天），掌握 Plan-and-Execute 范式：Planner 一次性把任务拆解为步骤列表（结构化输出计划 JSON），Executor 逐步执行并支持 Replan 重规划，对比 ReAct（每步思考、灵活但 Token 消耗高）与 P&E（一次规划、Token 低但执行偏差难修正）的选型场景。⚠️ Spring AI / LangChain4j 均无 P&E 开箱组件，按\"原理讲清 + 最小可运行示例\"原则：用 Spring AI 1.1.x ChatClient 结构化输出实现 Planner，复用 Tool-Calling Loop 作 Executor，跑通一次 Replan。\n【知识点】Planner-Executor 两阶段 / Replan 重规划 / 结构化输出计划 JSON / ReAct·Plan-Execute·Reflection 三范式选型 / Token 预算\n【学习资源】Spring AI 结构化输出官方文档: https://docs.spring.io/spring-ai/reference/ ; LangGraph4j（Java Agent 编排 Graph 状态机，路线图在学项目）: https://github.com/bsorrentino/langgraph4j ; LangChain4j 官方文档: https://docs.langchain4j.dev/ ; 路线图推荐项目 agentic-rag（Planning→工具选择→验证→Replan 迭代闭环参照）\n【验收标准】能口述 ReAct / Plan-Execute / Reflection 三范式选型（Token 成本/偏差修正/适用场景）；跑通最小 Plan-Execute demo（计划 JSON + 逐步执行 + 至少一次 Replan）；口述 P&E 执行偏差为什么难修正、怎么兜底（步内 ReAct 化/人工校验点）。\n【相关面试题】ReAct / Plan-and-Execute / Reflection 三范式选型（第二梯队）；Agent Loop 可靠性治理（第一梯队）",
+  "due": {
+    "timestamp": "1792108800000",
+    "is_all_day": true
+  },
+  "tasklists": [
+    {
+      "tasklist_guid": "5a08bfe3-e67f-49d7-9a33-f5681f22648d"
+    }
+  ]
+}

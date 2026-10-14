@@ -1,0 +1,109 @@
+# 2026-10-14 每日维护日志
+
+## 基本信息
+- 日期: 2026-10-14 (北京时间)
+- DAY_NUM: 78
+- PHASE: 2 (Phase 2 · 工程化补齐 + 分布式中间件 + Agent 进阶)
+- TODAY_TS: 1791907200 (2026-10-14 00:00 +08:00)
+- TOMORROW_TS: 1791993600 (2026-10-15)
+- DAY_AFTER_TS: 1792080000 (2026-10-16)
+
+## 步骤执行记录
+
+### 步骤1: 拉取仓库
+- 状态: 成功
+- git clone 指定仓库，HEAD 为 2026-10-11 周刷新提交 (7196abe)
+- 注: 本地无未提交更改，无需 git pull --rebase（克隆即最新远程）
+
+### 步骤2: 创建日志目录
+- 状态: 成功
+- .trae/logs/ 目录已存在
+
+### 步骤3: 初始化时间与阶段
+- 状态: 成功
+- TODAY=2026-10-14, DAY_NUM=78, PHASE=2
+
+### 步骤4: 飞书鉴权
+- 状态: 成功（凭据外部提供，task/drive 命令全程正常，未触发 RequestAuthorization）
+- 清单 GUID: 5a08bfe3-e67f-49d7-9a33-f5681f22648d
+
+### 步骤5: 更新反馈层
+- 5.1 HTML today-marker: Phase 2 · 第 75/168 天 → 第 78/168 天 ✓
+- 5.2 __RADAR_GAP__.me: [80,40,65,40,63,70,55] → [88,40,65,40,69,70,64] ✓
+- 5.3 __RADAR_DAILY__: 重置为 [0,0,0,0,0,0]（最近 7 天滚动窗口内暂无新完成作业）✓
+
+### 步骤6: 采集飞书任务状态 + 扫描作业
+- 6.1 飞书清单查找: 成功
+- 6.2 飞书任务列表: 50 个任务（快照 .trae/snapshot.json）
+- 6.3 作业扫描: assignments/ 最新为 2026-09-18（3 篇教程）
+- 6.4 Diff结果:
+  - NEW_DONE: 无（9-18 之后无新完成任务）
+  - VANISHED: 无
+  - NEW_APPEARED: 无
+- 6.5 描述补写: 活跃任务描述均非空，无需补写
+
+### 步骤7: 滑动窗口任务规划
+- N = 9 (活跃未完成任务)
+- G = max(0, 9-9) = 0 → 无需拆解新任务
+- 窗口锚定: 9 个活跃任务按 created_at 排序，无条件重写 due
+  - 今天 2026-10-14 (3个): RabbitMQ 异步文档入库 / Redis 会话记忆与缓存 / SpringCloud 微服务基础
+  - 明天 2026-10-15 (3个): ReAct Agent / MCP 协议 / Python asyncio
+  - 后天 2026-10-16 (3个): Multi-Agent 协作 / Plan-Execute / SSE 与令牌桶限流
+- 新拆解任务 (3个, created_at 1791960327458~42136, 均入清单成功):
+  1. c5e65f5b - Multi-Agent 多智能体协作实战（Spring AI Alibaba Graph, Supervisor 委派）
+  2. e9d581b1 - Plan-Execute 计划执行模式实战（Planner-Executor 两阶段 + 三范式选型）
+  3. ff5b5d22 - 流式输出 SSE 与令牌桶限流实战（ChatClient 流式 + Gateway RequestRateLimiter）
+- 快照保存: .trae/snapshot.json（50 任务 = 41 完成 + 9 活跃 + 0 冻结）✓
+
+### 步骤8: 当天 due 任务融合教程生成（3篇，均按 tutorial-fusion.md 规范）
+- 幂等三信号检查: 注册表无三任务 guid；assignments/ 无 2026-10-14 目录及对应 slug → 全部通过，均需生成
+- 教程 1: RabbitMQ 异步文档入库实战
+  - 路径: assignments/2026-10-14/rabbitmq-async-ingest/RabbitMQ-异步文档入库实战：...（标题即文件名）
+  - 11 节校验: 通过（9 代码块，无 span 泄漏，表格全包裹，视觉模板锚点匹配，术语桥接+术语表 12 条）
+  - 内容: 异步解耦原理 / Docker 部署 / publisher-confirm / 手动 ACK / 幂等消费(setIfAbsent+唯一索引兜底) / DLQ 死信 / 面试三问
+- 教程 2: Redis 会话记忆与缓存实战
+  - 路径: assignments/2026-10-14/redis-chatmemory-cache/Redis-会话记忆与缓存实战：...
+  - 11 节校验: 通过（5 代码块，全部检查项 OK，术语表 9 条）
+  - 内容: ChatMemory 三层体系 / 官方内置 Repository 对照（Redis 无内置→⚠️ 手写 RedisChatMemoryRepository, Hash+TTL）/ MessageWindowChatMemory 装配 / 会话状态缓存 / 短期 vs 长期记忆
+- 教程 3: SpringCloud 微服务基础实战
+  - 路径: assignments/2026-10-14/springcloud-microservice-basics/SpringCloud-微服务基础实战：...
+  - 11 节校验: 通过（12 代码块，全部检查项 OK，术语表 11 条）
+  - 内容: 单体拆分思路 / Nacos 注册（SCA 2023.0.x BOM 版本对齐, @EnableDiscoveryClient 已废弃说明）/ OpenFeign 动态代理（Ribbon 已退役→LoadBalancer）/ Gateway 路由+全局过滤器 / 与项目1 结合叙事
+- 术语白名单: 28 个新解释术语写入 skills/term-whitelist.md 待观察组，维护记录更新 ✓
+
+### 步骤9: git 提交
+- 状态: 成功
+- commit 163c40a: 3 篇教程 + term-whitelist.md（4 files, 1130 insertions）
+- 作者: 沿用仓库历史身份风格（本仓库级配置 cnddb-2024）
+
+### 步骤10: 上传飞书云盘（与 GitHub 同构）
+- 目录创建（逐级, 全部新建成功）:
+  - assignments/2026-10-14 → folder_token VQ1lfA8eXlaBtrdsKcQcfHK2nyc
+  - rabbitmq-async-ingest → KSNjfm49Ll6GmldGGYZcbSCAnDd
+  - redis-chatmemory-cache → FG2gfarrOlRUVBdT8drcTYkBnqf
+  - springcloud-microservice-basics → B7XWfOjbSl2N3OdeYebcmX1Endd
+- 文件上传（3/3 成功）:
+  1. RabbitMQ 篇: https://my.feishu.cn/file/Gs4GbA7JnoLE6kxR6nHcuDtTnjg
+  2. Redis 篇: https://my.feishu.cn/file/Kb71bgvHjou2uaxt9upcOBx9nCc
+  3. SpringCloud 篇: https://my.feishu.cn/file/IdXzb5117oY0t1xW6P9cTqzsnnf
+- .trae/tutorial_registry.json 新增 3 条（feishu_url/file_token/folder_path/comment_id 齐全）
+- .trae/feishu_drive_cache.json 追加 2026-10-14 目录树
+
+### 步骤11: 任务评论（防重，单任务单命令）
+- 注册表三任务 feishu_comment_id 均为 null → 全部发送
+- 评论响应均 ok:true，且本次返回了 comment_id（已回写注册表）:
+  1. RabbitMQ 任务 c3902111: comment_id 7696417694966353100
+  2. Redis 任务 4642a9f0: comment_id 7696417728848022531
+  3. SpringCloud 任务 0fa7ef57: comment_id 7696417736557088015
+
+### 步骤12: 本地预览
+- 已复制 3 篇 HTML 到 /workspace/今日作业教程_2026-10-14/
+- http.server 8765 启动成功（HTTP 200），OpenPreview 已暴露 http://localhost:8765/
+
+## 最终提交与推送
+- 状态: 成功（详见 git log）
+- 推送命令: git push https://x-access-token:***@github.com/cnddb-2024/java-ai-agent-roadmap.git main
+
+## 异常与备注
+- 无阻塞异常。git 身份首次在本沙箱配置为仓库级（user.name=cnddb-2024），提交作者与历史 trae-agent 风格略有差异，不影响内容
+- 今日无需拆解新任务（N=9 恰好填满窗口），拆解动作仅发生在 10-13 会话（3 个新任务已入清单并纳入本次窗口锚定）

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-18",
+  "updated": "2026-10-14",
   "entries": {
     "fe5fd757-cd63-4848-bafb-3e39cd001cee": {
       "summary": "Rerank 重排序实战：Cohere Rerank / bge-reranker 接入 + 召回排序优化与延迟代价评估",
@@ -238,6 +238,42 @@
       "feishu_comment_id": null,
       "generated_at": "2026-09-18",
       "note": "评论已发送成功(响应 ok:true)；comment_id 未随 +comment 响应返回且 task 域无评论查询命令，防重依赖注册表 guid 记录"
+    },
+    "c3902111-50e5-4a05-ab72-5e61677649a4": {
+      "summary": "RabbitMQ 异步文档入库实战：消息队列解耦文档解析与向量入库 + 幂等消费 + 失败重试（Phase2 中间件补齐）",
+      "slug": "rabbitmq-async-ingest",
+      "tutorial_path": "assignments/2026-10-14/rabbitmq-async-ingest/RabbitMQ-异步文档入库实战：消息队列解耦文档解析与向量入库-+-幂等消费-+-失败重试（Phase2-中间件补齐.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-10-14/rabbitmq-async-ingest/RabbitMQ-异步文档入库实战：消息队列解耦文档解析与向量入库-+-幂等消费-+-失败重试（Phase2-中间件补齐.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/Gs4GbA7JnoLE6kxR6nHcuDtTnjg",
+      "feishu_file_token": "Gs4GbA7JnoLE6kxR6nHcuDtTnjg",
+      "feishu_folder_path": "assignments/2026-10-14/rabbitmq-async-ingest/",
+      "feishu_comment_id": "7696417694966353100",
+      "generated_at": "2026-10-14"
+    },
+    "4642a9f0-4892-4664-bcd3-db6c9edc5980": {
+      "summary": "Redis 会话记忆与缓存实战：Spring AI ChatMemory 持久化到 Redis + 会话状态缓存（Phase2 中间件补齐）",
+      "slug": "redis-chatmemory-cache",
+      "tutorial_path": "assignments/2026-10-14/redis-chatmemory-cache/Redis-会话记忆与缓存实战：Spring-AI-ChatMemory-持久化到-Redis-+-会话状态缓存.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-10-14/redis-chatmemory-cache/Redis-会话记忆与缓存实战：Spring-AI-ChatMemory-持久化到-Redis-+-会话状态缓存.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/Kb71bgvHjou2uaxt9upcOBx9nCc",
+      "feishu_file_token": "Kb71bgvHjou2uaxt9upcOBx9nCc",
+      "feishu_folder_path": "assignments/2026-10-14/redis-chatmemory-cache/",
+      "feishu_comment_id": "7696417728848022531",
+      "generated_at": "2026-10-14"
+    },
+    "0fa7ef57-dfb0-4fee-bc92-e707e741d3a4": {
+      "summary": "SpringCloud 微服务基础实战：Nacos 注册中心 + Gateway 网关 + OpenFeign 声明式调用（项目1 微服务化第一步，Phase2 工程化补齐）",
+      "slug": "springcloud-microservice-basics",
+      "tutorial_path": "assignments/2026-10-14/springcloud-microservice-basics/SpringCloud-微服务基础实战：Nacos-注册中心-+-Gateway-网关-+-OpenFeign.html",
+      "raw_url": "https://raw.githubusercontent.com/cnddb-2024/java-ai-agent-roadmap/main/assignments/2026-10-14/springcloud-microservice-basics/SpringCloud-微服务基础实战：Nacos-注册中心-+-Gateway-网关-+-OpenFeign.html",
+      "raw_url_status": "unavailable_github_repo_404",
+      "feishu_url": "https://my.feishu.cn/file/IdXzb5117oY0t1xW6P9cTqzsnnf",
+      "feishu_file_token": "IdXzb5117oY0t1xW6P9cTqzsnnf",
+      "feishu_folder_path": "assignments/2026-10-14/springcloud-microservice-basics/",
+      "feishu_comment_id": "7696417736557088015",
+      "generated_at": "2026-10-14"
     }
   }
 }
