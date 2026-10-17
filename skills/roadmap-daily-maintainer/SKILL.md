@@ -1,10 +1,10 @@
 ---
 name: roadmap-daily-maintainer
 description: "Java AI Agent 转型学习计划的每日无人值守维护：拉取路线图仓库、飞书鉴权、更新反馈层(HTML/雷达图)、滑动窗口任务规划与拆解、融合教程生成、写回与兜底。当用户要求执行该学习计划每日维护或为其设置定时任务时使用。"
-version: "1.1.0"
+version: "1.2.0"
 author: "user"
 created: "2026-08-17"
-updated: "2026-09-16"
+updated: "2026-10-17"
 ---
 
 # Java AI Agent 转型学习计划 · 每日无人值守维护提示词
@@ -46,7 +46,7 @@ updated: "2026-09-16"
    6.5 补写学习指引：飞书中 description 为空的任务，按【描述规范】补写后用 lark-cli task tasks patch --as user --task-guid <guid> --data '{"task":{"description":"<内容>"},"update_fields":["description"]}' 更新。
 
    【描述规范】（6.5 与 7.3.7 共用，全文只此一处定义）
-   description 内容格式为：学习目标 / 知识点 / 学习资源 / 验收标准 / 相关面试题；其中"相关面试题"从路线图面试体系中匹配。
+   description 内容格式为：学习目标 / 知识点 / 学习资源 / 验收标准 / 相关面试题；其中"相关面试题"从路线图面试体系中匹配；框架能力类任务另须含【立项三问】：当前版本有什么 / 更高 GA 版本有什么（M 里程碑不算）/ 为什么不用更高版本（规则见 task-generation.md 原则3）。
 
    重要：步骤6不保存snapshot.json，snapshot将在步骤7结束后统一保存。
 
@@ -107,7 +107,7 @@ updated: "2026-09-16"
    8.3 对需要生成教程的每个任务，按 tutorial-fusion.md 规范执行：
         - 获取飞书任务详情（summary + description）
         - 解析 java-ai-agent-roadmap.html 确定当前 Phase，提取相关推荐项目链接和面试题
-        - 搜索互联网教程（至少5个来源），同时提取路线图中推荐的参考项目链接
+        - 先在本地官方文档镜像（docs/springai-official/ 等，规则见 tutorial-fusion.md 第13节）定位相关章节，缺页先补抓再下断言；再搜索互联网教程（至少5个来源，官方文档页须列入来源），同时提取路线图中推荐的参考项目链接
         - 读取 skills/term-whitelist.md 区分"已掌握/待观察"术语，按 tutorial-fusion.md 第12节规范：白名单外专有名词首次出现必须桥接式解释（类比 Java/Spring/MySQL/Redis 已有知识），教程底部附术语表
         - 按 tutorial-fusion.md 规范融合生成 <任务全称>.html（标题即文件名，见该 skill 第3节）：主线语言 Java（LangChain4j + Spring AI），Python 仅辅助；顶部标注总预估时长（≤1小时，极限1.5小时）；顶部标注 Phase 和任务全称；底部"教程来源"列出所有来源链接（互联网+路线图推荐项目，地位平等）；自包含 HTML，使用 html-report skill 规范。
         - 存入 assignments/<当前due日期>/<slug>/<任务全称>.html
