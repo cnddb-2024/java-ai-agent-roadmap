@@ -1,0 +1,56 @@
+# 周度内容刷新日志 2026-10-18（周日）
+
+运行时间：2026-10-18（北京时间）
+上次刷新：2026-10-11
+当前阶段：Phase 2 · 第 82/168 天（项目期，依据 today-marker 推断）
+
+## 区块1 岗位JD清单（#jd-list）
+- 容量：固定 20 条
+- 淘汰 4 条（时效性淘汰，发布已超/近一月，WebFetch 逐一核验后让位新 JD）：
+  1. 杭州某大型互联网电商平台上市公司 · Java 开发工程师（AI Agent 方向）[2026-09-11，37天]
+  2. 成都图巧科技 · 高级 Agent 开发工程师 [2026-09-11，37天]
+  3. 某宁波大型基金/证券/期货公司 · 大模型应用开发工程师 [2026-09-12，36天]
+  4. 深圳智能链 · Java 开发工程师（AI Agent/大模型方向）[2026-09-18，30天]
+- 日期刷新 1 条（同岗位新发布链接，内容更新）：
+  * 北京某电子签公司 · Java 研发工程师（AI Agent）：09-18/猎聘77771917 → 10-16/猎聘78258947（新猎头发布，核验 32 分钟前在线；补充 Spring 全家桶 / MySQL·Redis·MQ / LangChain·LlamaIndex / DeepSeek-Coder·Qwen3-Coder·GLM5.2 代码大模型等新任职要求，移至顶部）
+- 新增 4 条（WebSearch 检索 + WebFetch 逐条核验在线状态与语言要求，Java-only/Java可投优先）：
+  1. 厦门德捷信息科技 · AI Agent 工程师（LLM应用/Agent系统）[2026-10-17，智联]——Python/C#/Java/Go 至少一种（Java 可投），Agent 状态管理与任务编排 + RAG 体系 + 校验机制/异常处理/失败恢复，LangChain 优先不硬性，匹配"高"
+  2. 深圳某软件公司（猎头代招）· AI 应用工程师（Java 方向）[2026-10-16，猎聘]——30-50k，Java + Spring Boot/Cloud + MySQL/PostgreSQL + Redis/MQ 优先，AI Agent/RAG/MCP 优先不硬性，经验不限，匹配"高"
+  3. 深圳某具身智能公司（科锐国际代招）· Java 开发工程师（AI 方向）[2026-10-16，猎聘]——12-18k，Java-only + Agent 编排多源数据采集/清洗/交叉验算 + 飞书开放平台/PLM 对接；Agent 开发/Harness 编程/OpenClaw·Hermes 部署需同时满足（小众工具硬性故标"中"）
+  4. 上海某金融科技公司（菲顿猎头代招）· Agent 开发工程师 [2026-10-14，猎聘]——30-60k·18薪，学历/语言不限（Java 可投），LLM 企业级 Agent 系统 + RAG 优化 + Agent 评测体系 + Prompt 工程/上下文管理，匹配"高"
+- 当前总数：20 条（满员）✓，日期严格降序，高 17 / 中 3，时效分布：10-14~10-17 共 5 条，09-19~10-10 共 15 条
+- 备注（核验不引入项）：
+  1. Boss直聘·小影 AI Agent 研发工程师（Java）：WebFetch 核验显示"职位已关闭"——验证了时效性淘汰的必要性
+  2. 智联·北京思灵机器人 AI Agent应用开发工程师：精通 Go 语言硬性 + 硕士 985/211 硬性，双硬性暂避
+  3. 前程无忧·杭州清瑶智能 Java(AI应用)：Java 5 年 + Python 1 年实战双硬性 + 统招一本硬性，暂避
+  4. 前程无忧·上海学珍企业 LLM Agent 方向：精通 Python 硬性，暂避
+  5. 猎聘·北京 应用AI研发（锐仕方达）：研究生 985/211 学历硬性，不收录
+  6. 智联·中恒博瑞 大模型应用算法工程师（Java+LangChain4j/Spring AI 全对口）：核验有效但硕士硬性且更新 09-19 时效弱于新增 4 条，本轮让位未收录，下轮优先候补
+  7. Boss直聘·BOSS直聘自家 Java开发工程师(AI Agent方向)：页面更新 2026-09-04，时效过旧；磐石云（苏州，SpringAI+GraphRAG+AgenticRAG 高度对口）页面更新 2026-08-17 超 2 月，均不收录
+
+## 区块2 实战项目（#projects）
+- 动态上限：项目期（Phase2）4-5 个"在学"
+- 淘汰 0 条：在学 5 个项目（langgraph4j / agent-openai-java-banking-assistant / agent-long-term-memory-with-spring-ai / spring-ai-alibaba-graph-example / spring-ai-alibaba-multi-agent-demo）对应待办（ReAct Agent / MCP Server / Redis ChatMemory / Multi-Agent 协作 / SpringCloud Nacos 微服务）在 snapshot.json（更新于 2026-10-14）中均 completed=false，无淘汰依据；亦无"已完成"需改标"参考"的行。
+- 新增 0 条：在学 5 个已达 Phase2 上限，无空位（抗堆叠原则，不追加）。
+- 检索备注：WebSearch 核验 spring-ai-alibaba 仓库持续活跃（v1.0.0-M3.2 快速开始路径已更新），已被参考池"Spring AI Alibaba 官方生态（JManus/DataAgent/DeepResearch）"与"spring-ai-alibaba-examples"条目覆盖；langchain4j 中文文档 2026-09 更新为文档非项目。上次记录的候补 langchain4j-spring-agent（Gitee）继续候补。
+- 当前总数：20 条（在学 5 / 参考 15）✓
+
+## 区块3 面试题（#interview-t1/t2/t3）
+- 动态上限：非冲刺期维持 5-10（T1 计）
+- 第一梯队（#interview-t1）：淘汰 0（snapshot 自 2026-09-18 后无新增完成任务，无新掌握度依据；MQ/记忆/MCP/Agent Loop 等题对应 Phase2 待办均未完成，保留）；新增 0（已达 10 条上限）。当前 10 题。
+- 第二梯队（#interview-t2）：淘汰 0（无新掌握度依据）。新增 3 题点（Phase2 核心：网关限流/SSE 流式 + 最弱维度分布式中间件 + RAG 检索深化，均为 2026 真题，增量插入原段落结构）：
+  1. LLM Gateway 设计（接入层协议适配与鉴权限流 / 决策层模型路由决策与 fallback 编排 / 出口层，多模型降级与 Token 用量计费管控，Shopee 大模型二面真题 2026）[42]
+  2. 流式响应逐 token 处理三层拆解（字节流→事件流按 SSE 规则切分 / 事件流→状态机维护 content block 进度 / 状态机→业务：文本边到边推 UI 而工具调用参数须等 content_block_stop 才能解析执行，字节二面真题 2026）[43]——直接对应 Phase 2 SSE 流式输出与令牌桶限流待办
+  3. 多阶段 RAG 检索策略（BM25+向量混合召回融合设计 / 为什么不能只做一次召回 / 二段三段检索分别解决什么问题 / PDF 扫描件 OCR 与版面理解为何不能分开，淘天 AI Agent 岗面经 2026-04）[44]
+- 第三梯队（#interview-t3）：无变更。
+- 当前总数：T1=10（上限内）/ T2 题点 +3 / T3 段落结构不变 ✓
+
+## 其他维护
+- today-marker 时效更新：第 78/168 天 → 第 82/168 天
+- 引用区：新增 cite-42（51CTO·Shopee LLM Gateway 二面）/ cite-43（51CTO·字节流式逐 token 三层）/ cite-44（牛客·淘天 AI Agent 岗面经），全文引用定义 43 个，新增引用均闭合；既有孤儿引用（cite-6/7/10/25）为历史遗留，本轮未引入新孤儿
+- 页脚时效日期：2026-09-27 → 2026-10-18
+- 校验：JD 20 条日期严格降序（高 17/中 3），项目 20 行（在学 5/参考 15），T1 10 题，tr/td/tbody/table/div/sup/p/a/li 标签配对完整
+
+## 结果
+- git commit: chore(weekly): 2026-10-18 内容刷新
+- git push: main ✓
