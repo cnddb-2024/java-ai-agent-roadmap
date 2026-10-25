@@ -1,0 +1,56 @@
+# 周度内容刷新日志 2026-10-25（周日）
+
+运行时间：2026-10-25（北京时间）
+上次刷新：2026-10-18
+当前阶段：Phase 2 · 第 89/168 天（项目期，依据 today-marker 推断）
+
+## 区块1 岗位JD清单（#jd-list）
+- 容量：固定 20 条
+- 淘汰 4 条（时效性淘汰，发布已超/近一月，让位新 JD）：
+  1. 西安泽润通远 · Agent 开发工程师 [2026-09-25，30天]
+  2. 南京众信慧德网络科技 · Java AI 智能体开发工程师 [2026-09-19，36天]
+  3. 胥瓷信息科技 · 政务 AI 应用开发工程师（Java / 智能体方向）[2026-09-19，36天]
+  4. 上海艾策通讯 · AI 应用研发工程师（Java 方向）[2026-09-27，28天]
+- 日期刷新 2 条（同岗位新发布链接，内容更新，旧行移除）：
+  * 长春某央企平台 · AI 应用开发工程师（Java 方向）：09-26/猎聘80050803 → 10-20/猎聘80937623（凌医冈云代招，岗位名与要求刷新：15-17k、2年以上、硕士及以上硬性优先博士、信创部署运维、30 岁以上须全栈与系统设计）
+  * 郑州恒达智控（韬正人力代招）· Java 智能体开发工程师：09-27/前程无忧173478597 → 10-23/猎聘80612911（"郑州某智能体平台（猎头代招）· Java 软件开发工程师"，18-25k、学历不限、补充消息队列处理 / 监控埋点 / Docker / GitLab CI 加分项）
+- 新增 4 条（WebSearch 检索 + WebFetch 核验在线状态与语言要求，Java-only / Java 可投优先）：
+  1. 德睿智药（AI 制药 B 轮）· AI Agent 工程师 / Agent 应用开发工程师 [2026-10-22，猎聘]——Python / Java / TypeScript 至少一种（Java 可投），Agent 任务规划 / 工具调用 / 记忆系统 / 错误恢复 + RAG 质量迭代 + LangChain / LangGraph / Spring AI 至少一种框架二次开发 + 多 Agent 协作 + MCP / Context Engineering，匹配"高"
+  2. 八维通科技（中国中车投资 · 国企背景）· AI Agent 开发工程师（Java）[2026-10-20，猎聘]——Java-only 高度对口：3年+ Java 且 1年+ 大模型落地，Spring Boot 3 / Spring Cloud / Spring AI / LangChain4j + Nacos / Gateway / Sentinel / Seata + Milvus / pgvector + Function Calling / MCP / ReAct / Plan-and-Execute + RAG 全链路（Tika / PDFBox / 混合检索 / 重排 / 引用溯源）+ 评测集建设，匹配"高"
+  3. 转转集团 · AI 全栈开发工程师（架构）（J15172）[2026-10-19，转转官网]——3-5年 Java + JVM / IO / 多线程 + MySQL 优化 + MQ 等中间件建设，大模型能力（RAG / Agent / 工具调用）与业务系统和中间件打通、服务端方案设计与核心实现，AI 应用落地经验优先不硬性，匹配"高"
+  4. 奇策数智科技（武汉 · B 轮）· Java 智能体开发工程师（大模型应用方向）[2026-10-15，Boss直聘，核验"招聘中"总经理刚活跃]——Java-only：Spring Boot / Spring Cloud + Alibaba AI 框架 / LangChain4j / DeepSeek4j + 本地知识库 / 意图识别 / 智能编排 / 查询改写 + PostgreSQL + pgVector + AI Agent 垂直行业应用，匹配"高"
+- 当前总数：20 条（满员）✓，日期严格降序，高 17 / 中 3，时效分布：10-14~10-23 共 11 条，10-04~10-10 共 9 条
+- 备注（核验不引入项）：
+  1. 猎聘·广州 AI Agent 开发工程师（35-55k·13薪，10-22 更新）：精通 Python、Java 双语言硬性 + 以 Dify 低代码平台为主，暂避
+  2. Boss直聘·洞隐科技 AI 开发工程师（Java）：WebFetch 核验显示"职位已关闭"，不收录（再证时效性淘汰必要性）
+  3. Boss直聘·磐石云 Java 工程师（AI Agent 全栈方向，SpringAI+GraphRAG+AgenticRAG 高度对口）：页面更新 2026-08-17 超 2 月，时效过旧继续候补
+  4. 猎聘·郑州 Java 智能体开发工程师（三秦人力，18-28k）：09-18 更新且与已刷新的郑州岗同岗位，不重复收录
+  5. 上海资深 Agent 研发（40-50k，10-22）：5-10 年 + 2 年 MultiAgent 框架硬性，继续候补
+  6. 阿里千问办公电商 AI Agent 岗（30-50k，10-19）：精通 Python 或 Node.js 硬性，暂避
+
+## 区块2 实战项目（#projects）
+- 动态上限：项目期（Phase2）4-5 个"在学"
+- 淘汰 0 条：在学 5 个项目（langgraph4j / agent-openai-java-banking-assistant / agent-long-term-memory-with-spring-ai / spring-ai-alibaba-graph-example / spring-ai-alibaba-multi-agent-demo）对应 Phase2 待办（ReAct Agent / MCP Server / Redis ChatMemory / Multi-Agent 协作 / SpringCloud Nacos 微服务）在 snapshot.json（更新于 2026-10-14）中均 completed=false，无淘汰依据；亦无"已完成"需改标"参考"的行。
+- 新增 0 条：在学 5 个已达 Phase2 上限，无空位（抗堆叠原则，不追加）。
+- 检索备注：WebSearch 核验 Spring AI Alibaba 生态新增 Agent Framework（spring-ai-alibaba-agent-framework：ReactAgent / 多智能体编排 / Hooks / Skills）与 Admin 平台，能力上已被参考池"Spring AI Alibaba 官方生态（JManus / DataAgent / DeepResearch）"与 Graph 示例条目覆盖；候补 langchain4j-spring-agent（Gitee）继续候补。
+- 当前总数：20 条（在学 5 / 参考 15）✓
+
+## 区块3 面试题（#interview-t1/t2/t3）
+- 动态上限：非冲刺期维持 5-10（T1 计）
+- 第一梯队（#interview-t1）：淘汰 0（snapshot 自 2026-10-14 后无新增完成任务，MQ / 记忆 / MCP / Agent Loop 等题对应 Phase2 待办均未完成，保留）；新增 0（已达 10 条上限）。当前 10 题。
+- 第二梯队（#interview-t2）：淘汰 0（无新掌握度依据）。新增 3 题点（Phase2 核心工程化维度：MCP 评测 / 可观测性 / 会话持久化，均为 2026 真题，增量插入原段落结构）：
+  1. MCP Server 效果评测与迭代（工具调用成功率 / 参数合规率 / 平均往返延迟与超时率分层归因，badcase 归因到 Schema 描述不清还是模型能力边界、修描述→重测回归闭环，阿里 Agent Infra 一面真题 2026-03）[45]
+  2. Agent 链路追踪与可观测性（同一条 Trace 贯穿模型调用 / 工具执行 / 审批暂停 / 子 Agent：trace·模型版本·Prompt 与工具版本·输入输出摘要·Token·耗时·重试与最终状态，敏感脱敏；指标至少含成功率 / 工具错误率 / 循环率 / P95 延迟 / 成本 / 人工接管率，阿里 Agent Infra 真题 2026-03 + 卡码笔记 Harness 可观测性专题 2026-10）[45][46][47]——直接呼应"Agent 可观测"已进大厂 JD 与现有"Agent Harness 评测体系"题点
+  3. Agent 对话记录保存与数据结构（messages 表 session_id→turn_id 层级、role / content / tool_calls 与 tool_call_id 关联，原文 JSON 存档与检索摘要分层、按会话增量拉取 + 异步落库，阿里 Agent Infra 一面真题 2026-03）[45]——衔接既有"Redis 会话记忆存储"题点补齐存储层设计
+- 第三梯队（#interview-t3）：无变更。
+- 当前总数：T1=10（上限内）/ T2 题点 +3 / T3 段落结构不变 ✓
+
+## 其他维护
+- today-marker 时效更新：第 82/168 天 → 第 89/168 天
+- 引用区：新增 cite-45（牛客·阿里 Agent Infra 岗面经 2026-03-31）/ cite-46（卡码笔记·Agent Harness 可观测性面试详解 2026-10）/ cite-47（牛客·AI Agent 面试高频 100 问 2026），全文引用定义 46 个，新增引用均闭合；既有孤儿引用（cite-6/7/10/25）为历史遗留，本轮未引入新孤儿
+- 页脚时效日期：2026-10-18 → 2026-10-25
+- 校验：JD 20 条日期严格降序（高 17/中 3），项目 20 行（在学 5/参考 15），T1 10 题，tr/td/tbody/table/div/sup/p/a/li/section 标签配对完整，无悬空引用
+
+## 结果
+- git commit: chore(weekly): 2026-10-25 内容刷新
+- git push: main ✓
