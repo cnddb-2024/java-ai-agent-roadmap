@@ -1,0 +1,2 @@
+push test @ 2026-11-03 (Asia/Shanghai)
+验证 main 直接开发 + 快进推送工作流（AGENTS.md 规则）
