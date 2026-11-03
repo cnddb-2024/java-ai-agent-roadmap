@@ -1,0 +1,60 @@
+# 长暂停后进度重评估日志 2026-11-03
+
+运行时间：2026-11-03（北京时间）· 手动会话（每日维护定时任务处于 Paused，未恢复）
+当前阶段：Phase 2 · 第 98 天（任务驱动模式，自本日起 Phase 不再按日期推进）
+
+## 一、根因
+
+- 每日维护定时任务（v3 LHV8P-DCW2R3.C，06:30）处于 Paused：2026-10-14 后 snapshot 无更新、任务窗口不滚动、教程不生成（旧版 DACDDFTQG1JB9D 亦 Paused）
+- 周度刷新（Q76L20B62L.DCI，周日 10:00）持续 Active（最后 2026-11-01），但只刷新 JD/项目/面试题，不碰任务与教程
+- 时间轴按 2026-07-29 锚点硬算：今天=第 98/168 天=旧算法下 Phase 2 最后一天，明天起将按日期滑入 Phase 3，而 Phase 2 实际仅完成约 3/12 知识点 → 漏学风险固化
+
+## 二、评估结论（依据：assignments/ 教程树 + tutorial_registry.json 25 条 + snapshot.json 50 任务 + 维护日志）
+
+### 已覆盖（无需补学）
+- Phase 0 全部（08-01~08-14 共 15 篇）：LangChain4j/Spring AI QuickStart、RAG 核心概念、流式、Function Calling/Tool Use、Advisors、可观测性基础、Ollama 部署、选型对比、JD 清单、思维导图
+- Phase 1 全部 + 收官（08-21~09-18 共 24 篇注册教程）：解析/切分/Embedding/混合检索/Rerank/上下文组装/引用防幻觉/评测指标/多轮 RAG/增量更新/注入防护/灰度发布/线上体验对齐/召回排查/幻觉治理/决策日志 01-03/生产级工程化整理（Phase1 验收项）
+- Python 贯穿线 7 篇：quickstart/数据结构/OOP/模块/requests 调 LLM/pandas/transformers
+- JD 对照：11-01 周报"匹配高"岗位（滴滴/千方科技/云审中软）核心要求（RAG 全链路、评测体系、LangChain4j、Spring AI）均已覆盖
+
+### 漏学（Phase 2 窗口滑走导致，6 任务无教程，assignments/ 全树确认）
+- ReAct Agent 实战（Tool-Calling Loop + 死循环防护）—— 航天鳞象 ReAct 硬性、滴滴 Tool Calling
+- MCP 协议实战（写 MCP Server）—— 航天鳞象 MCP/A2A 硬性
+- Multi-Agent 多智能体协作（Spring AI Alibaba Graph）—— 航天鳞象/爱化身多智能体协同
+- Plan-Execute 计划执行模式 —— 各 JD 任务规划硬性
+- 流式输出 SSE 与令牌桶限流 —— 滴滴成本时延、云审中软流式响应
+- Python asyncio 并发 —— Python 类 JD 加分
+- Phase 2 验收未达成：MCP Server 未写、项目 1 微服务化改造未完成、智能客服项目未立项、Agent 死循环防护/Function Call 底层/Agent vs Workflow 口述未验收（Function Call 底层有 Phase 0 概念基础）
+
+### 未拆解（核心内容有、任务从未创建）
+- Micrometer 全链路追踪实战（仅 Phase 0 基础教程）
+- 项目 2 智能客服项目立项与开发（用户决策：暂缓，由后续飞书任务布置引出，绝不漏学）
+- 项目 1 微服务化改造收尾
+
+## 三、本次调整明细
+
+1. skills/roadmap-daily-maintainer/SKILL.md v1.2.0 → v1.3.0：
+   - 步骤 3：PHASE 改从 snapshot.json 顶层 current_phase 读取（缺失时旧公式兜底一次），与日期解耦
+   - 步骤 5.1：today-marker 格式改「Phase X · 第 N 天 · 任务驱动（…）」，保留 Phase X 前缀兼容周度刷新解析
+   - 步骤 7.3.6：改写为全文唯一 Phase 推进门控（核心内容+验收映射任务全部拆解且全部 completed + 验收自查通过才 +1），禁止按日期推进
+   - 步骤 7.7：snapshot 保存携带 current_phase / phase_model / updated
+2. skills/task-generation.md：拆解流程第 2 步改读 current_phase；原则 1/5 同步门控；Phase 索引去天数标注；Phase 1 补注验收已满足（2026-09-18）；新增 Phase 2 验收标准任务映射 5 项（MCP Server / 项目1 微服务化收尾 / 智能客服项目 / Agent 口述自测 / Micrometer 全链路）
+3. java-ai-agent-roadmap.html：today-marker 更新为任务驱动文案；Phase 2 段落补暂停与复盘重启说明；时间轴 figcaption 改「基准示意 · 实际以任务完成驱动」
+4. 飞书 9 任务 due 重锚定（单任务单命令 patch，逐个成功）：
+   - 2026-11-03：RabbitMQ(c3902111) / Redis(4642a9f0) / SpringCloud(0fa7ef57) —— 三篇已有教程，先复习通关
+   - 2026-11-04：asyncio(c591988c) / MCP(a63ae1ea) / ReAct(084bb411)
+   - 2026-11-05：SSE+限流(ff5b5d22) / Plan-Execute(e9d581b1) / Multi-Agent(c5e65f5b)
+   - 复查：11-03/11-04/11-05 各 3 个 ✓；未改 summary/description、未新建/删除/冻结/评论
+5. snapshot.json：顶层新增 current_phase=2、phase_model=task_driven、updated=2026-11-03；9 个未完成 due 同步（JSON 校验通过，PHASE 读取验证=2）
+
+## 四、定时任务现状（不动，等用户手动恢复）
+
+- 每日学习维护 v3（LHV8P-DCW2R3.C）：Paused —— 用户手动恢复后按 v1.3.0 新规则运行，届时自动生成 6 篇漏学教程（幂等三信号防重）并按门控拆解 Phase 2 剩余任务
+- 周内容刷新（Q76L20B62L.DCI）：Active，保持不动
+- 每日维护旧版（DACDDFTQG1JB9D）：Paused，建议用户恢复时只启用 v3 避免双跑
+
+## 五、后续流程预期（恢复自动化后自动发生，本次不执行）
+
+- N=9 满窗口 → 不拆新任务；每天用户完成 3 个任务后 N<9 触发拆解：Phase 2 未覆盖点（Micrometer 全链路、验收映射口述自测、项目 1 微服务化收尾）依次入窗
+- 逾期未完成 + 当天 due 任务触发教程生成：6 篇漏学教程按 due 日期目录生成（assignments/2026-11-03~05/…）
+- 雷达图：仅任务 completed 时推进 me 值，无需手动改 charts.js
