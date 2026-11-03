@@ -1,10 +1,10 @@
 ---
 name: roadmap-daily-maintainer
 description: "Java AI Agent 转型学习计划的每日无人值守维护：拉取路线图仓库、飞书鉴权、更新反馈层(HTML/雷达图)、滑动窗口任务规划与拆解、融合教程生成、写回与兜底。当用户要求执行该学习计划每日维护或为其设置定时任务时使用。"
-version: "1.2.0"
+version: "1.3.0"
 author: "user"
 created: "2026-08-17"
-updated: "2026-10-17"
+updated: "2026-11-03"
 ---
 
 # Java AI Agent 转型学习计划 · 每日无人值守维护提示词
@@ -20,7 +20,22 @@ updated: "2026-10-17"
 3. 初始化时间与阶段（仅计算一次，全程复用）
    TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
    DAY_NUM=$(python3 -c "from datetime import datetime; print((datetime.strptime('$TODAY','%Y-%m-%d')-datetime(2026,7,29)).days+1)")
-   PHASE=$(python3 -c "d=$DAY_NUM; print(0 if d<=14 else 1+(d-15)//42)")
+   PHASE=$(python3 -c "
+import json,os
+from datetime import datetime
+snap='.trae/snapshot.json'
+d=$DAY_NUM
+fallback=0 if d<=14 else 1+(d-15)//42
+if os.path.exists(snap):
+    try:
+        phase=json.load(open(snap)).get('current_phase')
+        print(int(phase) if phase else fallback)
+    except Exception:
+        print(fallback)
+else:
+    print(fallback)
+   ")
+   # PHASE 从 snapshot.json 顶层 current_phase 字段读取（2026-11-03 迁移时已置 2；字段缺失时按旧公式算一次并写回 current_phase 作迁移兜底，见步骤 7.7）。DAY_NUM 保留，仅用于 today-marker 展示。Phase 推进唯一依据 = 步骤 7.3.6 验收门控，与日期无关。
    TODAY_TS=$(python3 -c "from datetime import datetime,timezone; print(int(datetime.strptime('$TODAY','%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())*1000)")
    TOMORROW_TS=$((TODAY_TS + 86400000))
    DAY_AFTER_TS=$((TODAY_TS + 172800000))
@@ -30,7 +45,7 @@ updated: "2026-10-17"
    lark-cli auth status --as user 检查飞书token状态。若失败，用 RequestAuthorization 请求 trae-remote-official:lark::feishu 授权后重试。若仍失败，则本次运行直接终止并报警（飞书必须可用，由本人监督），不再继续执行后续步骤。
 
 5. 更新反馈层（改 HTML + charts.js）
-   5.1 使用【初始化】已算出的 TODAY / DAY_NUM / PHASE（Phase0:第1-14天, Phase1:第15-56天, Phase2:第57-98天...）更新 java-ai-agent-roadmap.html 中 id="today-marker" 的div，用sed正则替换天数。格式：当前：Phase X · 第 N/168 天
+   5.1 使用【初始化】已算出的 TODAY / DAY_NUM / PHASE（Phase 由 snapshot.json 顶层 current_phase 字段驱动，任务完成门控推进，见 7.3.6）更新 java-ai-agent-roadmap.html 中 id="today-marker" 的div，用sed正则替换天数。格式：当前：Phase X · 第 N 天 · 任务驱动（完成核心任务与验收标准后进入下一阶段）。保留 "Phase X · 第 N 天" 前缀结构，周度刷新按此推断阶段。
    5.2 更新 assets/charts.js 中 window.__RADAR_GAP__.me 数组（7维）。me值只有在飞书任务completed=true时才推进，根据已完成任务对应的知识维度递增。
    5.3 更新 assets/charts.js 中 window.__RADAR_DAILY__ 数组（6维），基于assignments/目录中最近7天作业完成情况。
 
@@ -72,7 +87,7 @@ updated: "2026-10-17"
         7.3.3 读取 snapshot.json，收集所有已存在任务的 summary（已完成 + 未完成 + 冻结）。
         7.3.4 对比 Phase 核心内容与已存在任务，找出尚未覆盖的知识点。
         7.3.5 将未覆盖知识点按 task-generation.md 规范拆解为 G' 个新任务（粒度控制：≤1h/个，禁止内容爆满）。
-        7.3.6 如果当前 Phase 核心内容已全部拆解完毕但仍不足 G' 个：检查该 Phase 验收标准是否已全部满足，若已满足则进入下一 Phase；从下一 Phase 核心内容中拆解剩余任务；如果下一 Phase 也不存在或路线图已到末尾，创建多少算多少，不凑数。
+        7.3.6 Phase 推进门控（全文唯一 Phase 推进判定，2026-11-03 起替代按日期推进）：进入下一 Phase 的唯一条件 = 当前 Phase 核心内容及其验收标准映射任务（见 skills/task-generation.md 各 Phase「验收标准任务映射」）已全部拆解且全部 completed，且验收标准逐条自查通过。满足才将 snapshot.json 顶层 current_phase 加 1 并写回（PHASE 变量同步更新）。禁止按日期推进；当前 Phase 有未完成任务时，新任务一律继续从当前 Phase 未覆盖知识点（含验收映射任务）拆解，禁止跳 Phase。
         7.3.7 每个新任务编写 description：严格按【描述规范】（见步骤6【描述规范】）编写，从路线图面试体系匹配相关面试题。
         7.3.8 贯穿线任务穿插：每 3-4 个 Phase 核心任务后，穿插一个 Python 补齐或技术决策日志任务（见 task-generation.md 贯穿线规则）。
    7.4 汇总所有活跃未完成任务 = 飞书 completed_at="0" 且 frozen=false 的任务（含本次解冻的） + 新拆解的任务。按 created_at 从旧到新排序（新拆解任务的 created_at 设为当前时间戳，排在已有任务之后）。
@@ -90,6 +105,8 @@ updated: "2026-10-17"
         - created_at：已在旧 snapshot 中的用旧值；NEW_APPEARED 用飞书API值；新拆解用步骤7.3设定的时间戳；快照缺失则按需 lark-cli task tasks get 获取（见 created_at 统一规则）。
         - due：用飞书返回的 due.timestamp 转换为 YYYY-MM-DD（冻结任务可为空）。
         - frozen：冻结任务为 true，其余 false。
+        - 顶层字段：current_phase（当前 Phase，经 7.3.6 门控后可能 +1；首次迁移缺字段时写入本次【初始化】的 PHASE 值）、phase_model="task_driven"、updated（当日 TODAY）。
+        - 若初始化时走了迁移兜底（current_phase 缺失按旧公式计算），本步骤必须把该值写回 current_phase，此后以门控推进为准。
 
 8. 融合教程生成（依赖飞书+路线图）
    读取 roadmap-repo/skills/tutorial-fusion.md 中的 Skill 规范，为需要处理的任务生成专属融合教程。（详细融合规则见该 Skill 文件，主提示词不再复述）
