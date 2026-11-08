@@ -1,0 +1,61 @@
+# 周度内容刷新日志 2026-11-08（周日）
+
+运行时间：2026-11-08（北京时间）
+上次刷新：2026-11-01
+当前阶段：Phase 2 · 第 103/168 天（项目期，依据 today-marker 推断，任务驱动模式）
+snapshot.json 更新于 2026-11-03（复盘重启：Phase 推进改为任务完成驱动），9 项主线待办（RabbitMQ / Redis 记忆 / SpringCloud / ReAct / MCP / asyncio / Multi-Agent Graph / Plan-Execute / SSE 限流）均 completed=false，自该日后无新增完成任务，掌握度淘汰均以此为据。
+
+## 区块1 岗位JD清单（#jd-list）
+- 容量：固定 20 条
+- 淘汰 6 条（1 条失效 + 5 条时效性淘汰）：
+  1. 长春某央企平台（凌医冈云代招）· AI 应用开发工程师（Java 方向）[2026-10-20]——WebFetch 核验"该职位已暂停招聘"，URL 失效淘汰
+  2. 江苏开拓信息 · AI Agent 开发工程师 / 资深 AI 全栈工程师 [2026-10-10，29 天]——时效性淘汰
+  3. 哔哩哔哩（updream）· Agent 高级研发工程师（AI 视频创作平台）[2026-10-10，29 天]——时效性淘汰
+  4. 广州某金融科技公司（猎头代招）· Java 工程师（AI 开发 / 金融）[2026-10-10，29 天]——时效性淘汰
+  5. 滴滴 · 高级 / 资深 Java 研发工程师（AI 全栈方向）[2026-10-10，29 天]——时效性淘汰
+  6. 上海某 AI 公司（猎头代招）· AI Agent 开发工程师 [2026-10-09，30 天]——时效性淘汰
+- 新增 6 条（WebSearch 检索 + WebFetch 逐条核验在线状态与语言要求，Java-only 优先）：
+  1. 武汉某软件企业（厦门锦灏代招）· JAVA 工程师（偏 AI 开发）[2026-11-06，猎聘]——Java-only：大模型 API 接入 / 流式响应 / Function Calling + RAG 知识库 / Agent / 工作流编排后端集成 + 微服务治理（权限 / 缓存 / 限流 / 降级）+ Spring Boot 3.x / Spring Cloud / RocketMQ·Kafka；Spring AI / LangChain4j / Spring AI Alibaba 至少一种仅优先非硬性，门槛友好，与 Phase2 主线完全一致，匹配"高"
+  2. 上海某公司（腾驹达猎头代招）· 资深 Agent 研发工程师 [2026-11-05，猎聘]——Python 或 Java 均可（语言不限）：多意图编排 / 记忆机制 / 复杂 workflow + Harness Engineering + AOP（Agent Operating Procedure）；5-10 年与 2 年+ Multi-Agent 硬性超出当前掌握，LangChain4j / Spring AI 优先，匹配"中"
+  3. 中钢武汉安全环保研究院（国企）· 后端开发工程师（Spring AI + AI Agent 方向）[2026-11-04，智联]——Java-only：Spring Cloud Alibaba 微服务 + Spring AI 搭建企业级 Agent（RAG / 工具调用 / 多轮对话）+ JVM / JUC + Nacos / RocketMQ / Gateway / Sentinel + Docker / CI/CD；与 Phase2 待办逐项对应（SpringCloud 微服务实战 + Spring AI），匹配"高"
+  4. 阿里巴巴（杭州·滨江，团队直招）· 高级开发工程师（Java · Agent 方向）[2026-11-03，鱼泡网]——Java-only、经验不限：Agent 方向高阶开发 + Spring AI 经验优先 + MySQL / Redis / Spring；高阶开发职责为主要挑战，匹配"高"
+  5. 海尔集团（万链生态 · 产业金融小微）· 研发工程师（AI Agent 方向）[2026-11-02，海尔官网]——Java-only：Spring AI / AgentScope 框架 Agent 平台建设（规划 / 工具调用 / 记忆 / 工作流编排 / 异常兜底）+ 业务能力封装 Function Calling / MCP Skills + RAG 链路优化（混合检索 / 重排）+ 链路追踪 / 评测 / 灰度 / 成本治理；1-2 年大模型落地经验为门槛挑战，匹配"高"
+  6. 深圳可触未来创新科技（LOOI Robot）· 大模型应用开发工程师 [2026-11-01，鱼泡网]——Java 为工程落地主力：Agent 智能服务体系（意图理解 / 记忆提取与查询）+ RAG 研发（重排 / 知识库更新策略）+ Tool Calling 容错与工具插件框架 + 高并发弹性扩展后端 + 机器人本地执行与云端大模型闭环，匹配"高"
+- 当前总数：20 条（满员）✓，日期严格降序（11-06 → 10-14），高 16 / 中 4，时效分布：11-01~11-06 共 6 条，10-14~10-30 共 14 条
+- 备注（核验不引入项）：
+  1. 慧博云通 · Agent-RAG 开发（Python、Java）[Boss直聘]——WebFetch 核验"职位已关闭"，不收录（再证时效性淘汰必要性）
+  2. 易佰网络 · JAVA 大模型应用开发工程师 [猎聘]——WebFetch 核验"该职位已暂停招聘"，不收录
+  3. 中国电信（中通服软件科技）· AI 智能体开发工程师 [2026-10-26，官网]——2027 届校招岗（应届生），非目标岗位方向，不收录
+  4. 沈阳瞻言科技 · 大模型应用开发工程师（校招）[智联]——校招 + 硕士硬性，不收录
+  5. 北京赛迪时代 · 大模型应用开发工程师 [智联]——精通 Python 主力（Java 仅"了解"），按语言优先级暂避
+  6. 北京海淀 · 大模型系统开发工程师 [2026-11-01，鱼泡网]——"熟练掌握 Go/Python/Java"且要求"扎实的 Java、Python 开发能力"，双语言硬性倾向，暂避
+  7. 武汉启云方 · Agent 开发工程师（芯片半导体）[猎聘]——原发布 09-22 已 47 天（页面 11-06 刷新），且"3 年以上 Agent 开发经验"硬性超出当前掌握，不收录
+  8. 天智云算（深圳）· AI Agent 工程师 [智联]——发布 09-02 已 67 天，时效过旧不收录
+  9. 滴滴 · 资深 Java 开发工程师（AI Agent 安全网关）[官网，更新 2026-09-22]——信息安全部资深岗，原发布超 45 天且安全方向偏离主线，候补
+  10. 吉利汽车 · 大模型 Agent 开发工程师 [2026-10-09，官网]——发布 30 天，时效临界偏低，本轮不收录
+
+## 区块2 实战项目（#projects）
+- 动态上限：项目期（Phase2）4-5 个"在学"
+- 淘汰 0 条：在学 5 个项目对应 snapshot.json（2026-11-03）任务（langgraph4j→ReAct Agent / banking-assistant→MCP Server / long-term-memory→Redis ChatMemory / graph-example→Multi-Agent Graph 编排 / multi-agent-demo→A2A+Nacos 微服务）均 completed=false，无掌握度淘汰依据；亦无"已完成"需改标"参考"的行。
+- 新增 0 条：在学 5 个已达 Phase2 上限，无空位（抗堆叠原则，不追加）。
+- 当前总数：20 行（在学 5 / 参考 15）✓
+
+## 区块3 面试题（#interview-t1/t2/t3）
+- 动态上限：非冲刺期维持 5-10（T1 计）
+- 第一梯队（#interview-t1）：淘汰 0（snapshot 自 2026-11-03 后无新增完成任务，MQ / 记忆 / MCP / Agent Loop 等题对应待办均未完成，保留）；新增 0（T1 已满 10 条上限，抗堆叠不追加）。当前 10 题 ✓
+- 第二梯队（#interview-t2）：淘汰 0（无新掌握度依据）。新增 2 题点（经与现有 40+ 题点查重后增量插入原段落结构）：
+  1. Agent 长期记忆生命周期治理（写回时机与增量更新、时间衰减与置信度加权淘汰、新旧经验冲突消解——牛客 2828 条面经统计中记忆类项目深挖题的代表，2026-09）[49]
+  2. Java 虚拟线程承载 LLM 高并发调用的边界（虚拟线程提升应用侧并发度而非供应商容量，需信号量 / 舱壁限流匹配 API rate limit；与 Reactor Flux 并行合并的选型权衡——Java 工程师差异化考点，Spring AI 面试题集 2026）[50]
+- 第三梯队（#interview-t3）：无变更。
+- 检索备注：核验牛客《2025-2026 AI 应用开发与 Agent 面试高频知识点洞察》（2828 条面经频次统计：RAG 175 次居首 / 提示词工程 25 / 幻觉 13 / ReAct 11）、面灵 AI 265 道真题、卡码笔记面经汇总、Cloud Soft Solutions / Javapedia Spring AI 面试题集；其余高频题点（RAG 全链路 / 幻觉治理 / 向量库选型 / Agent vs Workflow / 上下文压缩 / 并行工具调用 / 模型路由等）与现有 T1/T2 题点高度重叠，按查重原则不重复引入。
+- 当前总数：T1=10（上限内）/ T2 题点 +2 / T3 段落结构不变 ✓
+
+## 其他维护
+- today-marker 时效更新：第 98/168 天 → 第 103/168 天（2026-11-03 复盘更新后顺延 5 天）
+- 引用区：新增 cite-49（牛客·AI 应用开发与 Agent 面试高频知识点洞察 2026-09）、cite-50（Cloud Soft Solutions·Spring AI 面试题集 2026），全文引用定义 49 个，新增引用均闭合；既有孤儿引用（cite-6/7/10/25）为历史遗留，本轮未引入新孤儿
+- 页脚调研时间：2026-11-01 → 2026-11-08
+- 校验：JD 20 条日期严格降序（高 16 / 中 4），项目 20 行（在学 5 / 参考 15），T1 10 题，tr/td/tbody/table/div/sup/p/a/li/section/span 标签配对完整，无悬空引用
+
+## 结果
+- git commit: chore(weekly): 2026-11-08 内容刷新
+- git push: main（按 AGENTS.md 显式路径暂存，未使用 git add .）
