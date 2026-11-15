@@ -1,0 +1,53 @@
+# 路线图周任务运行日志 · 2026-11-15（周日）
+
+## 运行环境
+- 沙箱系统时间：2026-11-15（UTC）
+- 北京时间：2026-11-15（周日），TZ=Asia/Shanghai date +%Y-%m-%d 核验
+- 仓库：cnddb-2024/java-ai-agent-roadmap @ main（克隆自远程）
+- 今日为计划要求的周日运行节点，全流程无人值守执行
+
+## 快照状态
+- .trae/snapshot.json：current_phase=2（updated 2026-11-03）；最近完成任务 2026-09-18（RAG 幻觉分层治理口述整合、RAG 召回效果排查与调优整合复盘）；Phase 2 九项待办全部未完成（RabbitMQ 异步入库 / Redis 会话记忆 / SpringCloud 微服务 / ReAct / MCP / Python asyncio / Multi-Agent / Plan-Execute / SSE 限流）
+- today-marker：Phase 2 · 第 103 天 → 第 110 天（项目期："在学"上限 4-5，T1 题量 base 10）
+
+## 区块 1：岗位 JD 清单（#jd-list）
+- 淘汰 5 条：
+  1. 武汉某软件企业（厦门锦灏代招）· JAVA 工程师（偏 AI 开发）[2026-11-06]——检索核验显示"该职位已暂停招聘"，URL 失效，移除
+  2. 上海某金融科技公司（菲顿猎头代招）· Agent 开发工程师 [2026-10-14]——时效 32 天超阈值，时效性淘汰
+  3. 奇策数智科技（武汉）· Java 智能体开发工程师 [2026-10-15]——时效 31 天超阈值，时效性淘汰
+  4. 深圳某具身智能公司（科锐国际代招）· Java 开发工程师（AI 方向）[2026-10-16]——时效 30 天临界且匹配"中"（OpenClaw / Hermes 实际部署硬性偏门），让位
+  5. 北京某电子签公司 · Java 研发工程师（AI Agent）[2026-10-16]——时效 30 天临界且"精通 OpenAI Codex / Claude Code 编程 Agent 工具"硬门槛与现状差距大，让位
+- 新增 5 条（全部经详情页核验可访问，语言优先级 Java-only 优先）：
+  1. 四川云起老和科技（成都 · 斯茂瑞代招）· Java AI Agent 开发工程师 [2026-11-13，猎聘，高]——Java-only + SpringBoot/SpringCloud 微服务 + Agent 从零搭建端到端落地，与 Phase 2 主线完全对口
+  2. 恩士迅 NCS（成都）· Java 开发工程师（AI 融合方向）[2026-11-13，猎聘，高]——Java-only + Spring Cloud 微服务 + MySQL/Redis/MQ + 大模型接口封装 / AI Agent / 流程编排 / 向量检索，本地研发方向英语门槛低
+  3. 滴滴（杭州）· 高级/资深 Java 研发工程师（AI 全栈方向）[2026-11-10，滴滴官网，高]——Java 熟练 + Spring/Redis/MQ/RPC 分布式 + Agent 工作流 + 生产环境问题治理（工具调用失败 / 权限隔离 / 人工介入 / 评测 / 成本时延）
+  4. 杭州某公司（三秦猎头代招）· Agent 开发工程师 [2026-11-05，猎聘，中]——多 Agent 协同框架 + 任务编排 / 记忆 / RAG / 多轮对话，Java 或 Python 均可（非双硬性）
+  5. 河南通联智翔科技（郑州 · 中国联通中原数据基地）· AI 工程师（智能体开发）[2026-11-04，智联招聘，中]——Python/Java/Go 至少精通一种 + Dify/LangChain 智能体编排 + 私有知识库全流程（Dify 低代码倾向故标"中"）
+- 检索核验但不引入：BOSS直聘大模型应用开发工程师（后端方向）[职位已关闭]；鑫锡软件 AI Agent 岗 [发布日 03-13 距今约 8 个月，时效不足]；润建股份 AI 智能体开发工程师 [技术栈明确 Python/PyTorch/FastAPI 主力，暂避]；深圳某猎头 Agent 开发工程师 40-70k [发布 09-22 距今 54 天 + LangChain/AutoGen/CrewAI 开源贡献硬性]；云从科技 AI Agent 平台研发工程师 [页面更新 2026-08-27 距今 80 天，时效不足]；同花顺 AI Agent 算法/开发工程师 [Boss 详情页反爬 404 无法核验]；吉利大模型 Agent 开发工程师 [原发布 10-09 距今 37 天]
+- 当前总数：20 / 20（高 15 · 中 5），日期跨度 2026-10-16 ~ 2026-11-13，降序排列
+
+## 区块 2：实战项目（#projects）
+- 动态上限：Phase 2 项目期 → 4-5，当前"在学"5 / 5，无空位
+- snapshot 自 2026-11-03 后无新增完成任务，五个"在学"项目对应待办均未完成：langgraph4j（ReAct 待办未完成）、agent-openai-java-banking-assistant（MCP 待办未完成）、agent-long-term-memory-with-spring-ai（Redis 记忆待办未完成）、spring-ai-alibaba-graph-example（Multi-Agent Graph 待办未完成）、spring-ai-alibaba-multi-agent-demo（SpringCloud / A2A 待办未完成）
+- 无"已完成"转"参考"，按"仅补空位"策略不追加，全部保留
+- 当前总数：在学 5 / 参考 15
+
+## 区块 3：面试题（#interview-t1 / t2 / t3）
+- 动态上限：Phase 2（非冲刺期）→ T1 维持 base 10
+- T1 淘汰 2 题（依据 snapshot.json 掌握度判定"已掌握，移出当前梯队"；两题对应任务 2026-09-18 已完成，此前数周按"snapshot 更新后无新增完成"口径保守保留，本周按任务书"读取 snapshot 掌握度数据"口径正式移出）：
+  1. RAG 幻觉分层治理 + 引用溯源与拒答（对应"RAG 幻觉分层治理口述整合：检索层/生成层/数据层三层拆解与拒答设计"已完成）
+  2. RAG 召回效果排查与调优路径（对应"RAG 召回效果排查与调优整合复盘：五维排查 + 分层策略"已完成）
+- T1 补位 2 题（来源：牛客淘天集团 AI Agent / AI 应用研发岗面经 2026-04，按当前 Phase 主线与最弱能力维度"分布式中间件"挑选，与既有 T1/T2 题点无重复）：
+  1. Redis 核心原理与缓存一致性治理（AI 应用缓存 / 会话记忆场景）——单线程高并发三方面分析 / AOF vs RDB 与 fork 内存翻倍排查 / Cache Aside · 延迟双删 · binlog 异步删对比 / session 会话记忆结构（衔接 Redis ChatMemory 待办）
+  2. Skill vs 子 Agent 能力边界与多 Agent 失效治理——skill 静态能力封装 vs 子 Agent 独立推理循环边界 / 多 Agent 易错场景（目标漂移 / 上下文割裂 / 级联失败 / 成本放大）与治理
+- T2 / T3：snapshot 自 2026-11-03 后无新增完成任务，无已掌握题点需移出；无空位不追加
+- 当前总数：T1 = 10 / 10，三梯队分级结构保持
+
+## 其他维护
+- today-marker 时效更新：第 103 天 → 第 110 天
+- 页脚调研时间：2026-11-08 → 2026-11-15
+
+## 执行结果
+- HTML 三区块增量刷新完成（抗堆叠：JD 固定 20，在学 5 ≤ 4-5，T1 = base 10）
+- 提交并推送 main（提交信息：chore(weekly): 2026-11-15 内容刷新）
+- 无异常中断，无静默失败步骤
